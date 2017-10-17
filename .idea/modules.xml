@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DataXCustomStepsSDK.iml" filepath="$PROJECT_DIR$/.idea/modules/DataXCustomStepsSDK.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DataXCustomStepsSDK_main.iml" filepath="$PROJECT_DIR$/.idea/modules/DataXCustomStepsSDK_main.iml" group="DataXCustomStepsSDK" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DataXCustomStepsSDK_test.iml" filepath="$PROJECT_DIR$/.idea/modules/DataXCustomStepsSDK_test.iml" group="DataXCustomStepsSDK" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ExampleSteps.iml" filepath="$PROJECT_DIR$/.idea/modules/ExampleSteps.iml" group="ExampleSteps" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ExampleSteps/ExampleSteps_main.iml" filepath="$PROJECT_DIR$/.idea/modules/ExampleSteps/ExampleSteps_main.iml" group="ExampleSteps" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ExampleSteps/ExampleSteps_test.iml" filepath="$PROJECT_DIR$/.idea/modules/ExampleSteps/ExampleSteps_test.iml" group="ExampleSteps" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MyCustomSteps.iml" filepath="$PROJECT_DIR$/.idea/modules/MyCustomSteps.iml" group="MyCustomSteps" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MyCustomSteps/MyCustomSteps_main.iml" filepath="$PROJECT_DIR$/.idea/modules/MyCustomSteps/MyCustomSteps_main.iml" group="MyCustomSteps" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MyCustomSteps/MyCustomSteps_test.iml" filepath="$PROJECT_DIR$/.idea/modules/MyCustomSteps/MyCustomSteps_test.iml" group="MyCustomSteps" />
+    </modules>
+  </component>
+</project>

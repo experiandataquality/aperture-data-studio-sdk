@@ -1,0 +1,4 @@
+rootProject.name = 'DataXCustomStepsSDK'
+include 'MyCustomSteps'
+include 'ExampleSteps'
+
