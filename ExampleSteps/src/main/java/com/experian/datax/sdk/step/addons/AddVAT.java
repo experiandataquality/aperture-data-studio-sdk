@@ -1,6 +1,21 @@
+/**
+ * Copyright © 2017 Experian plc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.experian.datax.sdk.step.addons;
 
-import com.experian.sdk.step.*;
+import com.experian.datax.sdk.step.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -78,6 +93,7 @@ public class AddVAT extends StepConfiguration {
             StepProperty arg2 = properties.get(1);
             if (arg1 != null && arg2 != null
                     && arg1.getValue() != null && arg2.getValue() != null) {
+                log(getStepDefinitionName() + " - Column Name: " + arg1.getValue() + " V.A.T.@ " + arg2.getValue());
                 return null;
             }
         }
@@ -118,6 +134,8 @@ public class AddVAT extends StepConfiguration {
                     getColumnManager().removeColumn(selectedColumnName);
                     // and add our own column in its place, so we can change its value in getValueAt()
                     getColumnManager().addColumnAt(this, selectedColumnName + " plus VAT", "", selectedColumnPosition);
+                } else {
+                    logError(getStepDefinitionName() + " - Couldn't find a column by the name of: " + selectedColumnName);
                 }
             }
         }
@@ -133,6 +151,7 @@ public class AddVAT extends StepConfiguration {
          */
         @Override
         public Object getValueAt(long row, int col) throws Exception {
+            
             // get the user-defined VAT value
             Float vat = Float.parseFloat(getArgument(1));
             // get the user-defined column
@@ -151,6 +170,7 @@ public class AddVAT extends StepConfiguration {
                 return dValue + (dValue * vat / 100);
             } else {
                 // if not found return an empty value. We could alternatively throw an error.
+                logError(getStepDefinitionName() + " - There was an Error doing getValueAt Row: " + row + ", Column: " + col);
                 return "";
             }
         }

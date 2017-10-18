@@ -1,6 +1,24 @@
+/**
+ * Copyright © 2017 Experian plc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.experian.datax.sdk.step.addons;
 
-import com.experian.sdk.step.*;
+import com.experian.datax.sdk.step.StepConfiguration;
+import com.experian.datax.sdk.step.StepOutput;
+import com.experian.datax.sdk.step.StepProperty;
+import com.experian.datax.sdk.step.StepPropertyType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -100,11 +118,13 @@ public class DataSource extends StepConfiguration {
                 try {
                     Integer colCount = Integer.parseInt(arg1.getValue().toString());
                     Integer rowCount = Integer.parseInt(arg2.getValue().toString());
-                    if (arg3 != null && arg3.getValue() != null && !arg3.getValue().toString().isEmpty()
+                    if (arg3.getValue() != null && !arg3.getValue().toString().isEmpty()
                             && colCount > 0 && rowCount > 0) {
+                        log(getStepDefinitionName() + " - Chosen Number of Columns: " + arg1.getValue() + " Chosen Number of Rows: " + arg2.getValue() + ", Chosen Datatype: " + arg3.getValue());
                         return true;
                     }
                 } catch (NumberFormatException ex) {
+                    logError(ex.getMessage());
                 }
             }
         }
