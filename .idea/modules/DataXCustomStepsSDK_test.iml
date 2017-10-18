@@ -22,7 +22,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../libs/sdk-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../libs/sdk-javadoc.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -31,7 +31,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../libs/sdk-javadoc.jar!/" />
+          <root url="jar://$MODULE_DIR$/../../libs/sdk-sources.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
