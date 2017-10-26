@@ -21,6 +21,6 @@ The project comes with an ExampleSteps module which, when built, will output the
 
 ## Documentation
 
-View the SDK [user guide](linkToGuide) for information on how the SDK works and how to write the code for your own custom step.
+View the SDK [user guide](http://edq.com/documentation/applications/datax/sdk-guide) for information on how the SDK works and how to write the code for your own custom step.
 You can find the SDK Javadoc in the class comments as normal. Alternatively open the index.html file from the sdk-javadoc.jar file in the libs folder.
 
