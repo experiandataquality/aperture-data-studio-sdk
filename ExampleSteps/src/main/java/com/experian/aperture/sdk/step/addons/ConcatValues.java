@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-package com.experian.datax.sdk.step.addons;
+package com.experian.aperture.sdk.step.addons;
 
-import com.experian.datax.sdk.step.*;
+import com.experian.aperture.sdk.step.*;
 
 import java.util.Arrays;
 import java.util.List;
