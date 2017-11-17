@@ -1,4 +1,4 @@
-rootProject.name = 'DataXCustomStepsSDK'
+rootProject.name = 'ApertureCustomStepSDK'
 include 'MyCustomSteps'
 include 'ExampleSteps'
 

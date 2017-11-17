@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-package com.experian.datax.sdk.step.addons;
+package com.experian.aperture.sdk.step.addons;
 
-import com.experian.datax.sdk.step.StepConfiguration;
-import com.experian.datax.sdk.step.StepOutput;
-import com.experian.datax.sdk.step.StepProperty;
-import com.experian.datax.sdk.step.StepPropertyType;
+import com.experian.aperture.sdk.step.StepConfiguration;
+import com.experian.aperture.sdk.step.StepOutput;
+import com.experian.aperture.sdk.step.StepProperty;
+import com.experian.aperture.sdk.step.StepPropertyType;
 
 import java.util.Arrays;
 import java.util.List;
