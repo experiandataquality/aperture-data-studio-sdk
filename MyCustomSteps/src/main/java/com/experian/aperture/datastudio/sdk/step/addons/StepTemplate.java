@@ -13,12 +13,9 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.addons;
 
-import com.experian.aperture.sdk.step.StepConfiguration;
-import com.experian.aperture.sdk.step.StepOutput;
-import com.experian.aperture.sdk.step.StepProperty;
-import com.experian.aperture.sdk.step.StepPropertyType;
+import com.experian.aperture.datastudio.sdk.step.*;
 
 import java.util.*;
 
