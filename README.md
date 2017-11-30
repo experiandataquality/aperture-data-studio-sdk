@@ -12,7 +12,7 @@ You can make use of the Gradle project here to quickly build your own custom ste
 3. Create a new class within the MyCustomSteps module. We recommend that you base it on one of the examples or use the template class.
 4. Run the relevant Gradle build task - the MyCustomSteps build task will build the jar for the steps you have created.
 5. Copy jar from the build output (build/libs) into the addons folder in your Aperture Data Studio installation.
-6. Restart the Aperture server.
+6. Restart the Aperture Data Studio service.
 7. Test step by dragging into the workflow like any other step.
 
 ## Examples
