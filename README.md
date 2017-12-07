@@ -13,17 +13,17 @@ The steps below show how to generate a compatible jar file using Gradle:
 2. Open the project in your favourite IDE.
 3. Create a new class within the MyCustomSteps module. For the output jar to work correctly it will need to be in the com.experian.aperture.datastudio.sdk.step.addons package - the template class is located there. We recommend that you base your class on one of the examples or use the template class.
 4. Open the Gradle window in your IDE and run the MyCustomSteps build task. This will build the jar for the steps you have created.
-5. Your new jar will be built to build/libs/MyCustomSteps.jar
+5. Your new jar will be built to build/libs/MyCustomSteps.jar.
 
 ## Building a custom step from a new or existing project 
 
 If you don't wish to use Gradle, you'll need to configure your own java project to generate a compatible jar artifact:
 
-1. Create a new java project or open an existing one
-2. Download the [sdk.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk.jar) file
-3. Create a libs folder and add in the sdk.jar as a library
-4. Create a new package - com.experian.aperture.datastudio.sdk.step.addons
-5. Create a new class in the package you just created
+1. Create a new java project or open an existing one.
+2. Download the [sdk.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk.jar) file.
+3. Create a libs folder and add in the sdk.jar as a library.
+4. Create a new package - com.experian.aperture.datastudio.sdk.step.addons.
+5. Create a new class in the package you just created.
 4. Configure your project to output a jar file as an artifact, this will be done differently depending on your IDE.
  
 ## Adding a custom step to Aperture Data Studio
@@ -40,6 +40,6 @@ The project comes with an ExampleSteps module which, when built, will output the
 
 ## Documentation
 
-View the SDK [user guide](http://edq.com/documentation/applications/aperture-data-studio/sdk-guide) for more information about the SDK works.
+View the SDK [user guide](http://edq.com/documentation/applications/aperture-data-studio/sdk-guide) for more information about how the SDK works.
 You can find the SDK Javadoc in the class comments as normal. Alternatively open the index.html file from the sdk-javadoc.jar file in the libs folder.
 
