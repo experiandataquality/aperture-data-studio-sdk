@@ -20,7 +20,7 @@ The steps below show how to generate a compatible jar file using Gradle:
 If you don't wish to use Gradle, you'll need to configure your own java project to generate a compatible jar artifact:
 
 1. Create a new java project or open an existing one
-2. Download the [sdk.jar](/raw/master/libs/sdk.jar) file
+2. Download the [sdk.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk.jar) file
 3. Create a libs folder and add in the sdk.jar as a library
 4. Create a new package - com.experian.aperture.datastudio.sdk.step.addons
 5. Create a new class in the package you just created
