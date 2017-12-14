@@ -152,7 +152,10 @@ First up you can set the name that appears when viewing the output data by overr
 @Override
 public String getName() { return "Demo step"; }
 ```
-Next is the `initialise` method. This method initialises the view and so is where you would set up your output columns. You may want to add some columns or replace values in an existing column. You can use the `ColumnManager` class for this.
+
+### initialise
+
+The `initialise` method initialises the view and is therefore where you would set up your output columns. You may want to add some columns or replace values in an existing column. You can use the `ColumnManager` class for this.
 
 An example of using the column manager to add a column is below. Here the column manager clears the columns, gets the column selected by the user and adds a column next to it.
 
@@ -177,7 +180,7 @@ public void initialise() throws Exception {
 }
 ```
 
-### Using getValueAt
+### getValueAt
 The `getValueAt` object is called for each cell when generating the view or executing the workflow. By default it will simply display the data as it is. If you override this, you can set the values in a specific column.
 You'll see in the example below that the row and column are passed in. The example also shows getting the column selected by the user and using those values to set the values of another column.
 
