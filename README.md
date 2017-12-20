@@ -40,7 +40,7 @@ The project comes with an ExampleSteps module which, when built, will output the
 
 ## Javadoc
 
-You can view the Javadoc [here](https://experiandataquality.github.io/aperture-data-studio-sdk)
+You can view the Javadoc [here](https://experiandataquality.github.io/aperture-data-studio-sdk/)
 
 ## Creating a custom step 
 
