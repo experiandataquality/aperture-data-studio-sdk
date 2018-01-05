@@ -4,6 +4,30 @@ The SDK provides a simple Java library to create your own custom steps and exten
 
 This repo contains the SDK jar and a pre-configured Java project that uses Gradle to easily build your own custom step. Alternatively, you can add the SDK as a dependency to your own project by downloading the SDK jar from the `libs` folder.
 
+The project comes with an `ExampleSteps` module which, when built, will output the SDK examples jar. The example classes demonstrate some key functionality of the SDK along with providing a template class which can be used as a starting point for your own custom steps.
+
+You can view the Javadoc [here](https://experiandataquality.github.io/aperture-data-studio-sdk) for full reference documentation.
+
+## Table of contents
+
+<!-- TOC -->
+
+- [Generating a custom step with the sample project](#generating-a-custom-step-with-the-sample-project)
+- [Generating a custom step from a new or existing project](#generating-a-custom-step-from-a-new-or-existing-project)
+- [Adding a custom step to Aperture Data Studio](#adding-a-custom-step-to-aperture-data-studio)
+- [Creating a custom step](#creating-a-custom-step)
+    - [Importing the SDK](#importing-the-sdk)
+    - [Configuring your step](#configuring-your-step)
+        - [Adding step information](#adding-step-information)
+        - [Adding step properties](#adding-step-properties)
+    - [Step output](#step-output)
+        - [initialise](#initialise)
+        - [getValueAt](#getvalueat)
+        - [getInputRow](#getinputrow)
+- [Multi-threading](#multi-threading)
+
+<!-- /TOC -->
+
 
 ## Generating a custom step with the sample project
 
@@ -30,17 +54,8 @@ If you don't wish to use Gradle, you'll need to configure your own java project 
 
 To make your custom step available in the Aperture Data Studio UI:
 
-1. Copy your new jar into the addons folder in your Aperture Data Studio installation directory.
-2. Restart the Aperture Data Studio service.
-3. Test your new step by dragging it into the workflow like any other step.
-
-## Examples
-
-The project comes with an ExampleSteps module which, when built, will output the SDK examples jar. The example classes demonstrate some key functionality of the SDK along with providing a template class which can be used as a starting point for your own custom steps.
-
-## Javadoc
-
-You can view the Javadoc [here](https://experiandataquality.github.io/aperture-data-studio-sdk)
+1. Copy your new jar into the addons folder in your Aperture Data Studio installation directory - you should see the new step in the UI.
+2. Test your new step by dragging it into your workflow like any other step.
 
 ## Creating a custom step 
 
@@ -137,7 +152,7 @@ Step output is where the main work is done, you'll need to define a new output c
 setStepOutput(new DemoOutput());
 ```
 
-### Configuring step output
+### Step output
 
 Step output classes are configured by extending the `StepOutput` class.
 
@@ -153,7 +168,7 @@ First up you can set the name that appears when viewing the output data by overr
 public String getName() { return "Demo step"; }
 ```
 
-### initialise
+#### initialise
 
 The `initialise` method initialises the view and is therefore where you would set up your output columns. You may want to add some columns or replace values in an existing column. You can use the `ColumnManager` class for this.
 
@@ -180,7 +195,7 @@ public void initialise() throws Exception {
 }
 ```
 
-### getValueAt
+#### getValueAt
 The `getValueAt` object is called for each cell when generating the view or executing the workflow. By default it will simply display the data as it is. If you override this, you can set the values in a specific column.
 You'll see in the example below that the row and column are passed in. The example also shows getting the column selected by the user and using those values to set the values of another column.
 
@@ -206,6 +221,46 @@ public Object getValueAt(long row, int col) throws Exception {
         return "";
     }
 }
+```
+
+#### getInputRow
+
+Similar to `getValueAt`, the `getInputRow` object array can be called to retrieve data from the view row-by-row. You can do something simple like return a row from a user specified ID by using `getInputRow` in an overridden `getValueAt` method.
+
+``` java
+@Override
+public Object getValueAt(long row, int col) throws Exception {
+    List<StepProperty> properties = getStepProperties();
+    if (properties != null && !properties.isEmpty()) {
+        String arg1 = getArgument(1);
+
+        if (arg1 != null) {
+            try {
+                Integer userDefinedInt = Integer.parseInt(arg1);
+                // Our custom column
+                if (col == 0) {
+                    return userDefinedInt;
+                }
+
+                // Need to correct the userDefinedInt as it gets passed to getInputRow,
+                // Because users will expect 1 to be the index of the first row, but we have a zero-based index here.
+                Object[] rowValues = getInputRow(0, userDefinedInt - 1);
+
+                // Need to correct the column index that we get the value for, 
+                // to allow for our extra column which we have already defined a value for.
+                // e.g. we want the value from the previous column Index because they have all shifted right by one
+                return rowValues[col - 1];
+
+            } catch (NumberFormatException ex) {
+                logError(ex.getMessage());
+            }
+        }
+    } else {
+        return new NullPointerException("Properties is null or empty");
+    }
+    return null;
+}
+
 ```
 
 ## Multi-threading
