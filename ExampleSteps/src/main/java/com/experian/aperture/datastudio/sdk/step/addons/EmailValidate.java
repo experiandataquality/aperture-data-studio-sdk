@@ -149,7 +149,7 @@ public class EmailValidate extends StepConfiguration {
             // switch by required column name
             if (response != null) {
                 // get our custom column name from the col index
-                String colName = getColumnManager().getColumnFromIndex(col).getName();
+                String colName = getColumnManager().getColumnFromIndex(col).getDisplayName();
                 switch (colName) {
                     case "Certainty":
                         return response.getCertainty();
