@@ -11,6 +11,7 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
+
 # Package Files #
 *.war
 *.ear
@@ -25,6 +26,15 @@ hs_err_pid*
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 /.idea/
+
+
+# Eclipse Files
+.project
+.settings/
+.classpath
+
+# Build Files
+bin/
 
 # CMake
 cmake-build-debug/
