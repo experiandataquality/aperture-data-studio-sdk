@@ -15,6 +15,7 @@
 
 package com.experian.aperture.datastudio.sdk.step.addons;
 
+import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
 
 import java.util.Arrays;
@@ -107,10 +108,10 @@ public class ConcatValues extends StepConfiguration {
         /**
          * Initialise the columns from the Input 
          * Insert a new column before the input columns.
-         * @throws Exception
+         * @throws SDKException
          */
         @Override
-        public void initialise() throws Exception {
+        public void initialise() throws SDKException {
             // initialise the columns with the first input's columns
             getColumnManager().setColumnsFromInput(getInput(0));
             // add new column at position 0 i.e. before all others
@@ -124,10 +125,10 @@ public class ConcatValues extends StepConfiguration {
          * @param row The row number required
          * @param col The column index required
          * @return The value for the required cell
-         * @throws Exception
+         * @throws SDKException
          */
         @Override
-        public Object getValueAt(long row, int col) throws Exception {
+        public Object getValueAt(long row, int col) throws SDKException {
             // get the delimiter value (argument 1)
             String delimiterString = getArgument(1);
             String delimiter = "";
@@ -155,8 +156,11 @@ public class ConcatValues extends StepConfiguration {
             
             // Concatenate the Values from each column and the chosen delimiter.
             if (selectedColumn1 != null && selectedColumn2 != null) {
-                return selectedColumn1.getValue(row) + delimiter + selectedColumn2.getValue(row);
-            
+                try {
+                    return selectedColumn1.getValue(row) + delimiter + selectedColumn2.getValue(row);
+                } catch (Exception e) {
+                    throw new SDKException(e);
+                }
             } else {
                 logError(getStepDefinitionName() + " - There was an Error doing getValueAt Row: " + row + ", Column: " + col);
                 return null;

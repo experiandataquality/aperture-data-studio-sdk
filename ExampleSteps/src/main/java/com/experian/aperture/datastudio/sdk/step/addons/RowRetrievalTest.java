@@ -5,10 +5,15 @@
  */
 package com.experian.aperture.datastudio.sdk.step.addons;
 
+import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ *
+ * @author Hayley.Kearey
+ */
 /**
  * The aim of the Row Retrieval Step is to return the row values of a given
  * table according to a row id chosen by the user. This was written to test and
@@ -85,10 +90,10 @@ public class RowRetrievalTest extends StepConfiguration {
          * title and description so that we can populate them with the given
          * data from getInputRow();
          *
-         * @throws Exception
+         * @throws SDKException
          */
         @Override
-        public void initialise() throws Exception {
+        public void initialise() throws SDKException {
             // set the columns up
             final int colCount = getColumns().size();
             final StepColumn[] cols = new StepColumn[colCount];
@@ -106,10 +111,10 @@ public class RowRetrievalTest extends StepConfiguration {
 
         /**
          *
-         * @return @throws Exception
+         * @return @throws SDKException
          */
         @Override
-        public long execute() throws Exception {
+        public long execute() throws SDKException {
             return 1;
         }
 
@@ -122,10 +127,10 @@ public class RowRetrievalTest extends StepConfiguration {
          * only outputting one row to our data view
          * @param col Used to choose the value to return
          * @returns a value to put in the data view at (row, col)
-         * @throws Exception
+         * @throws SDKException
          */
         @Override
-        public Object getValueAt(long row, int col) throws Exception {
+        public Object getValueAt(long row, int col) throws SDKException {
             List<StepProperty> properties = getStepProperties();
             if (properties != null && !properties.isEmpty()) {
                 String arg1 = getArgument(1);
