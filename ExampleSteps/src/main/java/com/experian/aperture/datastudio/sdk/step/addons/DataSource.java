@@ -15,6 +15,7 @@
 
 package com.experian.aperture.datastudio.sdk.step.addons;
 
+import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
 
 import java.util.Arrays;
@@ -47,7 +48,7 @@ public class DataSource extends StepConfiguration {
                     } else {
                         try {
                             return "Number of columns: " + Integer.parseInt(sp.getValue().toString());
-                        } catch (Exception ex) {
+                        } catch (NumberFormatException ex) {
                             return "Number of columns: 0";
                         }
                     }
@@ -66,7 +67,7 @@ public class DataSource extends StepConfiguration {
                     } else {
                         try {
                             return "Number of rows: " + Integer.parseInt(sp.getValue().toString());
-                        } catch (Exception ex) {
+                        } catch (NumberFormatException ex) {
                             return "Number of rows: 0";
                         }
                     }
@@ -141,10 +142,10 @@ public class DataSource extends StepConfiguration {
 
         /**
          * Add the required number of columns to our output data view
-         * @throws Exception
+         * @throws SDKException
          */
         @Override
-        public void initialise() throws Exception {
+        public void initialise() throws SDKException {
             // clear the columns, just to be sure
             getColumnManager().clearColumns();
 
@@ -163,10 +164,10 @@ public class DataSource extends StepConfiguration {
         /**
          * Return the number of rows in our output.
          * @return Row count
-         * @throws Exception
+         * @throws SDKException
          */
         @Override
-        public long execute() throws Exception {
+        public long execute() throws SDKException {
             return Integer.parseInt(getArgument(1));
         }
 
@@ -178,10 +179,10 @@ public class DataSource extends StepConfiguration {
          * @param row The row number required
          * @param col The column index required
          * @return The value for the required cell
-         * @throws Exception
+         * @throws SDKException
          */
         @Override
-        public Object getValueAt(long row, int col) throws Exception {
+        public Object getValueAt(long row, int col) throws SDKException {
             // get the numeric/a
             String dataType = getArgument(2);
 

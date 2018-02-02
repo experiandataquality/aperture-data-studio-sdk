@@ -15,6 +15,7 @@
 
 package com.experian.aperture.datastudio.sdk.step.addons;
 
+import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
 
 import java.util.*;
@@ -93,7 +94,7 @@ public class EmailValidate extends StepConfiguration {
         }
 
         @Override
-        public void initialise() throws Exception {
+        public void initialise() throws SDKException {
             // initialise the columns with the first input's columns
             getColumnManager().setColumnsFromInput(getInput(0));
             // add new columns after all others
@@ -103,7 +104,7 @@ public class EmailValidate extends StepConfiguration {
         }
 
         @Override
-        public long execute() throws Exception {
+        public long execute() throws SDKException {
             Long rowCount = Long.valueOf(getInput(0).getRowCount());
             ExecutorService es = Executors.newFixedThreadPool(THREAD_SIZE);
 
@@ -113,9 +114,12 @@ public class EmailValidate extends StepConfiguration {
             // queue up to 1000 threads, for processing BLOCK_SIZE times simultaneously
             List<Future> futures = new ArrayList<>();
             for (long rowId = 0L; rowId < rowCount; rowId++) {
-                String emailAddress = (String) selectedColumn.getValue(rowId);
-                Future<?> future = es.submit(() -> performValidation(emailAddress));
-                futures.add(future);
+                try {
+                    String emailAddress = (String) selectedColumn.getValue(rowId);
+                    futures.add(es.submit(() -> performValidation(emailAddress)));
+                } catch (Exception e) {
+                    throw new SDKException(e);
+                }
 
                 if (rowId % BLOCK_SIZE == 0) {
                     waitForFutures(futures);
@@ -137,11 +141,16 @@ public class EmailValidate extends StepConfiguration {
         }
 
         @Override
-        public Object getValueAt(long row, int col) throws Exception {
+        public Object getValueAt(long row, int col) throws SDKException {
             // get value for user-defined column at row location
             String selectedColumnName = getArgument(0);
             StepColumn selectedColumn = getColumnManager().getColumnByName(selectedColumnName);
-            String emailAddress = (String) selectedColumn.getValue(row);
+            String emailAddress = null;
+            try {
+                emailAddress = (String) selectedColumn.getValue(row);
+            } catch (Exception e) {
+                throw new SDKException(e);
+            }
 
             // get validation results for email address
             EmailResponse response = responses.getOrDefault(emailAddress, null);
@@ -149,7 +158,7 @@ public class EmailValidate extends StepConfiguration {
             // switch by required column name
             if (response != null) {
                 // get our custom column name from the col index
-                String colName = getColumnManager().getColumnFromIndex(col).getName();
+                String colName = getColumnManager().getColumnFromIndex(col).getDisplayName();
                 switch (colName) {
                     case "Certainty":
                         return response.getCertainty();
@@ -217,11 +226,16 @@ public class EmailValidate extends StepConfiguration {
          * Ideally results should be persisted on disk for reuse by other instances of this step or re-runs of this step,
          * so that (in this case) the email is only verified once no matter what step instance is invoking the functionality.
          * @param futures
-         * @throws Exception
+         * @throws SDKException
          */
-        private void waitForFutures(List<Future> futures) throws Exception {
+        private void waitForFutures(List<Future> futures) throws SDKException {
             for (Future future : futures) {
-                Object emr = future.get();
+                Object emr = null;
+                try {
+                    emr = future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new SDKException(e);
+                }
                 if (emr != null && emr instanceof EmailResponse) {
                     responses.put(((EmailResponse) emr).getEmail(), (EmailResponse) emr);
                 }

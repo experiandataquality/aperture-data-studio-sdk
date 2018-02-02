@@ -15,6 +15,7 @@
 
 package com.experian.aperture.datastudio.sdk.step.addons;
 
+import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
 
 import java.util.Arrays;
@@ -49,7 +50,7 @@ public class SimpleNumberValidate extends StepConfiguration {
                     } else {
                         try {
                             return "Even number: " + Integer.parseInt(sp.getValue().toString());
-                        } catch (Exception ex) {
+                        } catch (NumberFormatException ex) {
                             return "Even number: 78";
                         }
                     }
@@ -124,10 +125,10 @@ public class SimpleNumberValidate extends StepConfiguration {
 
         /**
          * Adds a single column to the output
-         * @throws Exception
+         * @throws SDKException
          */
         @Override
-        public void initialise() throws Exception {
+        public void initialise() throws SDKException {
             getColumnManager().clearColumns();
             getColumnManager().addColumn(this, "User Defined Integer", "The Even Integer entered by the user");
         }
@@ -135,10 +136,10 @@ public class SimpleNumberValidate extends StepConfiguration {
         /**
          * Returns a row count of 1
          * @return Row count
-         * @throws Exception
+         * @throws SDKException
          */
         @Override
-        public long execute() throws Exception {
+        public long execute() throws SDKException {
             return 1;
         }
 
@@ -147,10 +148,10 @@ public class SimpleNumberValidate extends StepConfiguration {
          * @param row The row number required
          * @param col The column number required
          * @return The value
-         * @throws Exception
+         * @throws SDKException
          */
         @Override
-        public Object getValueAt(long row, int col) throws Exception {
+        public Object getValueAt(long row, int col) throws SDKException {
             return "Number: " + getArgument(0);
         }
     }

@@ -15,6 +15,7 @@
 
 package com.experian.aperture.datastudio.sdk.step.addons;
 
+import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
 
 import java.util.Arrays;
@@ -59,7 +60,7 @@ public class AddVAT extends StepConfiguration {
                     } else {
                         try {
                             return "VAT rate: " + Float.parseFloat(sp.getValue().toString());
-                        } catch (Exception ex) {
+                        } catch (NumberFormatException ex) {
                             return "VAT rate: 17.5";
                         }
                     }
@@ -113,10 +114,10 @@ public class AddVAT extends StepConfiguration {
          * Perform initialisation for the view.
          * Define the columns that will be output by it using the columnManager.
          * In this case we replace the user-defined input column with our own, so we can set its value ourselves later
-         * @throws Exception
+         * @throws SDKException
          */
         @Override
-        public void initialise() throws Exception {
+        public void initialise() throws SDKException {
             // clear columns so they are not saved, resulting in undefined columns
             getColumnManager().clearColumns();
 
@@ -147,11 +148,10 @@ public class AddVAT extends StepConfiguration {
          * @param row The row number required
          * @param col The column index required
          * @return The value for the required cell
-         * @throws Exception
+         * @throws SDKException
          */
         @Override
-        public Object getValueAt(long row, int col) throws Exception {
-            
+        public Object getValueAt(long row, int col) throws SDKException {
             // get the user-defined VAT value
             Float vat = Float.parseFloat(getArgument(1));
             // get the user-defined column
@@ -163,11 +163,15 @@ public class AddVAT extends StepConfiguration {
                 inputColumn = getInputColumn(0, selectedColumnName);
             }
             if (inputColumn.isPresent() ) {
-                // get the input column's value for the selected row
-                String value = inputColumn.get().getValue(row).toString();
-                // add VAT and return it
-                Double dValue = Double.parseDouble(value);
-                return dValue + (dValue * vat / 100);
+                try {
+                    // get the input column's value for the selected row
+                    String value = inputColumn.get().getValue(row).toString();
+                    // add VAT and return it
+                    Double dValue = Double.parseDouble(value);
+                    return dValue + (dValue * vat / 100);
+                } catch (Exception e) {
+                    throw new SDKException(e);
+                }
             } else {
                 // if not found return an empty value. We could alternatively throw an error.
                 logError(getStepDefinitionName() + " - There was an Error doing getValueAt Row: " + row + ", Column: " + col);
