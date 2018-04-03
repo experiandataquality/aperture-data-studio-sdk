@@ -25,7 +25,15 @@ You can view the Javadoc [here](https://experiandataquality.github.io/aperture-d
         - [getValueAt](#getvalueat)
         - [getInputRow](#getinputrow)
 - [Multi-threading](#multi-threading)
-
+- [Reading Data Studio Properties](#reading-data-studio-values)
+    - [Constants](#constants)
+    - [Glossary Values](#glossary-values)
+    - [Server Properties](#server-properties)
+- [Optimising your Step](#optimising-your-step)
+    - [isInteractive flag](#isinteractive-flag)
+    - [Caching](#caching)
+        - [Cache interface](#cache-interface)
+    - [Progress](#progress)
 <!-- /TOC -->
 
 
@@ -267,3 +275,92 @@ public Object getValueAt(long row, int col) throws Exception {
 
 In order to improve performance, especially when calling a web service that may have slower response times, it is beneficial to to use multiple threads. The EmailValidate example step demonstrates how to make use of multi-threading within a custom step.
 
+## Reading Data Studio Values
+
+Various Data Studio properties are accessible through the SDK:
+
+#### Constants
+This function obtains the value of a constant value stored in Data Studio. 
+In Data Studio constants are stored under the Glossary area under the Constants tab. The name to pass to the function is typically the constant name uppercased and with spaces replaced with underscores. 
+For example, to obtain the regular expression for validating emails:
+``` java
+                Object res = getConstantByName("EMAIL_ADDRESS");
+```
+
+#### Glossary Values
+This function obtains groups of values defined under one glossary item in Data Studio. 
+For example to get a list of all the blocking keys:
+``` java
+                List<Object> values = getGlossaryValues("EXPERIAN_MATCH_BLOCKING_KEYS");
+```
+
+#### Server Properties
+You can obtain a list of values under a particular Data Studio property using:
+``` java
+                List<String> dnsServers = getServerObjectProperties("DNSServers", "CONTENT");
+```
+Alternatively you can obtain a single server property, as defined in Data Studio or set in the server's server.properties file:
+``` java
+                Object value = getServerProperty("NAME");
+```
+
+## Optimising your step
+Your custom step can be optimised by using the following function:
+``` java
+                Object value = getServerProperty("NAME");
+```
+
+#### isInteractive flag
+This flag is set to true when the step is being used as an interactive drilldown. When false the step is being invoked as part of a workflow execution step, or as input to a view that requires all its data.
+``` java
+boolean res = isInteractive();
+```
+This setting is best used during the execution and getValueAt stages of the step, as it can negate the need to process all the input data when being viewed interactively, instead you can just process values when required. 
+
+#### Caching 
+The cache object allows a custom step to cache its results for reuse later. Each cache object is created and referenced by a particluar name. The cache is global, and is useful for caching reponses from slow services between instances of custom steps. The backing key/value datastore is fast enough on reads to be used for random access lookups, and it can handle reads/writes from multiple steps at once. The cache is managed by Aperture Data Studio, but it is the responsibility of the custom step to deleted or refresh the cache as necessary.
+
+Caches are created simply or obtained by calling getCache with the name of your cache, which can be any string.
+``` java
+Cache myCache = getCache("my cache name");
+```
+
+##### Cache interface
+The cache interface is defined by the following functions. They are called through the Cache object returned by the getCache function described above.
+
+``` java
+    String read(String key) throws Exception;
+```
+Reads a string value from the cache according to the key given. If the key is not found in the cache it will return null.
+
+``` java
+    void write(String key, String value) throws Exception;
+```
+Writes a value string to the cache keyed by the given key string. If the key is already present, the old value will be replaced with the new value.
+
+``` java
+    void close() throws Exception;
+```
+Closes the cache. Should be called when all read/writes are completed - typically in StepOutput.close().
+
+``` java
+    void delete() throws Exception;
+```
+Deletes the cache. Will throw an exception if in use.
+
+``` java
+    long getCreateTime();
+```
+
+Gets the time when the cache was created.
+``` java
+    long getModifiedTime();
+```
+Gets the time when the cache was last modified.
+
+#### Progress
+When your step is being executed it may take a long time to run. You can let Data Studio and its users know how far it has got, and therefore approximately how long it will take to finish by sending progress updates to the server. The sendProgess call should be called with a double between 0 and 100 depending how far along your execution as got. For example:
+
+sendProgress(50.0);
+
+Note: When your step's execution function finishes the progress will automatically be set to 100.
