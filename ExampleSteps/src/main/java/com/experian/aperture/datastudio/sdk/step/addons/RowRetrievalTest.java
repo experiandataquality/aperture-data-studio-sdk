@@ -1,8 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Copyright © 2017 Experian plc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package com.experian.aperture.datastudio.sdk.step.addons;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
@@ -147,7 +157,7 @@ public class RowRetrievalTest extends StepConfiguration {
                         // Because users will expect 1 to be the index of the first row, but we have a zero-based index here.
                         Object[] rowValues = getInputRow(0, userDefinedInt - 1);
 
-                        // Need to correct the column index that we get the value for, 
+                        // Need to correct the column index that we get the value for,
                         // to allow for our extra column which we have already defined a value for.
                         // e.g. we want the value from the previous column Index because they have all shifted right by one
                         return rowValues[col - 1];
@@ -157,7 +167,7 @@ public class RowRetrievalTest extends StepConfiguration {
                     }
                 }
             } else {
-                return new NullPointerException("Properties is null or empty");
+                throw new SDKException(new NullPointerException("Properties is null or empty"));
             }
             return null;
         }
