@@ -178,7 +178,7 @@ public String getName() { return "Demo step"; }
 
 #### initialise
 
-The `initialise` method initialises the view and is therefore where you would set up your output columns. You may want to add some columns or replace values in an existing column. You can use the `ColumnManager` class for this.
+The `initialise` method initializes the view and is therefore where you would set up your output columns. You may want to add some columns or replace values in an existing column. You can use the `ColumnManager` class for this.
 
 An example of using the column manager to add a column is below. Here the column manager clears the columns, gets the column selected by the user and adds a column next to it.
 
@@ -360,7 +360,7 @@ Gets the time when the cache was last modified.
 
 #### Progress
 When your step is being executed it may take a long time to run. You can let Data Studio and its users know how far it has got, and therefore approximately how long it will take to finish by sending progress updates to the server. The sendProgess call should be called with a double between 0 and 100 depending how far along your execution as got. For example:
-
+``` java
 sendProgress(50.0);
-
+```
 Note: When your step's execution function finishes the progress will automatically be set to 100.
