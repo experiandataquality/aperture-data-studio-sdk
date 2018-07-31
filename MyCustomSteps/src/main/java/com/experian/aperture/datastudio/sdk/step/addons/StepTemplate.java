@@ -15,6 +15,7 @@
 
 package com.experian.aperture.datastudio.sdk.step.addons;
 
+import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
 
 import java.util.*;
@@ -63,7 +64,7 @@ public class StepTemplate extends StepConfiguration {
         }
 
         @Override
-        public Object getValueAt(long row, int col) throws Exception {
+        public Object getValueAt(long l, int i) throws SDKException {
             // will not be called since we have no custom columns
             return null;
         }
