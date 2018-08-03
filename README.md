@@ -24,6 +24,7 @@ You can view the Javadoc [here](https://experiandataquality.github.io/aperture-d
         - [initialise](#initialise)
         - [getValueAt](#getvalueat)
         - [getInputRow](#getinputrow)
+    - [Debugging](#debugging)
 - [Multi-threading](#multi-threading)
 - [Reading Data Studio Properties](#reading-data-studio-values)
     - [Constants](#constants)
@@ -270,6 +271,33 @@ public Object getValueAt(long row, int col) throws Exception {
 }
 
 ```
+
+#### Debugging
+
+To enable standard Java's remote debugging feature:
+
+1. Install Aperture Data Studio. Please [contact us](https://www.edq.com/data-quality-management/aperture-data-quality-management-platform/) to get the latest version.
+1. Go to the installation directory of Aperture Data Studio. 
+1. Edit `Aperture Data Studio Service 64bit.ini`. 
+1. Alter the following property: **`Virtual Machine Parameters`**
+    ```properties 
+    Virtual Machine Parameters=-Xms66:1000:16000P -Xmx66:1000:16000P -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 
+    ```
+1. Open Intellij IDEA, click _Edit Configurations..._
+    
+    ![Edit Configurations](edit_configurations.png)
+    
+1. Click the `+` button and add new remote debugging: 
+
+     ![Add Remote Debugging](remote.png)
+    
+1. Click OK.
+1. Place a debug point in your addons code.
+1. Restart Aperture Data Studio. 
+1. Now you can debug your custom addons code.
+
+**NOTE**: make sure `-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005` is removed in the production 
+environment.
 
 ## Multi-threading
 
