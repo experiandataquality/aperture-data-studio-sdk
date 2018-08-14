@@ -15,3 +15,7 @@ subprojects {
 
     }
 }
+
+task createGradleWrapper(type: Wrapper) {
+    gradleVersion = '4.9'
+}

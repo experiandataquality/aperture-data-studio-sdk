@@ -1,6 +1,6 @@
 # Aperture Data Studio SDK
 
-The SDK provides a simple Java library to create your own custom steps and extend the capabilities of Aperture Data Studio.
+The SDK provides a simple Java library to create your own custom steps and extend the capabilities of Aperture Data Studio version 1.2.
 
 This repo contains the SDK jar and a pre-configured Java project that uses Gradle to easily build your own custom step. Alternatively, you can add the SDK as a dependency to your own project by downloading the SDK jar from the `libs` folder.
 
@@ -271,6 +271,30 @@ public Object getValueAt(long row, int col) throws Exception {
 
 ```
 
+#### Debugging
+ To enable standard Java's remote debugging feature:
+ 1. Install Aperture Data Studio. Please [contact us](https://www.edq.com/data-quality-management/aperture-data-quality-management-platform/) to get the latest version.
+1. Go to the installation directory of Aperture Data Studio.
+1. Edit `Aperture Data Studio Service 64bit.ini`.
+1. Alter the following property: **`Virtual Machine Parameters`**
+    ```properties
+    Virtual Machine Parameters=-Xms66:1000:16000P -Xmx66:1000:16000P -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+    ```
+1. Open Intellij IDEA, click _Edit Configurations..._
+
+    ![Edit Configurations](edit_configurations.png)
+
+1. Click the `+` button and add new remote debugging:
+      ![Add Remote Debugging](remote.png)
+
+1. Click OK.
+1. Place a debug point in your addons code.
+1. Restart Aperture Data Studio.
+1. Now you can debug your custom addons code.
+ **NOTE**: make sure `-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005` is removed in the production
+environment.
+
+
 ## Multi-threading
 
 In order to improve performance, especially when calling a web service that may have slower response times, it is beneficial to to use multiple threads. The EmailValidate example step demonstrates how to make use of multi-threading within a custom step.
@@ -309,6 +333,13 @@ Your custom step can be optimised by using the following function:
 ``` java
                 Object value = getServerProperty("NAME");
 ```
+#### Step Type
+You can optionally specify that your step be a process flow step. Process nodes should be used to perform an operation that does not change the data, for example downloading new reference data, or sending an email notificiation. They differ from normal steps in that they have different connecting nodes, and pass data through unchanged. You do not have to specify any input or output arguments as a single input and output node will be added automatically.
+Set the step type to process by adding the following line to the step definition:
+``` java
+                setStepDefinitionType("PROCESS");
+```
+There is another step type "PROCESS_ONLY" which prevents the step from being connected to other steps' "data" outputs/inputs.
 
 #### isInteractive flag
 This flag is set to true when the step is being used as an interactive drilldown. When false the step is being invoked as part of a workflow execution step, or as input to a view that requires all its data.
@@ -364,3 +395,21 @@ When your step is being executed it may take a long time to run. You can let Dat
 sendProgress(50.0);
 
 Note: When your step's execution function finishes the progress will automatically be set to 100.
+
+## Working with Datastores
+You can get access to Aperture Data Studio's datastores and the tables within them through the SDK, obtain information about them and even create new tables or append to existing ones.
+
+### Datastores
+
+#### Get Datastores
+To get a list of all datastores available to you call the getDatastores function. This returns a list of Datastore objects that can be further queried.
+
+#### Datastore Interface
+
+This interface allows you to find out about a particular datasource. This includes getting its name, it's type, whether it is the current user's private import datastore, get the properties for the datastore and even set some properies. See the javadoc for the Datastore object for more details.
+This interface also allows you to obtain a list of tables within the datastore that you are allowed to see, which are returned as TableSDK objects.
+
+##### TableSDK Interface
+
+Objects implementing this interface allow you to interact with individual tables in a datastore. You can query the status of cached data, remove or refresh the cache, read the file or delete it (where applicable).
+See the javadoc for the TableSDK interface for more details.
