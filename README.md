@@ -1,6 +1,6 @@
 # Aperture Data Studio SDK
 
-The SDK provides a simple Java library to create your own custom steps and extend the capabilities of Aperture Data Studio version 1.2.
+The SDK provides a simple Java library to create your own custom steps and extend the capabilities of Aperture Data Studio version 1.3.
 
 This repo contains the SDK jar and a pre-configured Java project that uses Gradle to easily build your own custom step. Alternatively, you can add the SDK as a dependency to your own project by downloading the SDK jar from the `libs` folder.
 

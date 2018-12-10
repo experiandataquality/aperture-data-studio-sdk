@@ -1,2 +1,5 @@
 com.experian.aperture.datastudio.sdk.exception
+com.experian.aperture.datastudio.sdk.parser
+com.experian.aperture.datastudio.sdk.parser.shipped
+com.experian.aperture.datastudio.sdk.parser.shipped.metro2
 com.experian.aperture.datastudio.sdk.step
