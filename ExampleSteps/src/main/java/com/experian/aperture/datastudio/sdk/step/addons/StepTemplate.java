@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.examples;
+package com.experian.aperture.datastudio.sdk.step.addons;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
@@ -26,8 +26,8 @@ import java.util.*;
 public class StepTemplate extends StepConfiguration {
 
     public StepTemplate() {
-        
-        
+
+
         // Basic step information
         setStepDefinitionName("Custom - Simple Passthrough");
         setStepDefinitionDescription("Passes input to output");

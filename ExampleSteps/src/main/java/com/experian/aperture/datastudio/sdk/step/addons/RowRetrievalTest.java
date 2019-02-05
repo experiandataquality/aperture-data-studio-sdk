@@ -12,11 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.experian.aperture.datastudio.sdk.step.addons;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
-import com.experian.aperture.datastudio.sdk.step.*;
+import com.experian.aperture.datastudio.sdk.step.StepColumn;
+import com.experian.aperture.datastudio.sdk.step.StepConfiguration;
+import com.experian.aperture.datastudio.sdk.step.StepOutput;
+import com.experian.aperture.datastudio.sdk.step.StepProperty;
+import com.experian.aperture.datastudio.sdk.step.StepPropertyType;
 import java.util.Arrays;
 import java.util.List;
 
