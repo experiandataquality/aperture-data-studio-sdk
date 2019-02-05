@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
@@ -124,7 +124,6 @@ public class EmailValidate extends StepConfiguration {
                 if (rowId % BLOCK_SIZE == 0) {
                     waitForFutures(futures);
                     Double progress = (Long.valueOf(rowId).doubleValue()/rowCount) * 100;
-                    log("Processed: " + progress.intValue() + "%");
                 }
             }
 
@@ -133,10 +132,7 @@ public class EmailValidate extends StepConfiguration {
 
             // close all threads
             es.shutdown();
-
-            // log that we are complete
-            log("Processed: " + 100 + "%");
-
+            
             return rowCount;
         }
 

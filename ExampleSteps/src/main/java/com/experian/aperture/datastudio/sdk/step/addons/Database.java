@@ -2,15 +2,12 @@ package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
-import javafx.scene.control.Tab;
 
-import javax.swing.text.html.Option;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -18,7 +15,7 @@ import java.util.stream.Collectors;
  * It tests a couple of scenarios:
  * 1. The display and selection of datasources and their tables, and obtaining the resulting table object for the
  *    selected item.
- * 2. Creates a new file in the user's import datastore if necessay, then appends data to it every time
+ * 2. Creates a new file in the user's import datastore if necessary, then appends data to it every time
  *    it is run.
  */
 public class Database  extends StepConfiguration {
@@ -29,7 +26,7 @@ public class Database  extends StepConfiguration {
     public Database() {
         // Basic step information
         setStepDefinitionName("Custom - Database Test");
-        setStepDefinitionDescription("Database test");
+        setStepDefinitionDescription("Demonstrates table chooser and creating/appending to a file table");
         setStepDefinitionIcon("DATABASE");
         // A PROCESS_ONLY step can only be connected to other processes - it cannot be connected to data inputs/outputs.
         setStepDefinitionType("PROCESS_ONLY");
@@ -70,7 +67,7 @@ public class Database  extends StepConfiguration {
     }
 
     /**
-     * Validate that the column has been set, and that a valid VAT has been specified
+     * Validate that the step has been configured correctly.
      * If so, return null (the default, or true - it doesn't matter) to enable the rows drilldown,
      * and enable the workflow to be considered valid for execution and export.
      * If invalid, return false. Data Rows will be disabled as will workflow execution/export.
@@ -282,16 +279,16 @@ public class Database  extends StepConfiguration {
                 throw new SDKException("Failed to write to file: " + e.getMessage());
             }
 
-            newTable.clearCachedData();
+            newTable.clearCachedData(getUserId());
             newTable.cacheData(getUserId());
-            while (newTable.isCaching()) {
+            while (newTable.isCaching(getUserId())) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                 }
             }
 
-            return newTable.getRowCount();
+            return newTable.getRowCount(getUserId());
         }
 
         /**
@@ -302,7 +299,7 @@ public class Database  extends StepConfiguration {
          */
         private void deleteTable(Datastore ds, String tableName) throws SDKException {
             TableSDK table = getTableFromDatastore(ds, tableName);
-            table.deleteFile();
+            table.deleteFile(getUserId());
             ds.refreshSynchronous();
         }
 

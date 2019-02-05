@@ -17,7 +17,7 @@ public class WaitFor extends StepConfiguration {
         setStepDefinitionName("Custom - Wait For");
         setStepDefinitionDescription("Wait for a trigger before continuing");
         setStepDefinitionIcon("PAUSE");
-        // A PROCESS_ONLY step will only connect to other PROCESS nodes, and therefore does not
+        // A PROCESS_ONLY step can only be connected to other processes - it cannot be connected to data inputs/outputs.
         setStepDefinitionType("PROCESS_ONLY");
 
         // Define the step properties:
@@ -47,7 +47,7 @@ public class WaitFor extends StepConfiguration {
     }
 
     /**
-     * Validate that the column has been set, and that a valid VAT has been specified
+     * Validate that the step has been configured correctly.
      * If so, return null (the default, or true - it doesn't matter) to enable the rows drilldown,
      * and enable the workflow to be considered valid for execution and export.
      * If invalid, return false. Data Rows will be disabled as will workflow execution/export.

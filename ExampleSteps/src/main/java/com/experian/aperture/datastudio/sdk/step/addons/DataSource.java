@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;

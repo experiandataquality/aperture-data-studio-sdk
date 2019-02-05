@@ -15,7 +15,7 @@
 
 package com.experian.aperture.datastudio.sdk.step.examples;
 
-import com.experian.aperture.datastudio.sdk.exception.addons;
+import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
 
 import java.util.Arrays;

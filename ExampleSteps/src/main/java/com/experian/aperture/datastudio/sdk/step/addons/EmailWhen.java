@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * A template email process step can be inserted into a data flow at any point, and is used to
- * (optionally) examine the data or some other state, and fire off a email (not implemented) when necessary.
+ * (optionally) examine the data or some other state, and fire off an email (not implemented) when necessary.
  * This is an example of a process step, as it connects anywhere in a workflow, does not change the
  * data, but passes input data to its output unchanged.
  */
@@ -50,7 +50,7 @@ public class EmailWhen extends StepConfiguration {
     }
 
     /**
-     * Validate that the column has been set, and that a valid VAT has been specified
+     * Validate that the step has been configured correctly.
      * If so, return null (the default, or true - it doesn't matter) to enable the rows drilldown,
      * and enable the workflow to be considered valid for execution and export.
      * If invalid, return false. Data Rows will be disabled as will workflow execution/export.
