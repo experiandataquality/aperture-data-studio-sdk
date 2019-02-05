@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.experian.aperture.datastudio.sdk.step.examples;
+package com.experian.aperture.datastudio.sdk.step.addons;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.Cache;
@@ -33,18 +33,18 @@ import java.util.logging.Logger;
 
 /**
  * This example step demonstrates the new ability to call Business Constants into custom steps from Aperture
- * 
+ *
  * This step will take an input column and validate the value in that column based on the Uk Vehicle Registration Business Constant.
  * It adds a Validated result column to the output view
  */
 
 
 public class BasicVehicleRegistrationValidateStep extends StepConfiguration {
-               
-        
+
+
 
      public BasicVehicleRegistrationValidateStep() {
-        
+
         setStepDefinitionName("Vehicle Registration Validate");
         setStepDefinitionDescription("Validates a given UK Registration number based on basic format validation");
         setStepDefinitionIcon("VALIDATION_GROUP");
@@ -93,18 +93,18 @@ public class BasicVehicleRegistrationValidateStep extends StepConfiguration {
         return false;
     }
 
- 
+
 
     /**
      * Define the output data view, i.e. rows and columns and title
      */
     private class MyStepOutput extends StepOutput {
-        
+
         private String regNumberPattern;
         private final String vehicleRegistration = "vr_cache";
-        
+
         private Cache cache;
-        
+
         @Override
         public String getName() {
             return "Validate Registration Number";
@@ -142,15 +142,15 @@ public class BasicVehicleRegistrationValidateStep extends StepConfiguration {
             StepColumn selectedColumn = getColumnManager().getColumnByName(getArgument(0));
             String regNumber;
             Boolean result;
-            
+
             try {
                 Object value = selectedColumn.getValue(row);
                 regNumber = (value != null && value instanceof String) ? (String) value : null;
-                
+
             } catch (Exception e) {
                 throw new SDKException(e);
             }
-            
+
             try {
                 cache = getCache(vehicleRegistration);
                 String cacheValue = cache.read(regNumber);
@@ -159,24 +159,24 @@ public class BasicVehicleRegistrationValidateStep extends StepConfiguration {
                     result = isValidFormat(regNumber);
                     cache.write(regNumber, result.toString());
                  }
-            
+
             } catch (Exception e) {
                 throw new SDKException(e);
             }
-            
+
             //When it is not interactive, this means it is in workflow execution mode, where setting the progress should make some impact
             if (!isInteractive() && row % 10 == 0) {
                 Long rowCount = getInput(0).getRowCount();
                 double progress = (Long.valueOf(row).doubleValue()/rowCount) * 100;
                 sendProgress(progress);
             }
-            
-            
-            
+
+
+
             return result;
         }
-        
-        
+
+
         /**
          * Take the value given and do a pattern match against the Business Constant found in Aperture
          * return boolean true or false depending on if validation passes or fails
@@ -200,5 +200,5 @@ public class BasicVehicleRegistrationValidateStep extends StepConfiguration {
         }
 
     }
-    
+
 }

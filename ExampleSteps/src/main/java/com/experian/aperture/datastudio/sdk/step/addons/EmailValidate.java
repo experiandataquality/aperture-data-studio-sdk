@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.examples;
+package com.experian.aperture.datastudio.sdk.step.addons;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
@@ -132,7 +132,7 @@ public class EmailValidate extends StepConfiguration {
 
             // close all threads
             es.shutdown();
-            
+
             return rowCount;
         }
 

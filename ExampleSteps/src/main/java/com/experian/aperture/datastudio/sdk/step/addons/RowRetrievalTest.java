@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.experian.aperture.datastudio.sdk.step.examples;
+package com.experian.aperture.datastudio.sdk.step.addons;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.StepColumn;
@@ -160,7 +160,7 @@ public class RowRetrievalTest extends StepConfiguration {
                         // Because users will expect 1 to be the index of the first row, but we have a zero-based index here.
                         Object[] rowValues = getInputRow(0, userDefinedInt - 1);
 
-                        // Need to correct the column index that we get the value for, 
+                        // Need to correct the column index that we get the value for,
                         // to allow for our extra column which we have already defined a value for.
                         // e.g. we want the value from the previous column Index because they have all shifted right by one
                         return rowValues[col - 1];

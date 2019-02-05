@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.examples;
+package com.experian.aperture.datastudio.sdk.step.addons;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
@@ -107,7 +107,7 @@ public class ConcatMultipleColumns extends StepConfiguration {
         }
 
         /**
-         * Initialise the columns from the Input 
+         * Initialise the columns from the Input
          * Insert a new column before the input columns.
          * @throws SDKException
          */

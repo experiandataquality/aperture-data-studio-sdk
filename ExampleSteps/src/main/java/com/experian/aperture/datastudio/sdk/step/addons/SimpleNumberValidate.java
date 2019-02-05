@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.examples;
+package com.experian.aperture.datastudio.sdk.step.addons;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
@@ -95,7 +95,7 @@ public class SimpleNumberValidate extends StepConfiguration {
         if (properties != null && !properties.isEmpty()) {
             StepProperty arg1 = properties.get(0);
             StepProperty arg2 = properties.get(1);
-            
+
             if (arg1 != null) {
                 try {
                     Integer userDefinedInteger = Integer.parseInt(arg1.getValue().toString());

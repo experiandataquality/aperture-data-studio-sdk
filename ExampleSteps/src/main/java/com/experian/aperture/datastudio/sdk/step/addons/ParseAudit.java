@@ -1,4 +1,4 @@
-package com.experian.aperture.datastudio.sdk.step.examples;
+package com.experian.aperture.datastudio.sdk.step.addons;
 
 import com.experian.aperture.datastudio.sdk.parser.CustomParser;
 import com.experian.aperture.datastudio.sdk.parser.ParserParameter;

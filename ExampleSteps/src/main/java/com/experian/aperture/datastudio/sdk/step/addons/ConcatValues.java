@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.examples;
+package com.experian.aperture.datastudio.sdk.step.addons;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
@@ -106,7 +106,7 @@ public class ConcatValues extends StepConfiguration {
         }
 
         /**
-         * Initialise the columns from the Input 
+         * Initialise the columns from the Input
          * Insert a new column before the input columns.
          * @throws SDKException
          */
@@ -148,12 +148,12 @@ public class ConcatValues extends StepConfiguration {
             }
 
             // get the user-defined column names and get the associated columns from the ColumnManager
-            
+
             String selectedColumnName1 = getArgument(0);
             String selectedColumnName2 = getArgument(2);
             StepColumn selectedColumn1 = getColumnManager().getColumnByName(selectedColumnName1);
             StepColumn selectedColumn2 = getColumnManager().getColumnByName(selectedColumnName2);
-            
+
             // Concatenate the Values from each column and the chosen delimiter.
             if (selectedColumn1 != null && selectedColumn2 != null) {
                 try {
@@ -165,7 +165,7 @@ public class ConcatValues extends StepConfiguration {
                 logError(getStepDefinitionName() + " - There was an Error doing getValueAt Row: " + row + ", Column: " + col);
                 return null;
             }
-            
+
         }
     }
 
