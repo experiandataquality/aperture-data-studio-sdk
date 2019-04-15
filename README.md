@@ -9,7 +9,7 @@ demonstrate some key functionality of the SDK and provide a template class which
 own custom steps. There is also a `TemplateParser` which generates some simple output for any input file with a .template 
 extension. For more detail, please refer to `ExampleSteps`'s [`README.md`](ExampleSteps/README.md).
 
-You can view the Javadoc [here](https://experiandataquality.github.io/aperture-data-studio-sdk) for full reference documentation.
+You can view the Javadoc [here](https://experiandataquality.github.io/aperture-data-studio-sdk/index.html) for full reference documentation.
 
 ## Table of contents
 
