@@ -1,4 +1,4 @@
-package com.experian.aperture.datastudio.sdk.parser.shipped;
+package com.experian.aperture.datastudio.sdk.parser.addons;
 
 import com.experian.aperture.datastudio.sdk.parser.CustomParser;
 import com.experian.aperture.datastudio.sdk.parser.ParserParameter;
