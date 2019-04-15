@@ -1,9 +1,17 @@
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
-import com.experian.aperture.datastudio.sdk.step.*;
+import com.experian.aperture.datastudio.sdk.step.Datastore;
+import com.experian.aperture.datastudio.sdk.step.StepConfiguration;
+import com.experian.aperture.datastudio.sdk.step.StepOutput;
+import com.experian.aperture.datastudio.sdk.step.StepProperty;
+import com.experian.aperture.datastudio.sdk.step.StepPropertyType;
+import com.experian.aperture.datastudio.sdk.step.TableSDK;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -14,14 +22,14 @@ import java.util.stream.Collectors;
  * A test example step that exercises the SDK's datastore and table functions.
  * It tests a couple of scenarios:
  * 1. The display and selection of datasources and their tables, and obtaining the resulting table object for the
- *    selected item.
+ * selected item.
  * 2. Creates a new file in the user's import datastore if necessary, then appends data to it every time
- *    it is run.
+ * it is run.
  */
-public class Database  extends StepConfiguration {
-    private static final String SELECT_DATASTORE =  "<Select a datastore>";
-    private static final String SELECT_TABLE =  "<Select a table>";
-    String selectedDatastore = null;
+public class Database extends StepConfiguration {
+    private static final String SELECT_DATASTORE = "<Select a datastore>";
+    private static final String SELECT_TABLE = "<Select a table>";
+    private String selectedDatastore = null;
 
     public Database() {
         // Basic step information
@@ -36,25 +44,25 @@ public class Database  extends StepConfiguration {
         // 1. A list of datasources accessible to the current user
         // 2. A list of tables for the selected datasource.
         // Input and output definitions are not necessary for PROCESS or PROCESS_ONLY steps.
-        StepProperty arg1 = new StepProperty()
+        final StepProperty arg1 = new StepProperty()
                 .ofType(StepPropertyType.CUSTOM_CHOOSER) // CUSTOM_CHOOSER allows the values to be specified by .withAllowedValuesProvider
                 .withIconTypeSupplier(sp -> () -> {
-                    String selectedCol = getSelectedDataStore(sp.getValue());
+                    final String selectedCol = getSelectedDataStore(sp.getValue());
                     return selectedCol.equals(SELECT_DATASTORE) ? "ERROR" : "OK";
                 })
                 .withAllowedValuesProvider(() ->
-                    getDatastores().stream().map(t -> t.getDisplayName()).collect(Collectors.toList())
+                        getDatastores().stream().map(Datastore::getDisplayName).collect(Collectors.toList())
                 )
                 .withArgTextSupplier(sp -> () -> getSelectedDataStore(sp.getValue()))
                 .validateAndReturn();
 
-        StepProperty arg2 = new StepProperty()
+        final StepProperty arg2 = new StepProperty()
                 .ofType(StepPropertyType.CUSTOM_CHOOSER)
                 .withAllowedValuesProvider(() ->
-                    getDataStoreTables(arg1.getValue()).stream().map(t -> t.getDisplayName()).collect(Collectors.toList())
+                        getDataStoreTables(arg1.getValue()).stream().map(TableSDK::getDisplayName).collect(Collectors.toList())
                 )
                 .withIconTypeSupplier(sp -> () -> {
-                    String selectedCol = getSelectedTable(sp.getValue());
+                    final String selectedCol = getSelectedTable(sp.getValue());
                     return selectedCol.equals(SELECT_TABLE) ? "ERROR" : "OK";
                 })
                 .withArgTextSupplier(sp -> () -> getSelectedTable(sp.getValue()))
@@ -63,7 +71,7 @@ public class Database  extends StepConfiguration {
         setStepProperties(Arrays.asList(arg1, arg2));
 
         // Define and set the step output class
-        setStepOutput(new Database.MyStepOutput());
+        setStepOutput(new MyStepOutput());
     }
 
     /**
@@ -71,19 +79,20 @@ public class Database  extends StepConfiguration {
      * If so, return null (the default, or true - it doesn't matter) to enable the rows drilldown,
      * and enable the workflow to be considered valid for execution and export.
      * If invalid, return false. Data Rows will be disabled as will workflow execution/export.
+     *
      * @return false - will not be able to execute/export/show data
-     *         true  - will be able to execute/export/show data
-     *         null  - will revert back to default behaviour, i.e. enabled if step has inputs, and are they complete?
+     * true  - will be able to execute/export/show data
+     * null  - will revert back to default behaviour, i.e. enabled if step has inputs, and are they complete?
      */
     @Override
     public Boolean isComplete() {
-        List<StepProperty> properties = getStepProperties();
+        final List<StepProperty> properties = getStepProperties();
         if (properties != null && !properties.isEmpty()) {
-            StepProperty arg1 = properties.get(0);
-            StepProperty arg2 = properties.get(1);
+            final StepProperty arg1 = properties.get(0);
+            final StepProperty arg2 = properties.get(1);
             if (arg1 != null && arg1.getValue() != null && arg2 != null && arg2.getValue() != null) {
                 // verify datastore and table are still valid
-                TableSDK selectedTable = getTable(arg1.getValue().toString(), arg2.getValue().toString());
+                final TableSDK selectedTable = getTable(arg1.getValue().toString(), arg2.getValue().toString());
                 return selectedTable != null;
             }
         }
@@ -93,24 +102,25 @@ public class Database  extends StepConfiguration {
     /**
      * UI function to get the selected datastore
      * When the datastore changes, clear the selected table.
+     *
      * @param dataStoreName
      * @return name of selected datastore
      */
-    private String getSelectedDataStore(Object dataStoreName) {
+    private String getSelectedDataStore(final Object dataStoreName) {
         if (dataStoreName == null) {
             return SELECT_DATASTORE;
         }
 
-        String datastore = dataStoreName.toString();
+        final String datastore = dataStoreName.toString();
         if (selectedDatastore != null && selectedDatastore.equals(datastore)) {
             return datastore;
         }
 
         // clear selected table
         if (selectedDatastore != null) {
-            List<StepProperty> properties = getStepProperties();
+            final List<StepProperty> properties = getStepProperties();
             if (properties != null && !properties.isEmpty()) {
-                StepProperty arg2 = properties.get(1);
+                final StepProperty arg2 = properties.get(1);
                 arg2.setValue(null);
             }
         }
@@ -122,15 +132,17 @@ public class Database  extends StepConfiguration {
     /**
      * UI Helper Function
      * returns the text to be displayed in the select table argument
+     *
      * @param tableName
      * @return string to display
      */
-    private static String getSelectedTable(Object tableName) {
+    private static String getSelectedTable(final Object tableName) {
         return tableName == null ? SELECT_TABLE : tableName.toString();
     }
 
     /**
      * Returns a list of datastores accessible by the current user
+     *
      * @return a list of datasource objects
      */
     public List<Datastore> getDatastores() {
@@ -139,39 +151,42 @@ public class Database  extends StepConfiguration {
 
     /**
      * Gets all tables in the given datastore that are visible to the current user
-     * @param datastoreName
+     *
+     * @param datastoreName The data store name
      * @return a list of tables
      */
-    public List<TableSDK> getDataStoreTables(Object datastoreName) {
-        Long userId = getUserId();
+    public List<TableSDK> getDataStoreTables(final Object datastoreName) {
+        final Long userId = getUserId();
         if (datastoreName != null && userId != null) {
             return getTables(datastoreName.toString(), userId);
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /**
      * Gets the datastore object matching the given name
-     * @param datastoreName
+     *
+     * @param datastoreName The data store name
      * @return the datastore object
      */
-    private Datastore getDatastore(String datastoreName) {
-        List<Datastore> datastores = getDatastores();
-        Optional<Datastore> datastore = datastores.stream().filter(db -> db.getDisplayName().equals(datastoreName)).findFirst();
+    private Datastore getDatastore(final String datastoreName) {
+        final List<Datastore> datastores = getDatastores();
+        final Optional<Datastore> datastore = datastores.stream().filter(db -> db.getDisplayName().equals(datastoreName)).findFirst();
         return datastore.isPresent() ? datastore.get() : null;
     }
 
     /**
      * Gets the table from the given datastore and table names
-     * @param datastoreName
-     * @param tableName
+     *
+     * @param datastoreName The data store name
+     * @param tableName     the table name
      * @return the table object or null if it cannot be found
      */
-    private TableSDK getTable(String datastoreName, String tableName) {
-        Datastore ds = getDatastore(datastoreName);
+    private TableSDK getTable(final String datastoreName, final String tableName) {
+        final Datastore ds = getDatastore(datastoreName);
         if (ds != null) {
-            List<TableSDK> tables = ds.getTables(getUserId());
-            Optional<TableSDK> table = tables.stream().filter(t -> t.getDisplayName().equals(tableName)).findFirst();
+            final List<TableSDK> tables = ds.getTables(getUserId());
+            final Optional<TableSDK> table = tables.stream().filter(t -> t.getDisplayName().equals(tableName)).findFirst();
             return table.isPresent() ? table.get() : null;
         }
         return null;
@@ -188,12 +203,13 @@ public class Database  extends StepConfiguration {
 
         /**
          * Gets the datastore object for the current user's personal import datastore
+         *
          * @return the datastore object
          * @throws SDKException
          */
         private Datastore getImportDatastore() throws SDKException {
-            List<Datastore> dss = getDatastores();
-            Optional<Datastore> dso = dss.stream().filter(db -> db.isImport()).findFirst();
+            final List<Datastore> dss = getDatastores();
+            final Optional<Datastore> dso = dss.stream().filter(Datastore::isImport).findFirst();
             if (dso.isPresent()) {
                 return dso.get();
             } else {
@@ -203,48 +219,50 @@ public class Database  extends StepConfiguration {
 
         /**
          * Gets the table from a datastore object given the table name.
-         * @param datastore
-         * @param tableName
+         *
+         * @param datastore The data store
+         * @param tableName The table name
          * @return the table object
          */
-        private TableSDK getTableFromDatastore(Datastore datastore, String tableName) {
-            List<TableSDK> tables = datastore.getTables(getUserId());
-            Optional<TableSDK> newTableOpt = tables.stream().filter(t -> t.getDisplayName().equalsIgnoreCase(tableName)).findFirst();
+        private TableSDK getTableFromDatastore(final Datastore datastore, final String tableName) {
+            final List<TableSDK> tables = datastore.getTables(getUserId());
+            final Optional<TableSDK> newTableOpt = tables.stream().filter(t -> t.getDisplayName().equalsIgnoreCase(tableName)).findFirst();
             return newTableOpt.isPresent() ? newTableOpt.get() : null;
         }
 
         /**
          * Creates a new file in the datastore, and refreshes the datastore to convert the new file into a table.
          * Only valid for file datastores.
-         * @param ds
-         * @param fileName
+         *
+         * @param ds       The data store
+         * @param fileName the file name
          * @throws SDKException
          */
-        private void createNewTable(Datastore ds, String fileName) throws SDKException {
+        private void createNewTable(final Datastore ds, final String fileName) throws SDKException {
             ds.refreshSynchronous();
 
-            List<TableSDK> tables = ds.getTables(getUserId());
+            final List<TableSDK> tables = ds.getTables(getUserId());
 
-            File file = ds.createNewTable(fileName);
+            final File file = ds.createNewTable(fileName);
             try {
-                boolean res = file.createNewFile();
+                final boolean res = file.createNewFile();
                 if (res) {
                     // write to new file
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-                    writer.write("heading1, heading2, heading3\n");
-                    writer.write("1, data1.1, data1.2\n");
-                    writer.write("2, data2.1, data2.2\n");
-                    writer.write("3, data3.1, data3.2\n");
-                    writer.close();
+                    try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                        writer.write("heading1, heading2, heading3\n");
+                        writer.write("1, data1.1, data1.2\n");
+                        writer.write("2, data2.1, data2.2\n");
+                        writer.write("3, data3.1, data3.2\n");
+                    }
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 // file already exists so return
                 return;
             }
 
             ds.refreshSynchronous();
 
-            List<TableSDK> updatedTables = ds.getTables(getUserId());
+            final List<TableSDK> updatedTables = ds.getTables(getUserId());
             if (updatedTables.size() <= tables.size()) {
                 // belt & braces - but should never get here, unless someone else has deleted
                 // the datastore's tables during this operation, which is possible.
@@ -254,13 +272,17 @@ public class Database  extends StepConfiguration {
 
         /**
          * Appends new data to an existing table (file) and caches the table.
-         * @param ds
-         * @param tableName
+         *
+         * @param ds        The data store
+         * @param tableName The table name
          * @return
          * @throws SDKException
          */
-        private long appendToFile(Datastore ds, String tableName) throws SDKException {
-            TableSDK newTable = getTableFromDatastore(ds, tableName);
+        private long appendToFile(final Datastore ds, final String tableName) throws SDKException {
+            final TableSDK newTable = getTableFromDatastore(ds, tableName);
+            if (newTable == null) {
+                throw new SDKException("New table couldn't be open");
+            }
 
             if (newTable.getAttributeNames().size() != 3) {
                 throw new SDKException("Incorrect number of attributes.");
@@ -268,14 +290,13 @@ public class Database  extends StepConfiguration {
 
             // append some more data to the file
             try {
-                File newTableFile = newTable.openFile();
-
-                BufferedWriter writer = new BufferedWriter(new FileWriter(newTableFile, true));
-                writer.append("4, data4.1, data4.2\n");
-                writer.append("5, data5.1, data5.2\n");
-                writer.append("6, data6.1, data6.2\n");
-                writer.close();
-            } catch (IOException e) {
+                final File newTableFile = newTable.openFile();
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter(newTableFile, true))) {
+                    writer.append("4, data4.1, data4.2\n");
+                    writer.append("5, data5.1, data5.2\n");
+                    writer.append("6, data6.1, data6.2\n");
+                }
+            } catch (final IOException e) {
                 throw new SDKException("Failed to write to file: " + e.getMessage());
             }
 
@@ -284,7 +305,8 @@ public class Database  extends StepConfiguration {
             while (newTable.isCaching(getUserId())) {
                 try {
                     Thread.sleep(100);
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
             }
 
@@ -293,48 +315,52 @@ public class Database  extends StepConfiguration {
 
         /**
          * Deletes the given table from the datastore.
-         * @param ds
-         * @param tableName
+         *
+         * @param ds        The data store
+         * @param tableName The table name
          * @throws SDKException
          */
-        private void deleteTable(Datastore ds, String tableName) throws SDKException {
-            TableSDK table = getTableFromDatastore(ds, tableName);
-            table.deleteFile(getUserId());
+        private void deleteTable(final Datastore ds, final String tableName) throws SDKException {
+            final TableSDK table = getTableFromDatastore(ds, tableName);
+            if (table != null) {
+                table.deleteFile(getUserId());
+            }
             ds.refreshSynchronous();
         }
 
         /**
          * Called when the step is executed. This happens when any downstream step is executed.
+         *
          * @return row count - is unused
          * @throws SDKException
          */
         @Override
         public long execute() throws SDKException {
             // create new file in My Files datastore
-            String fileName = "sdkexample.txt";
+            final String fileName = "sdkexample.txt";
             String tableName = "sdkexample";
 
-            Datastore ds = getImportDatastore();
+            final Datastore ds = getImportDatastore();
             try {
                 // create the new table if necessary
                 createNewTable(ds, fileName);
-            } catch (SDKException ex) {
+            } catch (final SDKException ex) {
                 // ignore
             }
 
             try {
                 // append more rows to it
-                long rowCount = appendToFile(ds, tableName);
+                final long rowCount = appendToFile(ds, tableName);
                 assert rowCount > 0;
-            } catch (SDKException ex) {
+            } catch (final SDKException ex) {
                 // delete it (for no good reason other than to test the functionality)
                 deleteTable(ds, tableName);
             }
 
             // get table from arguments
-            String databaseName = getArgument(0).toString();
-            tableName = getArgument(1).toString();
-            TableSDK table = getTable(databaseName, tableName);
+            final String databaseName = getArgument(0);
+            tableName = getArgument(1);
+            final TableSDK table = getTable(databaseName, tableName);
             assert table != null;
 
             return 0;
@@ -342,15 +368,15 @@ public class Database  extends StepConfiguration {
 
         /**
          * Has to be implemented, but will not be called.
-         * @param row The row number required
+         *
+         * @param row         The row number required
          * @param columnIndex The index of the column required
          * @return
          * @throws SDKException
          */
         @Override
-        public Object getValueAt(long row, int columnIndex) throws SDKException {
+        public Object getValueAt(final long row, final int columnIndex) throws SDKException {
             return null;
         }
     }
-
 }

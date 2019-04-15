@@ -13,10 +13,13 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
-import com.experian.aperture.datastudio.sdk.step.*;
+import com.experian.aperture.datastudio.sdk.step.StepConfiguration;
+import com.experian.aperture.datastudio.sdk.step.StepOutput;
+import com.experian.aperture.datastudio.sdk.step.StepProperty;
+import com.experian.aperture.datastudio.sdk.step.StepPropertyType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +44,7 @@ public class SimpleNumberValidate extends StepConfiguration {
         // Create a property to enter/display an even number, with text that changes dependent on what is entered,
         // and an initial value for the number. Validation is performed during the
         // It also defines a single output connection for the step.
-        StepProperty arg1 = new StepProperty()
+        final StepProperty arg1 = new StepProperty()
                 .ofType(StepPropertyType.INTEGER)
                 .withIconTypeSupplier(sp -> () -> "NUMBER")
                 .withArgTextSupplier(sp -> () -> {
@@ -50,7 +53,7 @@ public class SimpleNumberValidate extends StepConfiguration {
                     } else {
                         try {
                             return "Even number: " + Integer.parseInt(sp.getValue().toString());
-                        } catch (NumberFormatException ex) {
+                        } catch (final NumberFormatException ex) {
                             return "Even number: 78";
                         }
                     }
@@ -62,7 +65,7 @@ public class SimpleNumberValidate extends StepConfiguration {
         // Create a dropdown list containing three numbers with icons to match each of them
         // Just an example of number dropdown and not intended to perform a function
         final List<String> icons = Arrays.asList("NUMBER_1", "NUMBER_2", "NUMBER_3");
-        StepProperty arg2 = new StepProperty()
+        final StepProperty arg2 = new StepProperty()
                 .ofType(StepPropertyType.STRING)
                 .withIconTypeSupplier(sp -> () -> (sp.getValue() == null || sp.getValue().toString().isEmpty())
                         ? "MENU"
@@ -91,14 +94,14 @@ public class SimpleNumberValidate extends StepConfiguration {
         // if false will not be able to execute/export/show data
         // if true, will be able to execute/export/show data
         // if null, will revert back to default behaviour, i.e. enabled if step has inputs, and are they complete?
-        List<StepProperty> properties = getStepProperties();
+        final List<StepProperty> properties = getStepProperties();
         if (properties != null && !properties.isEmpty()) {
-            StepProperty arg1 = properties.get(0);
-            StepProperty arg2 = properties.get(1);
+            final StepProperty arg1 = properties.get(0);
+            final StepProperty arg2 = properties.get(1);
 
             if (arg1 != null) {
                 try {
-                    Integer userDefinedInteger = Integer.parseInt(arg1.getValue().toString());
+                    final Integer userDefinedInteger = Integer.parseInt(arg1.getValue().toString());
                     if (userDefinedInteger % 2 == 0) {
                         log(getStepDefinitionName() + " - Chosen Even Number: " + arg1.getValue() + " Multiple Number Chooser: " + arg2.getValue());
                         return true;
@@ -106,7 +109,7 @@ public class SimpleNumberValidate extends StepConfiguration {
                         log("Odd Number Entered - Enter an Even Number");
                         return false;
                     }
-                } catch (NumberFormatException ex) {
+                } catch (final NumberFormatException ex) {
                     logError(ex.getMessage());
                 }
             }
@@ -151,9 +154,8 @@ public class SimpleNumberValidate extends StepConfiguration {
          * @throws SDKException
          */
         @Override
-        public Object getValueAt(long row, int col) throws SDKException {
+        public Object getValueAt(final long row, final int col) throws SDKException {
             return "Number: " + getArgument(0);
         }
     }
 }
-

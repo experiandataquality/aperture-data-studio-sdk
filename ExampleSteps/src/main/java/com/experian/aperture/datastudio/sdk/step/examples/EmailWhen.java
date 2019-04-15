@@ -1,4 +1,4 @@
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.StepConfiguration;
@@ -31,7 +31,7 @@ public class EmailWhen extends StepConfiguration {
         // Add a string field to allow entry of an email address,
         // Input and output definitions are not required for PROCESS steps as a single PROCESS input and PROCESS output
         // is added automatically.
-        StepProperty arg1 = new StepProperty()
+        final StepProperty arg1 = new StepProperty()
                 .ofType(StepPropertyType.STRING)
                 .withIconTypeSupplier(sp -> () -> "EMAIL")
                 .withArgTextSupplier(sp -> () -> {
@@ -46,7 +46,7 @@ public class EmailWhen extends StepConfiguration {
         setStepProperties(Arrays.asList(arg1));
 
         // Define and set the step output class
-        setStepOutput(new EmailWhen.MyStepOutput());
+        setStepOutput(new MyStepOutput());
     }
 
     /**
@@ -60,9 +60,9 @@ public class EmailWhen extends StepConfiguration {
      */
     @Override
     public Boolean isComplete() {
-        List<StepProperty> properties = getStepProperties();
+        final List<StepProperty> properties = getStepProperties();
         if (properties != null && !properties.isEmpty()) {
-            StepProperty arg1 = properties.get(0);
+            final StepProperty arg1 = properties.get(0);
             // if email address has been entered. Do additional validation here if necessary.
             if (arg1 != null && arg1.getValue() != null && !arg1.getValue().toString().isEmpty()) {
                 return true;
@@ -83,7 +83,7 @@ public class EmailWhen extends StepConfiguration {
         }
 
         @Override
-        public Object getValueAt(long row, int columnIndex) throws SDKException {
+        public Object getValueAt(final long row, final int columnIndex) throws SDKException {
             return null;
         }
     }

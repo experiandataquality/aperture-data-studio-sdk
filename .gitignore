@@ -69,3 +69,20 @@ gradle-app.setting
 
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
+
+# npm packages
+node_modules
+
+# OSX
+**.DS_Store
+
+# Vim
+**.swp
+**.swn
+**.swo
+**.swm
+**.un
+**.un~
+
+# Lock files used by the Emacs editor
+.\#*

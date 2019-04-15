@@ -13,10 +13,14 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
-import com.experian.aperture.datastudio.sdk.step.*;
+import com.experian.aperture.datastudio.sdk.step.StepColumn;
+import com.experian.aperture.datastudio.sdk.step.StepConfiguration;
+import com.experian.aperture.datastudio.sdk.step.StepOutput;
+import com.experian.aperture.datastudio.sdk.step.StepProperty;
+import com.experian.aperture.datastudio.sdk.step.StepPropertyType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +32,7 @@ import java.util.Optional;
  * new column that is renamed with the updated.
  */
 public class AddVAT extends StepConfiguration {
-
+    private static final double VAT_RATE = 17.5;
     public AddVAT() {
         // Basic step information
         setStepDefinitionName("Custom - Add VAT");
@@ -40,7 +44,7 @@ public class AddVAT extends StepConfiguration {
         // Add status indicator to display the property in red if the input is not connected (and there are no columns)
         // Add text supplier to display the appropriate text in the property
         // And define an input and output connection for the step
-        StepProperty arg1 = new StepProperty()
+        final StepProperty arg1 = new StepProperty()
                 .ofType(StepPropertyType.COLUMN_CHOOSER)
                 .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null)
                 .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider == null ? "ERROR" : "OK")
@@ -51,7 +55,7 @@ public class AddVAT extends StepConfiguration {
 
         // Add a number text entry box
         // Set the text of the property to show user's value or the default value
-        StepProperty arg2 = new StepProperty()
+        final StepProperty arg2 = new StepProperty()
                 .ofType(StepPropertyType.DECIMAL)
                 .withIconTypeSupplier(sp -> () -> "NUMBER")
                 .withArgTextSupplier(sp -> () -> {
@@ -60,12 +64,12 @@ public class AddVAT extends StepConfiguration {
                     } else {
                         try {
                             return "VAT rate: " + Float.parseFloat(sp.getValue().toString());
-                        } catch (NumberFormatException ex) {
-                            return "VAT rate: 17.5";
+                        } catch (final NumberFormatException ex) {
+                            return "VAT rate: " + VAT_RATE;
                         }
                     }
                 })
-                .withInitialValue(17.5)
+                .withInitialValue(VAT_RATE)
                 .validateAndReturn();
 
         setStepProperties(Arrays.asList(arg1, arg2));
@@ -88,10 +92,10 @@ public class AddVAT extends StepConfiguration {
         // if false will not be able to execute/export/show data
         // if true, will be able to execute/export/show data
         // if null, will revert back to default behaviour, i.e. enabled if step has inputs, and are they complete?
-        List<StepProperty> properties = getStepProperties();
+        final List<StepProperty> properties = getStepProperties();
         if (properties != null && !properties.isEmpty()) {
-            StepProperty arg1 = properties.get(0);
-            StepProperty arg2 = properties.get(1);
+            final StepProperty arg1 = properties.get(0);
+            final StepProperty arg2 = properties.get(1);
             if (arg1 != null && arg2 != null
                     && arg1.getValue() != null && arg2.getValue() != null) {
                 log(getStepDefinitionName() + " - Column Name: " + arg1.getValue() + " V.A.T.@ " + arg2.getValue());
@@ -122,15 +126,15 @@ public class AddVAT extends StepConfiguration {
             getColumnManager().clearColumns();
 
             // get user-defined column
-            String selectedColumnName = getArgument(0);
+            final String selectedColumnName = getArgument(0);
             if (selectedColumnName != null) {
                 // ensure that our output columns pass through all those from the first input (the default behaviour)
                 getColumnManager().setColumnsFromInput(getInput(0));
                 // fine the user-selected column
-                StepColumn selectedColumn = getColumnManager().getColumnByName(selectedColumnName);
+                final StepColumn selectedColumn = getColumnManager().getColumnByName(selectedColumnName);
                 if (selectedColumn != null) {
                     // get it's position in the column list
-                    int selectedColumnPosition = getColumnManager().getColumnPosition(selectedColumnName);
+                    final int selectedColumnPosition = getColumnManager().getColumnPosition(selectedColumnName);
                     // remove it
                     getColumnManager().removeColumn(selectedColumnName);
                     // and add our own column in its place, so we can change its value in getValueAt()
@@ -151,25 +155,25 @@ public class AddVAT extends StepConfiguration {
          * @throws SDKException
          */
         @Override
-        public Object getValueAt(long row, int col) throws SDKException {
+        public Object getValueAt(final long row, final int col) throws SDKException {
             // get the user-defined VAT value
-            Float vat = Float.parseFloat(getArgument(1));
+            final Float vat = Float.parseFloat(getArgument(1));
             // get the user-defined column
-            String selectedColumnName = getArgument(0);
+            final String selectedColumnName = getArgument(0);
 
             // get the column object from the first input
-            Optional<StepColumn> inputColumn = null;
+            Optional<StepColumn> inputColumn = Optional.empty();
             if (selectedColumnName != null && !selectedColumnName.isEmpty()) {
                 inputColumn = getInputColumn(0, selectedColumnName);
             }
-            if (inputColumn.isPresent() ) {
+            if (inputColumn.isPresent()) {
                 try {
                     // get the input column's value for the selected row
-                    String value = inputColumn.get().getValue(row).toString();
+                    final String value = inputColumn.get().getValue(row).toString();
                     // add VAT and return it
-                    Double dValue = Double.parseDouble(value);
+                    final Double dValue = Double.parseDouble(value);
                     return dValue + (dValue * vat / 100);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new SDKException(e);
                 }
             } else {

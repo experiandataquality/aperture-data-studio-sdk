@@ -13,10 +13,13 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
-import com.experian.aperture.datastudio.sdk.step.*;
+import com.experian.aperture.datastudio.sdk.step.StepConfiguration;
+import com.experian.aperture.datastudio.sdk.step.StepOutput;
+import com.experian.aperture.datastudio.sdk.step.StepProperty;
+import com.experian.aperture.datastudio.sdk.step.StepPropertyType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +31,7 @@ import java.util.Random;
  * the number of rows, number of columns, and whether the randomised data is numeric or alphabetic.
  */
 public class DataSource extends StepConfiguration {
+    private static final Random RANDOM = new Random();
 
     public DataSource() {
         // Basic step information
@@ -39,7 +43,7 @@ public class DataSource extends StepConfiguration {
 
         // Obtain the number of columns, defaulting to zero
         // and define the output connection (but no input)
-        StepProperty arg1 = new StepProperty()
+        final StepProperty arg1 = new StepProperty()
                 .ofType(StepPropertyType.INTEGER)
                 .withIconTypeSupplier(sp -> () -> "ADD")
                 .withArgTextSupplier(sp -> () -> {
@@ -48,7 +52,7 @@ public class DataSource extends StepConfiguration {
                     } else {
                         try {
                             return "Number of columns: " + Integer.parseInt(sp.getValue().toString());
-                        } catch (NumberFormatException ex) {
+                        } catch (final NumberFormatException ex) {
                             return "Number of columns: 0";
                         }
                     }
@@ -58,7 +62,7 @@ public class DataSource extends StepConfiguration {
                 .validateAndReturn();
 
         // Obtain the number of rows, defaulting to zero
-        StepProperty arg2 = new StepProperty()
+        final StepProperty arg2 = new StepProperty()
                 .ofType(StepPropertyType.INTEGER)
                 .withIconTypeSupplier(sp -> () -> "ADD")
                 .withArgTextSupplier(sp -> () -> {
@@ -67,7 +71,7 @@ public class DataSource extends StepConfiguration {
                     } else {
                         try {
                             return "Number of rows: " + Integer.parseInt(sp.getValue().toString());
-                        } catch (NumberFormatException ex) {
+                        } catch (final NumberFormatException ex) {
                             return "Number of rows: 0";
                         }
                     }
@@ -76,7 +80,7 @@ public class DataSource extends StepConfiguration {
                 .validateAndReturn();
 
         // Obtain whether the generated data should be alphabetic or numeric using a dropdown selector
-        StepProperty arg3 = new StepProperty()
+        final StepProperty arg3 = new StepProperty()
                 .ofType(StepPropertyType.STRING)
                 .withIconTypeSupplier(sp -> () -> "MENU")
                 .withArgTextSupplier(sp -> () -> (sp.getValue() == null || sp.getValue().toString().isEmpty()) ? "Choose data type" : "Data type: " + sp.getValue().toString())
@@ -103,12 +107,12 @@ public class DataSource extends StepConfiguration {
         // if false will not be able to execute/export/show data
         // if true, will be able to execute/export/show data
         // if null, will revert back to default behaviour, i.e. enabled if step has inputs, and are they complete?
-        List<StepProperty> properties = getStepProperties();
+        final List<StepProperty> properties = getStepProperties();
         if (properties != null && !properties.isEmpty()) {
             // get the values of our 3 properties
-            StepProperty arg1 = properties.get(0);
-            StepProperty arg2 = properties.get(1);
-            StepProperty arg3 = properties.get(2);
+            final StepProperty arg1 = properties.get(0);
+            final StepProperty arg2 = properties.get(1);
+            final StepProperty arg3 = properties.get(2);
             // ensure they are non null
             if (arg1 != null && arg2 != null && arg3 != null
                     && arg1.getValue() != null && arg2.getValue() != null && arg3.getValue() != null) {
@@ -149,8 +153,8 @@ public class DataSource extends StepConfiguration {
             // clear the columns, just to be sure
             getColumnManager().clearColumns();
 
-            Integer rowCount = Integer.parseInt(getArgument(1).toString());
-            Integer colCount = Integer.parseInt(getArgument(0).toString());
+            Integer rowCount = Integer.parseInt(getArgument(1));
+            Integer colCount = Integer.parseInt(getArgument(0));
 
             // add the required number of columns to our output list
             for (int i=0; i<colCount; i++) {
@@ -188,12 +192,12 @@ public class DataSource extends StepConfiguration {
 
             // cache results so we don't have to calculate them again, and so they are consistent for the
             // lifetime of the view, because this function is called regularly for the same cell!
-            String value = cells[Long.valueOf(row).intValue()][col];
+            String value = cells[(int)row][col];
             if (value == null) {
                 value = (dataType.equalsIgnoreCase("numeric")
                         ? generateRandomInteger().toString()
                         : generateRandomChars("ABCDEFGHIJKLMNOPQRSTUVWXYZ", 8));
-                cells[Long.valueOf(row).intValue()][col] = value;
+                cells[(int)row][col] = value;
             }
 
             return value;
@@ -202,9 +206,8 @@ public class DataSource extends StepConfiguration {
 
     public static String generateRandomChars(String candidateChars, int length) {
         StringBuilder sb = new StringBuilder();
-        Random random = new Random();
         for (int i = 0; i < length; i++) {
-            sb.append(candidateChars.charAt(random.nextInt(candidateChars.length())));
+            sb.append(candidateChars.charAt(RANDOM.nextInt(candidateChars.length())));
         }
 
         return sb.toString();

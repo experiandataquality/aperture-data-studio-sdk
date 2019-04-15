@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.*;
@@ -26,8 +26,8 @@ import java.util.*;
 public class StepTemplate extends StepConfiguration {
 
     public StepTemplate() {
-
-
+        
+        
         // Basic step information
         setStepDefinitionName("Custom - Simple Passthrough");
         setStepDefinitionDescription("Passes input to output");
@@ -45,11 +45,28 @@ public class StepTemplate extends StepConfiguration {
                 .havingOutputNode(() -> "output0")
                 .validateAndReturn();
 
+        // This property does nothing. It is to demonstrate the isComplete() to enable/disable execution
+        // based on a required argument/value.
+        final StepProperty arg2 = new StepProperty()
+                .ofType(StepPropertyType.STRING)
+                .withArgTextSupplier(sp -> () -> sp.getValue() == null || sp.getValue().toString().isEmpty()
+                        ? "Enter value" : sp.getValue().toString())
+                .validateAndReturn();
+
         // Add the step properties
-        setStepProperties(Collections.singletonList(arg1));
+        setStepProperties(Arrays.asList(arg1, arg2));
 
         // Define and set the step output class
         setStepOutput(new MyStepTemplate());
+    }
+
+    @Override
+    public Boolean isComplete() {
+        // Prevent from executing this step until input node has been connected.
+        // INPUT_LABEL type does not have value, thus we don't need to validate.
+        final StepProperty arg2 = getStepProperties().get(1);
+        return arg2.getValue() == null || arg2.getValue().toString().isEmpty()
+                ? Boolean.FALSE : null;
     }
 
     /**

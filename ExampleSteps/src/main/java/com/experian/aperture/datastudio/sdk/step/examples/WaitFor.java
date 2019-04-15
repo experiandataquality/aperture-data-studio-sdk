@@ -1,7 +1,10 @@
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
-import com.experian.aperture.datastudio.sdk.step.*;
+import com.experian.aperture.datastudio.sdk.step.StepConfiguration;
+import com.experian.aperture.datastudio.sdk.step.StepOutput;
+import com.experian.aperture.datastudio.sdk.step.StepProperty;
+import com.experian.aperture.datastudio.sdk.step.StepPropertyType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +27,7 @@ public class WaitFor extends StepConfiguration {
         // Add a number field to allow specification of the number of milliseconds to wait,
         // Input and output definitions are not required for PROCESS steps as a single PROCESS input and PROCESS output
         // is added automatically.
-        StepProperty arg1 = new StepProperty()
+        final StepProperty arg1 = new StepProperty()
                 .ofType(StepPropertyType.DECIMAL)
                 .withIconTypeSupplier(sp -> () -> "NUMBER")
                 .withArgTextSupplier(sp -> () -> {
@@ -33,7 +36,7 @@ public class WaitFor extends StepConfiguration {
                     } else {
                         try {
                             return "Wait for milliseconds: " + Integer.parseInt(sp.getValue().toString());
-                        } catch (NumberFormatException ex) {
+                        } catch (final NumberFormatException ex) {
                             return "Enter milliseconds";
                         }
                     }
@@ -43,7 +46,7 @@ public class WaitFor extends StepConfiguration {
         setStepProperties(Arrays.asList(arg1));
 
         // Define and set the step output class
-        setStepOutput(new WaitFor.MyStepOutput());
+        setStepOutput(new MyStepOutput());
     }
 
     /**
@@ -57,9 +60,9 @@ public class WaitFor extends StepConfiguration {
      */
     @Override
     public Boolean isComplete() {
-        List<StepProperty> properties = getStepProperties();
+        final List<StepProperty> properties = getStepProperties();
         if (properties != null && !properties.isEmpty()) {
-            StepProperty arg1 = properties.get(0);
+            final StepProperty arg1 = properties.get(0);
             if (arg1 != null && arg1.getValue() != null && !arg1.getValue().toString().isEmpty()) {
                 return true;
             }
@@ -81,17 +84,17 @@ public class WaitFor extends StepConfiguration {
         @Override
         public long execute() throws SDKException {
             try {
-                String millisecondsString = getArgument(0);
-                Integer milliseconds = Integer.parseInt(millisecondsString);
+                final String millisecondsString = getArgument(0);
+                final Integer milliseconds = Integer.parseInt(millisecondsString);
                 Thread.sleep(milliseconds);
             } catch (InterruptedException | NumberFormatException e) {
-                // ignore
+                Thread.currentThread().interrupt();
             }
             return 0;
         }
 
         @Override
-        public Object getValueAt(long row, int columnIndex) throws SDKException {
+        public Object getValueAt(final long row, final int columnIndex) throws SDKException {
             return null;
         }
     }

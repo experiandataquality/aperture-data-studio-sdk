@@ -1,0 +1,121 @@
+# Handle line endings automatically for files detected as text
+# and leave all files detected as binary untouched.
+* text=auto
+
+#
+# The above will handle all files NOT found below
+#
+# These files are text and should be normalized (Convert crlf => lf)
+*.css           text
+*.df            text
+*.htm           text
+*.html          text
+*.java          text
+*.js            text
+*.json          text
+*.jsp           text
+*.jspf          text
+*.jspx          text
+*.properties    text
+*.sh            text
+*.tld           text
+*.txt           text
+*.tag           text
+*.tagx          text
+*.xml           text
+*.xsl           text
+*.yml           text
+*.gradle        text
+*.csv           text
+*.bash          text eol=lf
+*.sh            text eol=lf
+*.ts            text
+*.bat           text eol=crlf
+*.python        text
+*.ps1           text eol=crlf
+*.psm1          text eol=crlf
+.gitattributes  text
+.gitconfig      text
+.gitignore      text
+
+# These files are binary and should be left untouched
+# (binary is a macro for -text -diff)
+*.class         binary
+*.dll           binary
+*.ear           binary
+*.so            binary
+*.war           binary
+*.exe           binary
+*.pyc           binary
+
+# Graphics
+*.ai            binary
+*.bmp           binary
+*.eps           binary
+*.gif           binary
+*.ico           binary
+*.jng           binary
+*.jp2           binary
+*.jpg           binary
+*.jpeg          binary
+*.jpx           binary
+*.jxr           binary
+*.pdf           binary
+*.png           binary
+*.psb           binary
+*.psd           binary
+*.svg           text
+*.svgz          binary
+*.tif           binary
+*.tiff          binary
+*.wbmp          binary
+*.webp          binary
+
+## ARCHIVES
+*.7z            binary
+*.gz            binary
+*.jar           binary
+*.rar           binary
+*.tar           binary
+*.zip           binary
+
+## MS Documents
+*.doc           binary
+*.docx          binary
+*.ppt           binary
+*.pptx          binary
+*.xsl           binary
+*.xslx          binary
+
+## FONTS
+*.ttf           binary
+*.eot           binary
+*.otf           binary
+*.woff          binary
+*.woff2         binary
+
+## DOCUMENTATION
+*.ipynb         text
+*.markdown      text
+*.md            text
+*.mdwn          text
+*.mdown         text
+*.mkd           text
+*.mkdn          text
+*.mdtxt         text
+*.mdtext        text
+*.txt           text
+AUTHORS         text
+CHANGELOG       text
+CHANGES         text
+CONTRIBUTING    text
+COPYING         text
+copyright       text
+*COPYRIGHT*     text
+INSTALL         text
+license         text
+LICENSE         text
+NEWS            text
+readme          text
+*README*        text
+TODO            text

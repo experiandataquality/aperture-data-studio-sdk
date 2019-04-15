@@ -1,11 +1,11 @@
 /**
  * Copyright © 2017 Experian plc.
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,10 +13,14 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
-import com.experian.aperture.datastudio.sdk.step.*;
+import com.experian.aperture.datastudio.sdk.step.StepColumn;
+import com.experian.aperture.datastudio.sdk.step.StepConfiguration;
+import com.experian.aperture.datastudio.sdk.step.StepOutput;
+import com.experian.aperture.datastudio.sdk.step.StepProperty;
+import com.experian.aperture.datastudio.sdk.step.StepPropertyType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +42,7 @@ public class ConcatValues extends StepConfiguration {
         // A column chooser based on the columns from the first input, defines the first column
         // A fixed list of delimiters
         // Another column chooser based on columns from the first input, defines the second column
-        StepProperty arg1 = new StepProperty()
+        final StepProperty arg1 = new StepProperty()
                 .ofType(StepPropertyType.COLUMN_CHOOSER)
                 .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null)
                 .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider == null ? "ERROR" : "OK")
@@ -49,7 +53,7 @@ public class ConcatValues extends StepConfiguration {
 
         // Add a dropdown list containing the delimiters we want to concatenate with
         // the status indicator can be used to visually feed back that the user has chosen the wrong item (commented out in this case)
-        StepProperty arg2 = new StepProperty()
+        final StepProperty arg2 = new StepProperty()
                 .ofType(StepPropertyType.STRING)
                 //.statusIndicator(sp -> () -> "Comma".equals(sp.getValue()))
                 .withIconTypeSupplier(sp -> () -> "MENU")
@@ -58,7 +62,7 @@ public class ConcatValues extends StepConfiguration {
                 .validateAndReturn();
 
         // The second column name
-        StepProperty arg3 = new StepProperty()
+        final StepProperty arg3 = new StepProperty()
                 .ofType(StepPropertyType.COLUMN_CHOOSER)
                 .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null)
                 .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider == null ? "ERROR" : "OK")
@@ -76,19 +80,23 @@ public class ConcatValues extends StepConfiguration {
      * If so, return null (the default, or true - it doesn't matter) to enable the rows drilldown,
      * and enable the workflow to be considered valid for execution and export.
      * If invalid, return false. Data Rows will be disabled as will workflow execution/export.
+     *
      * @return false - will not be able to execute/export/show data
-     *         true  - will be able to execute/export/show data
-     *         null  - will revert back to default behaviour, i.e. enabled if step has inputs, and are they complete?
+     * true  - will be able to execute/export/show data
+     * null  - will revert back to default behaviour, i.e. enabled if step has inputs, and are they complete?
      */
     @Override
     public Boolean isComplete() {
-        List<StepProperty> properties = getStepProperties();
+        final List<StepProperty> properties = getStepProperties();
         if (properties != null && !properties.isEmpty()) {
-            StepProperty arg1 = properties.get(0);
-            StepProperty arg2 = properties.get(1);
-            StepProperty arg3 = properties.get(2);
-            if (arg1 != null && arg2 != null && arg3 != null
-                    && arg1.getValue() != null && arg2.getValue() != null && arg3.getValue() != null) {
+            final StepProperty arg1 = properties.get(0);
+            final boolean arg1HasValue = arg1 != null && arg1.getValue() != null;
+            final StepProperty arg2 = properties.get(1);
+            final boolean arg2HasValue = arg2 != null && arg2.getValue() != null;
+            final StepProperty arg3 = properties.get(2);
+            final boolean arg3HasValue = arg3 != null && arg3.getValue() != null;
+
+            if (arg1HasValue && arg2HasValue && arg3HasValue) {
                 log(getStepDefinitionName() + " - Column Name 1: " + arg1.getValue() + ", Delimiter Chosen:  " + arg2.getValue() + " Column Name 2: " + arg3.getValue());
                 return null;
             }
@@ -108,6 +116,7 @@ public class ConcatValues extends StepConfiguration {
         /**
          * Initialise the columns from the Input
          * Insert a new column before the input columns.
+         *
          * @throws SDKException
          */
         @Override
@@ -115,22 +124,23 @@ public class ConcatValues extends StepConfiguration {
             // initialise the columns with the first input's columns
             getColumnManager().setColumnsFromInput(getInput(0));
             // add new column at position 0 i.e. before all others
-            getColumnManager().addColumnAt(this, "Concatenated", "Concatenated values",0);
+            getColumnManager().addColumnAt(this, "Concatenated", "Concatenated values", 0);
         }
 
         /**
          * Called to obtain the value of any columns we've created.
          * In this case we get the delimiter string, and the two selected column names - we find them in our output columns list
          * and get the values from them, concatenate them together with our delimiter and return the value
+         *
          * @param row The row number required
          * @param col The column index required
          * @return The value for the required cell
          * @throws SDKException
          */
         @Override
-        public Object getValueAt(long row, int col) throws SDKException {
+        public Object getValueAt(final long row, final int col) throws SDKException {
             // get the delimiter value (argument 1)
-            String delimiterString = getArgument(1);
+            final String delimiterString = getArgument(1);
             String delimiter = "";
             switch (delimiterString) {
                 case "Comma":
@@ -143,22 +153,23 @@ public class ConcatValues extends StepConfiguration {
                     delimiter = " | ";
                     break;
                 case "Colon":
+                default:
                     delimiter = " : ";
                     break;
             }
 
             // get the user-defined column names and get the associated columns from the ColumnManager
 
-            String selectedColumnName1 = getArgument(0);
-            String selectedColumnName2 = getArgument(2);
-            StepColumn selectedColumn1 = getColumnManager().getColumnByName(selectedColumnName1);
-            StepColumn selectedColumn2 = getColumnManager().getColumnByName(selectedColumnName2);
+            final String selectedColumnName1 = getArgument(0);
+            final String selectedColumnName2 = getArgument(2);
+            final StepColumn selectedColumn1 = getColumnManager().getColumnByName(selectedColumnName1);
+            final StepColumn selectedColumn2 = getColumnManager().getColumnByName(selectedColumnName2);
 
             // Concatenate the Values from each column and the chosen delimiter.
             if (selectedColumn1 != null && selectedColumn2 != null) {
                 try {
                     return selectedColumn1.getValue(row) + delimiter + selectedColumn2.getValue(row);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new SDKException(e);
                 }
             } else {
@@ -168,5 +179,4 @@ public class ConcatValues extends StepConfiguration {
 
         }
     }
-
 }

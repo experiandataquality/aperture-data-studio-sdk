@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.StepColumn;
@@ -24,10 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *
- * @author Hayley.Kearey
- */
-/**
  * The aim of the Row Retrieval Step is to return the row values of a given
  * table according to a row id chosen by the user. This was written to test and
  * give an example of the method StepOutput.getInputRow()
@@ -36,10 +32,10 @@ import java.util.List;
 public class RowRetrievalTest extends StepConfiguration {
 
     public RowRetrievalTest() {
-        setStepDefinitionName("Row Retrieval Test");
+        setStepDefinitionName("Custom - Row Retrieval Test");
         setStepDefinitionIcon("ROWS");
 
-        StepProperty arg1 = new StepProperty()
+        final StepProperty arg1 = new StepProperty()
                 .ofType(StepPropertyType.INPUT_LABEL)
                 .withIconTypeSupplier(sp -> () -> "ROWS")
                 .withArgTextSupplier(sp -> () -> "Input Table")
@@ -47,7 +43,7 @@ public class RowRetrievalTest extends StepConfiguration {
                 .havingOutputNode(() -> "output0")
                 .validateAndReturn();
 
-        StepProperty arg2 = new StepProperty()
+        final StepProperty arg2 = new StepProperty()
                 .ofType(StepPropertyType.INTEGER)
                 .withStatusIndicator(sp -> () -> sp.getValue() != null)
                 .withArgTextSupplier(sp -> () -> "Number Value: " + ((sp.getValue() == null || sp.getValue().toString().isEmpty()) ? "None" : sp.getValue().toString()))
@@ -68,17 +64,17 @@ public class RowRetrievalTest extends StepConfiguration {
      */
     @Override
     public Boolean isComplete() {
-        List<StepProperty> properties = getStepProperties();
+        final List<StepProperty> properties = getStepProperties();
         if (properties != null && !properties.isEmpty()) {
-            StepProperty arg1 = properties.get(1);
+            final StepProperty arg1 = properties.get(1);
 
-            if (arg1 != null && !(arg1.getValue() == null)) {
+            if (arg1 != null && arg1.getValue() != null) {
                 try {
-                    Integer userDefinedInt = Integer.parseInt(arg1.getValue().toString());
+                    final Integer userDefinedInt = Integer.parseInt(arg1.getValue().toString());
                     log(getStepDefinitionName() + " - Chosen Number: " + userDefinedInt);
                     return true;
 
-                } catch (NumberFormatException ex) {
+                } catch (final NumberFormatException ex) {
                     logError(ex.getMessage());
                     return false;
                 }
@@ -143,14 +139,14 @@ public class RowRetrievalTest extends StepConfiguration {
          * @throws SDKException
          */
         @Override
-        public Object getValueAt(long row, int col) throws SDKException {
-            List<StepProperty> properties = getStepProperties();
+        public Object getValueAt(final long row, final int col) throws SDKException {
+            final List<StepProperty> properties = getStepProperties();
             if (properties != null && !properties.isEmpty()) {
-                String arg1 = getArgument(1);
+                final String arg1 = getArgument(1);
 
                 if (arg1 != null) {
                     try {
-                        Integer userDefinedInt = Integer.parseInt(arg1);
+                        final Integer userDefinedInt = Integer.parseInt(arg1);
                         // Our custom column
                         if (col == 0) {
                             return userDefinedInt;
@@ -158,14 +154,14 @@ public class RowRetrievalTest extends StepConfiguration {
 
                         // Need to correct the userDefinedInt as it gets passed to getInputRow,
                         // Because users will expect 1 to be the index of the first row, but we have a zero-based index here.
-                        Object[] rowValues = getInputRow(0, userDefinedInt - 1);
+                        final Object[] rowValues = getInputRow(0, (long) userDefinedInt - 1);
 
                         // Need to correct the column index that we get the value for,
                         // to allow for our extra column which we have already defined a value for.
                         // e.g. we want the value from the previous column Index because they have all shifted right by one
                         return rowValues[col - 1];
 
-                    } catch (NumberFormatException ex) {
+                    } catch (final NumberFormatException ex) {
                         logError(ex.getMessage());
                     }
                 }

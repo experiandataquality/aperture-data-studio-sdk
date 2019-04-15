@@ -13,22 +13,29 @@
  * limitations under the License.
  */
 
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
-import com.experian.aperture.datastudio.sdk.step.*;
+import com.experian.aperture.datastudio.sdk.step.StepColumn;
+import com.experian.aperture.datastudio.sdk.step.StepConfiguration;
+import com.experian.aperture.datastudio.sdk.step.StepOutput;
+import com.experian.aperture.datastudio.sdk.step.StepProperty;
+import com.experian.aperture.datastudio.sdk.step.StepPropertyType;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Steps to demonstrate the usage of boolean parameter.
+ */
 public class BooleanParametersTest extends StepConfiguration {
 
     public BooleanParametersTest() {
-        setStepDefinitionName("Boolean Test");
+        setStepDefinitionName("Custom - Boolean Test");
         setStepDefinitionIcon("INFO");
 
-        StepProperty arg1 = new StepProperty()
+        final StepProperty arg1 = new StepProperty()
                 .ofType(StepPropertyType.COLUMN_CHOOSER)
                 .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null)
                 .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider == null ? "ERROR" : "OK")
@@ -37,7 +44,7 @@ public class BooleanParametersTest extends StepConfiguration {
                 .havingOutputNode(() -> "output0")
                 .validateAndReturn();
 
-        StepProperty arg2 = new StepProperty()
+        final StepProperty arg2 = new StepProperty()
                 .ofType(StepPropertyType.BOOLEAN)
                 .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null)
                 .withArgTextSupplier(sp -> () ->  "Boolean Value: " + (sp.getValue() == null ? "None" : sp.getValue().toString()))
@@ -50,9 +57,9 @@ public class BooleanParametersTest extends StepConfiguration {
 
     @Override
     public Boolean isComplete() {
-        List<StepProperty> properties = getStepProperties();
+        final List<StepProperty> properties = getStepProperties();
         if (properties != null && !properties.isEmpty()) {
-            StepProperty arg2 = properties.get(1);
+            final StepProperty arg2 = properties.get(1);
             if (arg2 != null && arg2.getValue() != null) {
                 log(getStepDefinitionName() + " - Boolean: " + arg2.getValue());
                 return null;
@@ -72,12 +79,12 @@ public class BooleanParametersTest extends StepConfiguration {
         public void initialise() throws SDKException {
             getColumnManager().clearColumns();
 
-            String selectedColumnName = getArgument(0);
+            final String selectedColumnName = getArgument(0);
             if (selectedColumnName != null) {
                 getColumnManager().setColumnsFromInput(getInput(0));
-                StepColumn selectedColumn = getColumnManager().getColumnByName(selectedColumnName);
+                final StepColumn selectedColumn = getColumnManager().getColumnByName(selectedColumnName);
                 if (selectedColumn != null) {
-                    int selectedColumnPosition = getColumnManager().getColumnPosition(selectedColumnName);
+                    final int selectedColumnPosition = getColumnManager().getColumnPosition(selectedColumnName);
                     getColumnManager().removeColumn(selectedColumnName);
                     getColumnManager().addColumnAt(this, selectedColumnName + " plus Boolean value", "", selectedColumnPosition);
                 } else {
@@ -87,23 +94,23 @@ public class BooleanParametersTest extends StepConfiguration {
         }
 
         @Override
-        public Object getValueAt(long row, int col) throws SDKException {
-            String selectedColumnName = getArgument(0);
+        public Object getValueAt(final long row, final int col) throws SDKException {
+            final String selectedColumnName = getArgument(0);
 
-            Optional<StepColumn> inputColumn = null;
+            Optional<StepColumn> inputColumn = Optional.empty();
             if (selectedColumnName != null && !selectedColumnName.isEmpty()) {
                 inputColumn = getInputColumn(0, selectedColumnName);
             }
 
-            if (inputColumn != null && inputColumn.isPresent() ) {
-                String value;
+            if (inputColumn.isPresent()) {
+                final String value;
                 try {
                     value = inputColumn.get().getValue(row).toString();
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     throw new SDKException(e);
                 }
 
-                Object arg2 = getArgument(1);
+                final Object arg2 = getArgument(1);
                 if (arg2 != null && !arg2.toString().isEmpty()) {
                     return value + " " + arg2;
                 } else {
