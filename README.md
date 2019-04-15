@@ -69,13 +69,14 @@ You can view the Javadoc [here](https://experiandataquality.github.io/aperture-d
 The steps below show how to generate a compatible jar file using Gradle:
 
 1. Clone the repo.
-2. Open the project in your IDE of choice.
-3. Create a new class within the `MyCustomSteps` module. For the output jar to work correctly, it will need to be in
- the `com.experian.aperture.datastudio.sdk.step.addons` package, as the template class is located there. We recommend that
- you base your class on one of the com.experian.aperture.datastudio.sdk.step.examples provided or use the template class.
-4. Open the Gradle window in your IDE and run the `MyCustomSteps` build task. This will build the jar for the steps you
- have created.
-5. Your new jar will be built to `build/libs/MyCustomSteps.jar`.
+1. Open the project in your IDE of choice.
+1. Custom step skeleton is available at [StepTemplate.java](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/addons/StepTemplate.java). 
+   Please take note that the package structure `com.experian.aperture.datastudio.sdk.step.addons` must be respected as 
+   it's where Aperture Data Studio scan for custom steps. 
+1. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
+1. To build your step, you can run `gradle build` either from IDE or command prompt. Refer to the [documentation](ExampleSteps/README.md) of 
+   ExampleStep for more detail on the build step.
+1. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps.jar`.
 
 ## Generating a custom step from a new or existing project 
 
@@ -94,8 +95,10 @@ The sample project in the repository has a pre-configured Gradle build, it inclu
  correct package name configured. However, if you want to start your own project, then follow the [instructions above](#generating-a-custom-step-from-a-new-or-existing-project).
 
 With your project set up, you can now create a new class. If you cloned the sample project, you will have a
- `MyCustomSteps` module. Inside that module, you'll find the `com.experian.aperture.datastudio.sdk.step.addons` package.
-  Create your new classes in this package so that they are correctly picked up by the Data Studio UI.
+`ExampleSteps` module. Inside that module, you'll find the `com.experian.aperture.datastudio.sdk.step.addons` package.
+Create your new classes in this package so that they are correctly picked up by the Data Studio UI.
+
+You can bundle multiple custom steps into a single jar as long as they're located under `com.experian.aperture.datastudio.sdk.parser.addons` 
 
 ### Importing the step SDK
 
@@ -599,10 +602,14 @@ To make your custom step available in the Data Studio UI:
 The steps below show how to generate a compatible jar file using Gradle:
 
 1. Clone the repo.
-2. Open the project in your IDE of choice.
-3. Create a new class within the `MyCustomSteps` module. For the output jar to work correctly, it needs to be created in the `com.experian.aperture.datastudio.sdk.parser.addons` package. We recommend that you use the template class located here.
-4. Open the Gradle window in your IDE and run the `MyCustomSteps` build task. This will build the jar for the steps you have created.
-5. Your new jar will be built to `build/libs/MyCustomSteps.jar`.
+1. Open the project in your IDE of choice.
+1. Custom parser skeleton is available at [ParserTemplate.java](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/parser/addons/ParserTemplate.java). 
+   Please take note that the package structure `com.experian.aperture.datastudio.sdk.parser.addons` must be respected as 
+   it's where Aperture Data Studio scan for custom parser. 
+1. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
+1. To build your parser, you can run `gradle build` either from IDE or command prompt. Refer to the [documentation](ExampleSteps/README.md) of 
+   ExampleStep module for more detail on the build step.
+1. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps.jar`.
 
 ## Generating a custom parser from a new or existing project 
 
@@ -619,7 +626,11 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
 
 The sample project in the repository has a pre-configured Gradle build, it includes the SDK, and has the correct package name configured. However, if you want to start your own project, then follow the [instructions above](#generating-a-custom-parser-from-a-new-or-existing-project).
 
-With your project set up, you can now create a new class. If you cloned the sample project you will have a `MyCustomSteps` module. Inside that module you'll find the `com.experian.aperture.datastudio.sdk.parser.addons` package. Create your new class in this package so that it is correctly picked up by the Data Studio UI.
+With your project set up, you can now create a new class. If you cloned the sample project you will have a `ExampleSteps` module. 
+Inside that module you'll find the `com.experian.aperture.datastudio.sdk.parser.addons` package. Create your new class 
+in this package so that it is correctly picked up by the Data Studio UI.
+
+You can bundle multiple parsers into a single jar as long as they're located under `com.experian.aperture.datastudio.sdk.parser.addons` 
 
 ### Importing the parser SDK
 

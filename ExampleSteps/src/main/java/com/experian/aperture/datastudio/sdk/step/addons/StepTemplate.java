@@ -29,7 +29,7 @@ public class StepTemplate extends StepConfiguration {
 
 
         // Basic step information
-        setStepDefinitionName("Custom - Simple Passthrough");
+        setStepDefinitionName("Custom Step - Template");
         setStepDefinitionDescription("Passes input to output");
         setStepDefinitionIcon("INFO");
         log("Loading " + getStepDefinitionName());
