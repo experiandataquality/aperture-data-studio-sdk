@@ -27,8 +27,8 @@ public class StepConfigurationTest {
      */
     @Test
     public void stepShouldHaveCorrectAttributes() {
-        assertEquals("Custom - Step test template", this.targetStep.getStepDefinitionName());
-        assertEquals("Sample of tests on custom step that uses rest api service", this.targetStep.getStepDefinitionDescription());
+        assertEquals("Custom - Rest Service Sample Step", this.targetStep.getStepDefinitionName());
+        assertEquals("Custom step that uses rest api service", this.targetStep.getStepDefinitionDescription());
         assertEquals("DATA", this.targetStep.getStepDefinitionType());
     }
 

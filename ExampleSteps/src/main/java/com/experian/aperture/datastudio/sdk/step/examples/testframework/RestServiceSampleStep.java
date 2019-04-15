@@ -33,10 +33,11 @@ public class RestServiceSampleStep extends StepConfiguration {
 
     public RestServiceSampleStep(final ColorService colorService) {
         // Basic step information
-        setStepDefinitionName("Custom - Step test template");
-        setStepDefinitionDescription("Sample of tests on custom step that uses rest api service");
+        setStepDefinitionName("Custom - Rest Service Sample Step");
+        setStepDefinitionDescription("Custom step that uses rest api service");
 
         setStepProperties(Arrays.asList(createInputColumnNodeArg(), createAdditionalAttributeArg()));
+        setStepDefinitionIcon("EARTH");
         this.setStepOutput(new MyStepOutput(colorService));
     }
 

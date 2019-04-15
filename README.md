@@ -4,7 +4,11 @@ The SDK provides a simple Java library to create and test your own custom steps,
 
 This repo contains the SDK jar and a pre-configured Java project that uses Gradle, which allows you to easily build your own custom step. Alternatively, you can add the SDK as a dependency to your own project by downloading the SDK jar from the `libs` folder.
 
-The project comes with an `ExampleSteps` module which, when built, will output the SDK com.experian.aperture.datastudio.sdk.step.examples jar. The [example classes](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/master/ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/addons) demonstrate some key functionality of the SDK and provide a template class which can be used as a starting point for your own custom steps. There is also a `TemplateParser` which generates some simple output for any input file with a .template extension.
+The project comes with an `ExampleSteps` module which, when built, will output the SDK com.experian.aperture.datastudio.sdk.step.examples jar. 
+The [example classes](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/master/ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) 
+demonstrate some key functionality of the SDK and provide a template class which can be used as a starting point for your 
+own custom steps. There is also a `TemplateParser` which generates some simple output for any input file with a .template 
+extension. For more detail, please refer to `ExampleSteps`'s [`README.md`](ExampleSteps/README.md).
 
 You can view the Javadoc [here](https://experiandataquality.github.io/aperture-data-studio-sdk) for full reference documentation.
 
