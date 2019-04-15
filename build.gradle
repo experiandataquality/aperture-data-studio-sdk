@@ -5,14 +5,26 @@ subprojects {
 
     repositories {
         mavenCentral()
+        jcenter()
     }
 
     dependencies {
-        testCompile group: 'junit', name: 'junit', version: '4.12'
-        compile group: 'org.json', name: 'json', version: '20090211'
-        compile fileTree(dir: './../libs', include: ['sdk*.jar'])
+        compileOnly(
+                fileTree(dir: './../libs', include: ['sdk*.jar'], exclude: ['sdk-test-framework*.jar']),
+                'org.json:json:20090211',
+                "org.apache.logging.log4j:log4j-core:2.11.1"
 
-
+        )
+        testImplementation(
+                fileTree(dir: './../libs', include: ['sdk*.jar']),
+                "org.reflections:reflections:0.9.11",
+                "junit:junit:4.12",
+                "org.assertj:assertj-core:3.11.1",
+                "org.mockito:mockito-core:2.9.0"
+        )
+        testRuntimeOnly(
+                "org.apache.logging.log4j:log4j-core:2.11.1"
+        )
     }
 }
 
