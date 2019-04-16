@@ -83,8 +83,52 @@ The steps below show how to generate a compatible jar file using Gradle:
 If you don't wish to use Gradle, you'll need to configure your own Java project to generate a compatible jar artifact:
 
 1. Create a new Java project or open an existing one.
-2. Download the [sdk.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk.jar) file.
-3. Create a libs folder and add in the sdk.jar as a library.
+2. Download the [sdk.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk.jar) file 
+   and optionally [sdk-test-framework](libs/sdk-test-framework.jar). 
+   
+   Alternatively if you use Gradle, you can point to sdk repository in the `build.gradle`: 
+   
+   ```gradle
+   repositories {
+       mavenCentral()
+       maven {
+            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
+       }
+   }
+   
+   dependencies {
+       compileOnly("com.experian.aperture:sdk:1.4.0")
+       testCompile("com.experian.aperture:sdk-test-framework:1.4.0")
+   }
+   ```
+   
+   If you're using Maven, modify `pom.xml` to add github repository: 
+   
+   ```xml 
+   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+            
+       <!-- other details omitted --> 
+       
+       <repositories>
+           <repository>
+               <id>aperture-data-studio-github-repo</id>
+               <name>Aperture Data Studio Github Repo</name>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven</url>
+               <releases>
+                   <enabled>true</enabled>
+               </releases>
+               <snapshots>
+                   <enabled>true</enabled>
+               </snapshots>
+           </repository>
+       </repositories>
+       
+   </project>
+   ```
+   
+3. If in the previous step you downloaded the jar manually, create a libs folder and add in the sdk.jar as a library. 
+   You can skip this step if you're using maven or gradle.
 4. Create a new package called `com.experian.aperture.datastudio.sdk.step.addons`.
 5. Create a new class in the package you just created.
 6. Configure your project to output a jar file as an artifact. Note that this will be done differently depending on your IDE.
@@ -616,8 +660,52 @@ The steps below show how to generate a compatible jar file using Gradle:
 If you don't wish to use Gradle, you'll need to configure your own Java project to generate a compatible jar artifact:
 
 1. Create a new Java project or open an existing one.
-2. Download the [sdk.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk.jar) file.
-3. Create a libs folder and add in the sdk.jar as a library.
+2. Download the [sdk.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk.jar) file 
+   and optionally [sdk-test-framework](libs/sdk-test-framework.jar). 
+   
+   Alternatively if you use Gradle, you can point to sdk repository in the `build.gradle`: 
+   
+   ```gradle
+   repositories {
+       mavenCentral()
+       maven {
+            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
+       }
+   }
+   
+   dependencies {
+       compileOnly("com.experian.aperture:sdk:1.4.0")
+       testCompile("com.experian.aperture:sdk-test-framework:1.4.0")
+   }
+   ```
+   
+   If you're using Maven, modify `pom.xml` to add github repository: 
+   
+   ```xml 
+   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+            
+       <!-- other details omitted --> 
+       
+       <repositories>
+           <repository>
+               <id>aperture-data-studio-github-repo</id>
+               <name>Aperture Data Studio Github Repo</name>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven</url>
+               <releases>
+                   <enabled>true</enabled>
+               </releases>
+               <snapshots>
+                   <enabled>true</enabled>
+               </snapshots>
+           </repository>
+       </repositories>
+       
+   </project>
+   ```
+
+3. If you downloaded the jar manually, create a libs folder and add in the sdk.jar as a library. You can skip this step 
+   if you're using Maven or Gradle.
 4. Create a new package called `com.experian.aperture.datastudio.sdk.parser.addons`.
 5. Create a new class in the package you just created.
 6. Configure your project to output a jar file as an artifact. Note that this will be done differently depending on your IDE.
