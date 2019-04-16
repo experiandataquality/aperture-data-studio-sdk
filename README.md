@@ -89,6 +89,8 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
    Alternatively if you use Gradle, you can point to sdk repository in the `build.gradle`: 
    
    ```gradle
+   apply plugin: 'java'
+  
    repositories {
        mavenCentral()
        maven {
@@ -102,28 +104,44 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
    }
    ```
    
-   If you're using Maven, modify `pom.xml` to add github repository: 
+   If you're using Maven, modify `pom.xml` to add SDK github repository: 
    
    ```xml 
-   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-            
-       <!-- other details omitted --> 
-       
+   <project xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                                http://maven.apache.org/maven-v4_0_0.xsd">
+       <modelVersion>4.0.0</modelVersion>
+       <groupId>com.experian.aperture.datastudio.sdk.step.addons</groupId>
+       <!-- replace this accordingly with your custom step name -->
+       <artifactId>MyCustomStep</artifactId>
+       <!-- replace this accordingly with your custom step version -->
+       <version>1.0-SNAPSHOT</version>
+       <packaging>jar</packaging>
+       <!-- replace this accordingly with your custom step name -->
+       <name>MyCustomStep</name>
+   
        <repositories>
            <repository>
                <id>aperture-data-studio-github-repo</id>
-               <name>Aperture Data Studio Github Repo</name>
-               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven</url>
-               <releases>
-                   <enabled>true</enabled>
-               </releases>
-               <snapshots>
-                   <enabled>true</enabled>
-               </snapshots>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/</url>
            </repository>
        </repositories>
-       
+   
+       <dependencies>
+           <dependency>
+               <groupId>com.experian.aperture</groupId>
+               <artifactId>sdk</artifactId>
+               <version>1.4.0</version>
+               <scope>provided</scope>
+           </dependency>
+           <dependency>
+               <groupId>com.experian.aperture</groupId>
+               <artifactId>sdk-test-framework</artifactId>
+               <version>1.4.0</version>
+               <scope>test</scope>
+           </dependency>
+       </dependencies>
    </project>
    ```
    
@@ -666,6 +684,8 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
    Alternatively if you use Gradle, you can point to sdk repository in the `build.gradle`: 
    
    ```gradle
+   apply plugin: 'java'
+   
    repositories {
        mavenCentral()
        maven {
@@ -679,28 +699,44 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
    }
    ```
    
-   If you're using Maven, modify `pom.xml` to add github repository: 
+   If you're using Maven, modify `pom.xml` to add SDK github repository: 
    
    ```xml 
-   <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-            
-       <!-- other details omitted --> 
-       
+   <project xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                                http://maven.apache.org/maven-v4_0_0.xsd">
+       <modelVersion>4.0.0</modelVersion>
+       <groupId>com.experian.aperture.datastudio.sdk.step.addons</groupId>
+       <!-- replace this accordingly with your custom step name -->
+       <artifactId>MyCustomStep</artifactId>
+       <!-- replace this accordingly with your custom step version -->
+       <version>1.0-SNAPSHOT</version>
+       <packaging>jar</packaging>
+       <!-- replace this accordingly with your custom step name -->
+       <name>MyCustomStep</name>
+   
        <repositories>
            <repository>
                <id>aperture-data-studio-github-repo</id>
-               <name>Aperture Data Studio Github Repo</name>
-               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven</url>
-               <releases>
-                   <enabled>true</enabled>
-               </releases>
-               <snapshots>
-                   <enabled>true</enabled>
-               </snapshots>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/</url>
            </repository>
        </repositories>
-       
+   
+       <dependencies>
+           <dependency>
+               <groupId>com.experian.aperture</groupId>
+               <artifactId>sdk</artifactId>
+               <version>1.4.0</version>
+               <scope>provided</scope>
+           </dependency>
+           <dependency>
+               <groupId>com.experian.aperture</groupId>
+               <artifactId>sdk-test-framework</artifactId>
+               <version>1.4.0</version>
+               <scope>test</scope>
+           </dependency>
+       </dependencies>
    </project>
    ```
 
