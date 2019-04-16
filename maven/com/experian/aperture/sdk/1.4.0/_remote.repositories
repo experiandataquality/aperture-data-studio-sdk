@@ -1,0 +1,4 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Tue Apr 16 21:16:04 SGT 2019
+sdk-1.4.0.jar>=
+sdk-1.4.0.pom>=
