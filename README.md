@@ -295,7 +295,7 @@ final StepProperty multiChooser = new StepProperty()
 ```
 
 ##### Auto select column based on data tag
-Data Studio allows tagging columns with additional label. Refer to [Data Tagging](https://www.edq.com/documentation/aperture-data-studio/user-guide/#data-tagging) for more info. 
+Data Studio allows columns to be tagged columns with an additional label. Refer to [Data Tagging](https://www.edq.com/documentation/aperture-data-studio/user-guide/#data-tagging) for more info. 
 
 The column chooser step property can automatically select a column tagged with specific label (e.g. 'Phone') once the custom step connected with an input.
 
