@@ -338,7 +338,7 @@ public class ColumnTagStep extends StepConfiguration {
     }
 ```
 
-Code above is very similar to normal step configuration, except it will call `autoSelectTaggedColumn` method every time it updates UI with `withStatusIndicator`, `withIconTypeSupplier` and `withArgTextSupplier` methods.
+The code above is very similar to normal step configuration, except it will call the `autoSelectTaggedColumn` method every time it updates the UI with `withStatusIndicator`, `withIconTypeSupplier` and `withArgTextSupplier` methods.
 
 ```java
 
