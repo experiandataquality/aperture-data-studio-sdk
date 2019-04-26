@@ -343,7 +343,7 @@ Code above is very similar to normal step configuration, except it will call `au
 ```java
 
 /**
-* Auto set step property's value with column tagged with specific name.
+* Automatically set step property's value to a column tagged with specific label name.
 * This is done by comparing data tags in all input columns.
 * @param sp StepProperty
 * @param tag tag name
