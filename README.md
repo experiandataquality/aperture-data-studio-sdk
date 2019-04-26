@@ -210,7 +210,7 @@ public class DemoStep extends StepConfiguration {
 }
 ```
 ##### Setting Step Icon
-As demonstrated above, step icon can be set via `setStepDefinitionIcon` method. 
+As demonstrated above, a custom step icon can be set via the `setStepDefinitionIcon` method. 
 
 ![Step Icon](images/step-icon.png)
 
