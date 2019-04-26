@@ -69,14 +69,14 @@ You can view the Javadoc [here](https://experiandataquality.github.io/aperture-d
 The steps below show how to generate a compatible jar file using Gradle:
 
 1. Clone the repo.
-1. Open the project in your IDE of choice.
-1. Custom step skeleton is available at [StepTemplate.java](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/addons/StepTemplate.java). 
+2. Open the project in your IDE of choice.
+3. Custom step skeleton is available at [StepTemplate.java](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/addons/StepTemplate.java). 
    Please take note that the package structure `com.experian.aperture.datastudio.sdk.step.addons` must be respected as 
    it's where Aperture Data Studio scan for custom steps. 
-1. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
-1. To build your step, you can run `gradle build` either from IDE or command prompt. Refer to the [documentation](ExampleSteps/README.md) of 
+4. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
+5. To build your step, you can run `gradle build` either from IDE or command prompt. Refer to the [documentation](ExampleSteps/README.md) of 
    ExampleStep for more detail on the build step.
-1. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps.jar`.
+6. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps.jar`.
 
 ## Generating a custom step from a new or existing project 
 
@@ -209,6 +209,34 @@ public class DemoStep extends StepConfiguration {
     }
 }
 ```
+##### Setting Step Icon
+As demonstrated above, a custom step icon can be set via the `setStepDefinitionIcon` method. 
+
+![Step Icon](images/step-icon.png)
+
+Below are the standard icons that can be used.
+
+|Icon Name|Image||Icon Name|Image|
+|---|---|---|---|---|
+|ALPHA_NUMERIC|![ALPHA_NUMERIC](images/icons/ALPHA_NUMERIC.png)||DATABASE|![DATABASE](images/icons/DATABASE.png)|
+|EMAIL|![EMAIL](images/icons/EMAIL.png)||ERROR|![ERROR](images/icons/ERROR.png)|
+|INFO|![INFO](images/icons/INFO.png)||INTEGER|![INTEGER](images/icons/INTEGER.png)|
+|OK|![OK](images/icons/OK.png)||PERCENT|![PERCENT](images/icons/PERCENT.png)|
+|ROWS|![ROWS](images/icons/ROWS.png)||TABLES|![TABLES](images/icons/TABLES.png)|
+
+Beside these standard icons, you can define your own custom icon too.
+
+![Custom Icon](images/custom-icon.png)
+1.  Create your own icon file in PNG format. Preferable size is 64 x 64 pixels.
+2.  Put your icon file in `/src/main/resources/` folder, so that it will be bundled inside your JAR file.
+3.  Call `setStepDefinitionIcon` method inside your `StepConfiguration` constructor with the icon filename.
+    ```java
+    public CustomIconStep() {
+        setStepDefinitionName("Custom - Icon");
+        setStepDefinitionDescription("Custom step with custom icon");
+        setStepDefinitionIcon("experian.png");
+    ```
+Please refer to `CustomIconStep` source code in [ExampleSteps](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples).
 
 #### Adding step properties
 
@@ -251,9 +279,10 @@ The `StepOutput` is where the main work is done. You'll need to define a new out
 setStepOutput(new DemoOutput());
 ```
 
+##### Disable multi column chooser's select all
 By default, the _select all_ checkbox is visible: 
 
-![Select all enabled (default)](select-all.png)
+![Select all enabled (default)](images/select-all.png)
 
 To hide _select all_ checkbox: 
 
@@ -264,6 +293,80 @@ final StepProperty multiChooser = new StepProperty()
     // detail omitted
     .withSelectAllOption(false);
 ```
+
+##### Auto select column based on data tag
+Data Studio allows columns to be tagged columns with an additional label. Refer to [Data Tagging](https://www.edq.com/documentation/aperture-data-studio/user-guide/#data-tagging) for more info. 
+
+The column chooser step property can automatically select a column tagged with specific label (e.g. 'Phone') once the custom step connected with an input.
+
+![Tagged Column](images/tagged.png)
+
+```java
+public class ColumnTagStep extends StepConfiguration {
+
+    private static final String TAG_PHONE = "Phone";
+    
+    public ColumnTagStep() {
+        setStepDefinitionName("Custom - Column Tag");
+        setStepDefinitionIcon("INFO");
+
+        final StepProperty spPhone = new StepProperty()
+                .ofType(StepPropertyType.COLUMN_CHOOSER)
+                .withStatusIndicator(sp -> () -> isPhoneArgOk(sp))
+                .withIconTypeSupplier(sp -> () -> isPhoneArgOk(sp) ? "OK" : "ERROR")
+                .withArgTextSupplier(sp -> () -> getPhoneArgText(sp))
+                .havingInputNode(() -> "input0")
+                .havingOutputNode(() -> "output0")
+                .validateAndReturn();
+        setStepProperties(Arrays.asList(spPhone));
+
+        setStepOutput(new ColumnTagOutput());
+    }
+
+    private boolean isPhoneArgOk(final StepProperty sp) {
+        autoSelectTaggedColumn(sp, TAG_PHONE);
+        return sp.allowedValuesProvider != null && sp.getValue() != null;
+    }
+
+    private String getPhoneArgText(final StepProperty sp) {
+        autoSelectTaggedColumn(sp, TAG_PHONE);
+        if (sp.allowedValuesProvider == null) {
+            return "<Connect an input>";
+        } else {
+            return sp.getValue() == null ? "<Select a phone column>" : sp.getValue().toString();
+        }
+    }
+```
+
+The code above is very similar to normal step configuration, except it will call the `autoSelectTaggedColumn` method every time it updates the UI with `withStatusIndicator`, `withIconTypeSupplier` and `withArgTextSupplier` methods.
+
+```java
+
+/**
+* Automatically set step property's value to a column tagged with specific label name.
+* This is done by comparing data tags in all input columns.
+* @param sp StepProperty
+* @param tag tag name
+*/
+private void autoSelectTaggedColumn(final StepProperty sp, final String tag) {
+    if (sp.allowedValuesProvider != null) {
+        if (sp.getValue() == null) {
+            final Optional<StepColumn> tagColumn = sp.getInputColumns().stream().filter(c -> c.getDataTags().contains(tag)).findFirst();
+            if (tagColumn.isPresent()) {
+                final String colName = tagColumn.get().getDisplayName();
+                sp.setValue(colName);
+            }
+        }
+    }
+}
+```
+
+`autoSelectTaggedColumn` method will only perform if the input is connected and the step property value is null. It will find the first input column with the data tag matched the `tag` value. If found, that input column's name is set as the step property value.
+
+`StepColumn.getDataTags` method is used to get the tagged label of the column.
+
+Please refer the full source code of `ColumnTagStep` in [ExampleSteps](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples).
+
 
 ### Step output
 
@@ -664,14 +767,14 @@ To make your custom step available in the Data Studio UI:
 The steps below show how to generate a compatible jar file using Gradle:
 
 1. Clone the repo.
-1. Open the project in your IDE of choice.
-1. Custom parser skeleton is available at [ParserTemplate.java](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/parser/addons/ParserTemplate.java). 
+2. Open the project in your IDE of choice.
+3. Custom parser skeleton is available at [ParserTemplate.java](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/parser/addons/ParserTemplate.java). 
    Please take note that the package structure `com.experian.aperture.datastudio.sdk.parser.addons` must be respected as 
    it's where Aperture Data Studio scan for custom parser. 
-1. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
-1. To build your parser, you can run `gradle build` either from IDE or command prompt. Refer to the [documentation](ExampleSteps/README.md) of 
+4. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
+5. To build your parser, you can run `gradle build` either from IDE or command prompt. Refer to the [documentation](ExampleSteps/README.md) of 
    ExampleStep module for more detail on the build step.
-1. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps.jar`.
+6. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps.jar`.
 
 ## Generating a custom parser from a new or existing project 
 
@@ -1068,11 +1171,11 @@ To enable Java's standard remote debugging feature:
     ```
 5. Open IntelliJ IDEA, and click __Edit Configurations...__
 
-    ![Edit Configurations](edit_configurations.png)
+    ![Edit Configurations](images/edit_configurations.png)
 
 6. Click the `+` button and add new remote debugging:
 
-    ![Add Remote Debugging](remote.png)
+    ![Add Remote Debugging](images/remote.png)
 
 7. Click __OK__.
 8. Place a debug point in your addons code.
