@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.experian.aperture</groupId>
+  <artifactId>sdk</artifactId>
+  <versioning>
+    <versions>
+      <version>1.5.0-SNAPSHOT</version>
+    </versions>
+    <lastUpdated>20190503035839</lastUpdated>
+  </versioning>
+</metadata>
