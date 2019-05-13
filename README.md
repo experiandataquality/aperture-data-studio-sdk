@@ -84,7 +84,7 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
 
 1. Create a new Java project or open an existing one.
 2. Download the [sdk.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk.jar) file 
-   and optionally [sdk-test-framework](libs/sdk-test-framework.jar). 
+   and optionally [sdk-test-framework](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk-test-framework.jar). 
    
    Alternatively if you use Gradle, you can point to sdk repository in the `build.gradle`: 
    
@@ -568,7 +568,7 @@ This ensures the custom step works as intended. The test framework is also usefu
  
 If you are building the custom step from the sample project, the test framework has already been included as a test dependency.
  
-1.	Download the [sdk-test-framework.jar](sdk-test-framework.jar).
+1.	Download the [sdk-test-framework.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk-test-framework.jar).
 2.	Add it into the libs folder.
 3.	Add the test framework as a test dependency. 
  
@@ -782,7 +782,7 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
 
 1. Create a new Java project or open an existing one.
 2. Download the [sdk.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk.jar) file 
-   and optionally [sdk-test-framework](libs/sdk-test-framework.jar). 
+   and optionally [sdk-test-framework](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk-test-framework.jar). 
    
    Alternatively if you use Gradle, you can point to sdk repository in the `build.gradle`: 
    
