@@ -27,6 +27,7 @@ You can view the Javadoc [here](https://experiandataquality.github.io/aperture-d
         - [getValueAt](#getvalueat)
         - [getInputRow](#getinputrow)
 - [Multi-threading](#multi-threading)
+- [Class-isolation](#class-isolation)
 - [Optimizing a Step](#optimizing-a-step)
     - [Step type](#step-type)
     - [isInteractive flag](#isinteractive-flag)
@@ -246,6 +247,18 @@ StepProperty arg1 = new StepProperty()
         .ofType(StepPropertyType.COLUMN_CHOOSER);
 ```
 
+|StepPropertyType|Description|
+|---|---|
+|BOOLEAN        |`true` or `false` field|
+|STRING         |Text field|
+|INTEGER        |Number without fraction|
+|DECIMAL        |Number with fraction|
+|COLUMN_CHOOSER |Input column drop down list|
+|MULTI_COLUMN_CHOOSER|Input column drop down list that allow multiple selection|
+|CUSTOM_CHOOSER      |Custom drop down list|
+|MULTI_CUSTOM_CHOOSER|Custom drop down list that allow multiple selection (Version 1.5+)|
+|INPUT_LABEL         |Display text|
+
 It is also recommended that you update the UI with some prompts and error icons to show the user that more interaction is required before the step will work correctly. You can do this by using the `withStatusIndicator`, `withIconTypeSupplier` and `withArgTextSupplier` methods. The example below will show an error icon and display a couple of prompts if no data input is present and subsequently if no column is selected. If all is correct, then the name of the column will be displayed.
 
 ``` java
@@ -279,6 +292,63 @@ The `StepOutput` is where the main work is done. You'll need to define a new out
 setStepOutput(new DemoOutput());
 ```
 
+##### Multiple inputs
+
+From Data Studio version 1.5 onward, custom step support multiple inputs.
+``` java
+final StepProperty arg0 = new StepProperty()
+        .ofType(StepPropertyType.COLUMN_CHOOSER)
+        .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null)
+        .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null ? ICON_OK : ICON_ERROR)
+        .withArgTextSupplier(sp -> () -> sp.allowedValuesProvider == null ? "<Connect 1st input>" : (sp.getValue() == null ? "<Select 1st Input 1st column>" : sp.getValue().toString()))
+        .havingInputNode(() -> "input0") // add new input node `input0` and define arg0's options
+        .havingOutputNode(() -> "output0")
+        .validateAndReturn();
+
+final StepProperty arg1 = new StepProperty()
+        .ofType(StepPropertyType.COLUMN_CHOOSER)
+        .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null)
+        .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null ? ICON_OK : ICON_ERROR)
+        .withArgTextSupplier(sp -> () -> sp.allowedValuesProvider == null ? "<Connect 2nd input>" : (sp.getValue() == null ? "<Select 2nd input 1st column>" : sp.getValue().toString()))
+        .havingInputNode(() -> "input1") // add new input node `input1` and define arg1's options
+        .validateAndReturn();
+
+final StepProperty arg2 = new StepProperty()
+        .ofType(StepPropertyType.MULTI_COLUMN_CHOOSER)
+        .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null)
+        .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null ? ICON_OK : ICON_ERROR)
+        .withArgTextSupplier(sp -> () -> sp.allowedValuesProvider == null ? "<Connect 2nd input>" : (sp.getValue() == null ? "<Select 2nd input multi columns>" : sp.getValue().toString()))
+        .havingInputNode(() -> "input1") // define arg2's options with input1's columns
+        .validateAndReturn();
+
+```
+
+`havingInputNode` method on `StepProperty` will add input node to the custom step, if the returning name is unique. `arg2.havingInputNode(() -> "input1")` in the code above only defines the drop down list item with `input1`'s columns. As `input1` already defined in `arg2`, no new input node is added.
+
+```java
+@Override
+public Object getValueAt(long row, int columnIndex) {
+    final String firstInputFirstColumn = getArgument(0);
+    final String secondInputFirstColumn = getArgument(1);
+    final Optional<StepColumn> firstArg = getInputColumn(0, firstInputFirstColumn);
+    final Optional<StepColumn> secondArg = getInputColumn(1, secondInputFirstColumn);
+    final StringBuilder sb = new StringBuilder();
+    try {
+        if (firstArg.isPresent()) {
+            sb.append(firstArg.get().getValue(row).toString()).append(", "); 
+        }
+        if (secondArg.isPresent()) {
+            sb.append(secondArg.get().getValue(row).toString());
+        }
+    } catch (Exception ignore) {
+        // intentionally empty
+    }
+```
+In the `StepOutput`, you can get the data from second input by calling `getInputColumn(inputIndex=1, columnName)` method.
+
+Please refer the full source code of `MultiInputColumnChooserStep` in [ExampleSteps](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples).
+
+
 ##### Disable multi column chooser's select all
 By default, the _select all_ checkbox is visible: 
 
@@ -294,7 +364,7 @@ final StepProperty multiChooser = new StepProperty()
     .withSelectAllOption(false);
 ```
 
-##### Auto select column based on data tag
+##### Automatically select column based on data tag
 Data Studio allows columns to be tagged columns with an additional label. Refer to [Data Tagging](https://www.edq.com/documentation/aperture-data-studio/user-guide/#data-tagging) for more info. 
 
 The column chooser step property can automatically select a column tagged with specific label (e.g. 'Phone') once the custom step connected with an input.
@@ -481,6 +551,69 @@ public Object getValueAt(long row, int col) throws Exception {
 ## Multi-threading
 
 In order to improve performance, especially when calling a web service that may have slower response times, we recommend using multiple threads. The `EmailValidate` example step demonstrates how to make use of multi-threading within a custom step.
+
+## Class-isolation
+
+By default every custom step `JAR` files are isolated in its own class-loader. The class-loader used will scan libraries 
+relative to the custom-step. This allow custom-step to use libraries that have different version from other custom steps   
+and Aperture Data Studio itself without the need to _shade_ into different packages. 
+
+Some note on the custom step packaging: 
+
+1. When using [Gradle shadow plugin](https://imperceptiblethoughts.com/shadow/) or [Maven shade plugin](https://maven.apache.org/plugins/maven-shade-plugin/),
+   try not to `minimize` the resulting jar as it may remove dependencies that are loaded through reflection or service-provider-interface, i.e.
+   
+   Gradle:
+   
+   ```groovy
+   shadowJar {
+       minimize() // don't use this
+   }
+   ```
+   
+   Maven: 
+   
+   ```xml 
+    <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-shade-plugin</artifactId>
+       <version>3.2.1</version>
+       <executions>
+         <execution>
+           <phase>package</phase>
+           <goals>
+             <goal>shade</goal>
+           </goals>
+           <configuration>
+             <!-- don't use this -->
+             <minimizeJar>true</minimizeJar>
+           </configuration>
+         </execution>
+       </executions>
+    </plugin>
+   ```
+   
+1. When using centralized libs folder, make sure that all of the dependencies jars are referred inside the custom step's 
+   `MANIFEST.MF`:
+
+    ![Centralized lib](images/lib-with-manifest-structure.PNG)
+    
+    ```
+    Manifest-Version: 1.0
+    Class-Path: libs/DQTSCommon-1.4.jar libs/json-20160810.jar libs/log4j-
+     api-2.10.0.jar libs/jackson-datatype-jsr310-2.8.11.jar libs/jackson-d
+     atabind-2.8.11.1.jar libs/jackson-core-2.8.11.jar libs/jackson-annota
+     tions-2.8.11.jar libs/guava-21.0.jar libs/commons-io-2.5.jar libs/com
+     mons-text-1.2.jar libs/commons-lang3-3.7.jar libs/minimal-json-0.9.1.
+     jar
+    ```
+    
+### Feature Toggle
+
+Toggle off _Sdk Use Custom Classloader_ to revert the behavior to pre-1.5.0. When toggled off, all custom steps will be 
+loaded by single system class loader.
+
+![Class loader toggle](images/classloader-toggle.PNG)
 
 ## Optimizing a step
 Your custom step can be optimized by using the following function:
