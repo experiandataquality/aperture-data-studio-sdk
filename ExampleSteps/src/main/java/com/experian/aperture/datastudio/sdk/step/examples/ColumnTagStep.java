@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * Creates a step that auto select arguments with columns tagged with 'Phone' and 'Email'.
+ * Creates a step that automatically select arguments with columns tagged with 'Phone' and 'Email'.
  */
 public class ColumnTagStep extends StepConfiguration {
 
