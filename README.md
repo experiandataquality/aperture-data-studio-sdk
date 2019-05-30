@@ -1346,10 +1346,10 @@ inside a constructor of `StepConfiguration`.
  
 ### Glossary values
 This function obtains groups of values defined under one glossary item in Data Studio. 
-For example, to get a list of all the blocking keys:
+This is only used to get a list of the DNS servers.
 
 ``` java
-List<Object> values = getGlossaryValues("EXPERIAN_MATCH_BLOCKING_KEYS");
+List<Object> values = getGlossaryValues("DNS_SERVERS");
 ```
  
 ### Server properties
