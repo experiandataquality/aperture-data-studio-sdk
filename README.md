@@ -640,14 +640,66 @@ boolean res = isInteractive();
 This setting is best used during the execution and `getValueAt` stages of the step, as it can negate the need to process all the input data when being viewed interactively. Instead, you can just process values when required. 
 
 ### Caching 
-The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and referenced by a particular name. The cache, which is global, is useful for storing responses from slow services between instances of custom steps. The backing key/value datastore is fast enough on reads to be used for random access lookups, and it can handle reads/writes from multiple steps at once. The cache is managed by Data Studio, but it is the responsibility of the custom step to delete or refresh the cache as necessary.
 
-Caches are created or obtained by calling `getCache` method with the name of your cache, which can be any string.
+The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and referenced 
+by a particular name. The cache is _scoped to each custom step class_, which means that 2 instances of the same custom 
+step in 2 different workflows can use the same cache if both supplied the same cache name. It is useful for storing 
+responses from slow services between instances of custom steps. The backing key/value datastore is fast enough on reads 
+to be used for random access lookups, and it can handle reads/writes from multiple steps at once. The cache is managed 
+by Data Studio, but it is the responsibility of the custom step to delete or refresh the cache as necessary.
+
+Caches are created or obtained by calling `StepOutput#getCache` method with the name of your cache, which can be any 
+string. `StepOutput#getCache` call is thread safe. Example below create or obtain (if it's already created) a cache with 
+default configuration:
+
 ``` java
-Cache myCache = getCache("my cache name");
+public class MyCustomStepOutput extend StepOutput {
+    // ... detail omitted
+    @Override
+    public void execute() {
+        final Cache myCache = getCache("MyCache");
+    }
+}
 ```
 
+Each record inside a cache is tied to _time-to-leave_ value. _Time-to-leave_ value is uniform across a single cache, 
+however, eviction event for each record is different as it's based on `creation time + _time-to-leave_ value`. To 
+illustrate this:
+
+CacheA: Time-to-leave 1 hour
+
+* Record A: 
+    * creation time 10:00 AM
+    * eviction time approximately 10:01 AM
+* Record B: 
+    * creation time 10:05 AM
+    * eviction time approximately 11:05 AM
+    
+Example below illustrate how to create a cache with custom time-to-leave: 
+
+```java 
+public class MyCustomStepOutput extend StepOutput {
+    // ... detail omitted
+    @Override
+    public void execute() {
+        final Cache cache30s = getCache(CacheConfiguration.withName(SECOND_CACHE).withTtl(30, TimeUnit.SECONDS));
+    }
+}
+```
+
+Please take note that eviction time is not a _hard realtime_ and there is going to be a few second delay from the real 
+eviction time due to the asynchronous nature of the mechanism. 
+
+Cache default properties values: 
+
+* Time-to-leave: 1 day. Configurable as `Sdk.cacheTTL` system property.
+* Eviction pool size: 2. Configurable as `Sdk.cacheEvictionPoolSize` system property.
+* Eviction interval: 10 seconds. Configurable as `Sdk.cacheEvictionInterval` system property.
+* Initial allocation file size: 5 MB. Configurable as `Sdk.cacheAllocateFileSize` system property.
+* File increment size: 5 MB. Configurable as `Sdk.cacheIncrementFileSize` system property.
+
 #### Cache interface
+
 The cache interface is defined by the functions presented below. They are called through the `Cache` object returned by the `getCache` function described above.
 
 ``` java
@@ -665,6 +717,16 @@ void close() throws Exception;
 ```
 Closes the cache. Should be called when all read/writes are completed - typically in `StepOutput.close()`.
 
+```java 
+String remove(String key)
+```
+Remove a single record from the cache. It will return the removed cache value if record exists.
+
+```java 
+void clear()
+```
+Remove all records from a cache.
+
 ``` java
 void delete() throws Exception;
 ```
@@ -673,8 +735,8 @@ Deletes the cache. Will throw an exception if in use.
 ``` java
 long getCreateTime();
 ```
-
 Gets the time when the cache was created.
+
 ``` java
 long getModifiedTime();
 ```
