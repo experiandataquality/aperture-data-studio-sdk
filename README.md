@@ -1269,11 +1269,18 @@ See the `TableSDK` interface in the Javadoc for more details.
 Various Data Studio properties are accessible through the SDK:
  
 ### Constants
-This function obtains the value of a constant value stored in Data Studio (the Glossary area under the Constants tab). The name to pass to the function is typically the constant name, written in uppercase and with underscores replacing spaces. For example, to obtain the regular expression for validating emails:
+
+This function obtains the value of a constant value stored in Data Studio (the Glossary area under the Constants tab). 
+The name to pass to the function is typically the constant name, written in uppercase and with underscores replacing 
+spaces. For example, to obtain the regular expression for validating emails:
 
 ``` java
-Object res = getConstantByName("EMAIL_ADDRESS");
+final Optional<String> constantValue = ServerValueUtil.getGlossaryConstant("EMAIL_ADDRESS");
 ```
+
+Since 1.5, `StepOutput#getConstantByName(String)` has been marked as deprecated in favor of 
+`ServerValueUtil.getGlossaryConstant(String)`. `ServerValueUtil` provide more flexibility such as retrieving constant 
+inside a constructor of `StepConfiguration`.  
  
 ### Glossary values
 This function obtains groups of values defined under one glossary item in Data Studio. 
@@ -1284,14 +1291,23 @@ List<Object> values = getGlossaryValues("EXPERIAN_MATCH_BLOCKING_KEYS");
 ```
  
 ### Server properties
-You can obtain a list of values under a particular Data Studio property by using:
+
+To obtain a server property as defined in Data Studio, or set in the server's `server.properties` file:
+
+```java 
+final Optional<Object> serverPropertyValue = ServerValueUtil.getServerProperty("System.locale");
+```
+
+Alternatively, you can obtain a list of values under a particular Data Studio property by using (note that this method 
+only accessible inside child class of `StepOutput`):
+
 ``` java
 List<String> dnsServers = getServerObjectProperties("DNSServers", "CONTENT");
 ```
-Alternatively, you can obtain a single server property, as defined in Data Studio, or set in the server's server.properties file:
-``` java
-Object value = getServerProperty("NAME");
-```
+
+Since 1.5, `StepOutput#getServerProperty(String)` has been marked as deprecated in favor of 
+`ServerValueUtil.getServerProperty(String)`. `ServerValueUtil` provide more flexibility such as retrieving constant 
+inside a constructor of `StepConfiguration`.  
 
 ## Debugging
 To enable Java's standard remote debugging feature:
