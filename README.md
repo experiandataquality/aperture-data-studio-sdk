@@ -77,7 +77,7 @@ The steps below show how to generate a compatible jar file using Gradle:
 4. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
 5. To build your step, you can run `gradle build` either from IDE or command prompt. Refer to the [documentation](ExampleSteps/README.md) of 
    ExampleStep for more detail on the build step.
-6. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps.jar`.
+6. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps-all.jar`.
 
 ## Generating a custom step from a new or existing project 
 
@@ -969,7 +969,7 @@ The steps below show how to generate a compatible jar file using Gradle:
 4. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
 5. To build your parser, you can run `gradle build` either from IDE or command prompt. Refer to the [documentation](ExampleSteps/README.md) of 
    ExampleStep module for more detail on the build step.
-6. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps.jar`.
+6. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps-all.jar`.
 
 ## Generating a custom parser from a new or existing project 
 

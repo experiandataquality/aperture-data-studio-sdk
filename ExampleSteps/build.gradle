@@ -10,7 +10,9 @@ buildscript {
     }
 }
 
-apply plugin: 'com.github.johnrengelman.shadow'
+plugins {
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
+}
 
 dependencies {
     compileOnly(
@@ -42,3 +44,5 @@ shadowJar {
 }
 
 tasks.test.dependsOn tasks.shadowJar
+jar.enabled=false
+assemble.dependsOn(shadowJar)
