@@ -27,6 +27,7 @@ You can view the Javadoc [here](https://experiandataquality.github.io/aperture-d
         - [getValueAt](#getvalueat)
         - [getInputRow](#getinputrow)
 - [Multi-threading](#multi-threading)
+- [Class-isolation](#class-isolation)
 - [Optimizing a Step](#optimizing-a-step)
     - [Step type](#step-type)
     - [isInteractive flag](#isinteractive-flag)
@@ -76,7 +77,7 @@ The steps below show how to generate a compatible jar file using Gradle:
 4. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
 5. To build your step, you can run `gradle build` either from IDE or command prompt. Refer to the [documentation](ExampleSteps/README.md) of 
    ExampleStep for more detail on the build step.
-6. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps.jar`.
+6. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps-all.jar`.
 
 ## Generating a custom step from a new or existing project 
 
@@ -99,8 +100,8 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
    }
    
    dependencies {
-       compileOnly("com.experian.aperture:sdk:1.4.0")
-       testCompile("com.experian.aperture:sdk-test-framework:1.4.0")
+       compileOnly("com.experian.aperture:sdk:1.5.0")
+       testCompile("com.experian.aperture:sdk-test-framework:1.5.0")
    }
    ```
    
@@ -132,13 +133,13 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk</artifactId>
-               <version>1.4.0</version>
+               <version>1.5.0</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk-test-framework</artifactId>
-               <version>1.4.0</version>
+               <version>1.5.0</version>
                <scope>test</scope>
            </dependency>
        </dependencies>
@@ -246,6 +247,18 @@ StepProperty arg1 = new StepProperty()
         .ofType(StepPropertyType.COLUMN_CHOOSER);
 ```
 
+|StepPropertyType|Description|
+|---|---|
+|BOOLEAN        |`true` or `false` field|
+|STRING         |Text field|
+|INTEGER        |Number without fraction|
+|DECIMAL        |Number with fraction|
+|COLUMN_CHOOSER |Input column drop down list|
+|MULTI_COLUMN_CHOOSER|Input column drop down list that allow multiple selection|
+|CUSTOM_CHOOSER      |Custom drop down list|
+|MULTI_CUSTOM_CHOOSER|Custom drop down list that allow multiple selection (Version 1.5+)|
+|INPUT_LABEL         |Display text|
+
 It is also recommended that you update the UI with some prompts and error icons to show the user that more interaction is required before the step will work correctly. You can do this by using the `withStatusIndicator`, `withIconTypeSupplier` and `withArgTextSupplier` methods. The example below will show an error icon and display a couple of prompts if no data input is present and subsequently if no column is selected. If all is correct, then the name of the column will be displayed.
 
 ``` java
@@ -279,6 +292,63 @@ The `StepOutput` is where the main work is done. You'll need to define a new out
 setStepOutput(new DemoOutput());
 ```
 
+##### Multiple inputs
+
+From Data Studio version 1.5 onward, custom step support multiple inputs.
+``` java
+final StepProperty arg0 = new StepProperty()
+        .ofType(StepPropertyType.COLUMN_CHOOSER)
+        .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null)
+        .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null ? ICON_OK : ICON_ERROR)
+        .withArgTextSupplier(sp -> () -> sp.allowedValuesProvider == null ? "<Connect 1st input>" : (sp.getValue() == null ? "<Select 1st Input 1st column>" : sp.getValue().toString()))
+        .havingInputNode(() -> "input0") // add new input node `input0` and define arg0's options
+        .havingOutputNode(() -> "output0")
+        .validateAndReturn();
+
+final StepProperty arg1 = new StepProperty()
+        .ofType(StepPropertyType.COLUMN_CHOOSER)
+        .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null)
+        .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null ? ICON_OK : ICON_ERROR)
+        .withArgTextSupplier(sp -> () -> sp.allowedValuesProvider == null ? "<Connect 2nd input>" : (sp.getValue() == null ? "<Select 2nd input 1st column>" : sp.getValue().toString()))
+        .havingInputNode(() -> "input1") // add new input node `input1` and define arg1's options
+        .validateAndReturn();
+
+final StepProperty arg2 = new StepProperty()
+        .ofType(StepPropertyType.MULTI_COLUMN_CHOOSER)
+        .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null)
+        .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null ? ICON_OK : ICON_ERROR)
+        .withArgTextSupplier(sp -> () -> sp.allowedValuesProvider == null ? "<Connect 2nd input>" : (sp.getValue() == null ? "<Select 2nd input multi columns>" : sp.getValue().toString()))
+        .havingInputNode(() -> "input1") // define arg2's options with input1's columns
+        .validateAndReturn();
+
+```
+
+`havingInputNode` method on `StepProperty` will add input node to the custom step, if the returning name is unique. `arg2.havingInputNode(() -> "input1")` in the code above only defines the drop down list item with `input1`'s columns. As `input1` already defined in `arg2`, no new input node is added.
+
+```java
+@Override
+public Object getValueAt(long row, int columnIndex) {
+    final String firstInputFirstColumn = getArgument(0);
+    final String secondInputFirstColumn = getArgument(1);
+    final Optional<StepColumn> firstArg = getInputColumn(0, firstInputFirstColumn);
+    final Optional<StepColumn> secondArg = getInputColumn(1, secondInputFirstColumn);
+    final StringBuilder sb = new StringBuilder();
+    try {
+        if (firstArg.isPresent()) {
+            sb.append(firstArg.get().getValue(row).toString()).append(", "); 
+        }
+        if (secondArg.isPresent()) {
+            sb.append(secondArg.get().getValue(row).toString());
+        }
+    } catch (Exception ignore) {
+        // intentionally empty
+    }
+```
+In the `StepOutput`, you can get the data from second input by calling `getInputColumn(inputIndex=1, columnName)` method.
+
+Please refer the full source code of `MultiInputColumnChooserStep` in [ExampleSteps](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples).
+
+
 ##### Disable multi column chooser's select all
 By default, the _select all_ checkbox is visible: 
 
@@ -294,7 +364,7 @@ final StepProperty multiChooser = new StepProperty()
     .withSelectAllOption(false);
 ```
 
-##### Auto select column based on data tag
+##### Automatically select column based on data tag
 Data Studio allows columns to be tagged columns with an additional label. Refer to [Data Tagging](https://www.edq.com/documentation/aperture-data-studio/user-guide/#data-tagging) for more info. 
 
 The column chooser step property can automatically select a column tagged with specific label (e.g. 'Phone') once the custom step connected with an input.
@@ -482,6 +552,69 @@ public Object getValueAt(long row, int col) throws Exception {
 
 In order to improve performance, especially when calling a web service that may have slower response times, we recommend using multiple threads. The `EmailValidate` example step demonstrates how to make use of multi-threading within a custom step.
 
+## Class-isolation
+
+By default every custom step `JAR` files are isolated in its own class-loader. The class-loader used will scan libraries 
+relative to the custom-step. This allow custom-step to use libraries that have different version from other custom steps   
+and Aperture Data Studio itself without the need to _shade_ into different packages. 
+
+Some note on the custom step packaging: 
+
+1. When using [Gradle shadow plugin](https://imperceptiblethoughts.com/shadow/) or [Maven shade plugin](https://maven.apache.org/plugins/maven-shade-plugin/),
+   try not to `minimize` the resulting jar as it may remove dependencies that are loaded through reflection or service-provider-interface, i.e.
+   
+   Gradle:
+   
+   ```groovy
+   shadowJar {
+       minimize() // don't use this
+   }
+   ```
+   
+   Maven: 
+   
+   ```xml 
+    <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-shade-plugin</artifactId>
+       <version>3.2.1</version>
+       <executions>
+         <execution>
+           <phase>package</phase>
+           <goals>
+             <goal>shade</goal>
+           </goals>
+           <configuration>
+             <!-- don't use this -->
+             <minimizeJar>true</minimizeJar>
+           </configuration>
+         </execution>
+       </executions>
+    </plugin>
+   ```
+   
+1. When using centralized libs folder, make sure that all of the dependencies jars are referred inside the custom step's 
+   `MANIFEST.MF`:
+
+    ![Centralized lib](images/lib-with-manifest-structure.PNG)
+    
+    ```
+    Manifest-Version: 1.0
+    Class-Path: libs/DQTSCommon-1.4.jar libs/json-20160810.jar libs/log4j-
+     api-2.10.0.jar libs/jackson-datatype-jsr310-2.8.11.jar libs/jackson-d
+     atabind-2.8.11.1.jar libs/jackson-core-2.8.11.jar libs/jackson-annota
+     tions-2.8.11.jar libs/guava-21.0.jar libs/commons-io-2.5.jar libs/com
+     mons-text-1.2.jar libs/commons-lang3-3.7.jar libs/minimal-json-0.9.1.
+     jar
+    ```
+    
+### Feature Toggle
+
+Toggle off _Sdk Use Custom Classloader_ to revert the behavior to pre-1.5.0. When toggled off, all custom steps will be 
+loaded by single system class loader.
+
+![Class loader toggle](images/classloader-toggle.PNG)
+
 ## Optimizing a step
 Your custom step can be optimized by using the following function:
 
@@ -507,14 +640,66 @@ boolean res = isInteractive();
 This setting is best used during the execution and `getValueAt` stages of the step, as it can negate the need to process all the input data when being viewed interactively. Instead, you can just process values when required. 
 
 ### Caching 
-The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and referenced by a particular name. The cache, which is global, is useful for storing responses from slow services between instances of custom steps. The backing key/value datastore is fast enough on reads to be used for random access lookups, and it can handle reads/writes from multiple steps at once. The cache is managed by Data Studio, but it is the responsibility of the custom step to delete or refresh the cache as necessary.
 
-Caches are created or obtained by calling `getCache` method with the name of your cache, which can be any string.
+The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and referenced 
+by a particular name. The cache is _scoped to each custom step class_, which means that 2 instances of the same custom 
+step in 2 different workflows can use the same cache if both supplied the same cache name. It is useful for storing 
+responses from slow services between instances of custom steps. The backing key/value datastore is fast enough on reads 
+to be used for random access lookups, and it can handle reads/writes from multiple steps at once. The cache is managed 
+by Data Studio, but it is the responsibility of the custom step to delete or refresh the cache as necessary.
+
+Caches are created or obtained by calling `StepOutput#getCache` method with the name of your cache, which can be any 
+string. `StepOutput#getCache` call is thread safe. Example below create or obtain (if it's already created) a cache with 
+default configuration:
+
 ``` java
-Cache myCache = getCache("my cache name");
+public class MyCustomStepOutput extend StepOutput {
+    // ... detail omitted
+    @Override
+    public void execute() {
+        final Cache myCache = getCache("MyCache");
+    }
+}
 ```
 
+Each record inside a cache is tied to _time-to-leave_ value. _Time-to-leave_ value is uniform across a single cache, 
+however, eviction event for each record is different as it's based on `creation time + _time-to-leave_ value`. To 
+illustrate this:
+
+CacheA: Time-to-leave 1 hour
+
+* Record A: 
+    * creation time 10:00 AM
+    * eviction time approximately 10:01 AM
+* Record B: 
+    * creation time 10:05 AM
+    * eviction time approximately 11:05 AM
+    
+Example below illustrate how to create a cache with custom time-to-leave: 
+
+```java 
+public class MyCustomStepOutput extend StepOutput {
+    // ... detail omitted
+    @Override
+    public void execute() {
+        final Cache cache30s = getCache(CacheConfiguration.withName(SECOND_CACHE).withTtl(30, TimeUnit.SECONDS));
+    }
+}
+```
+
+Please take note that eviction time is not a _hard realtime_ and there is going to be a few second delay from the real 
+eviction time due to the asynchronous nature of the mechanism. 
+
+Cache default properties values: 
+
+* Time-to-leave: 1 day. Configurable as `Sdk.cacheTTL` system property.
+* Eviction pool size: 2. Configurable as `Sdk.cacheEvictionPoolSize` system property.
+* Eviction interval: 10 seconds. Configurable as `Sdk.cacheEvictionInterval` system property.
+* Initial allocation file size: 5 MB. Configurable as `Sdk.cacheAllocateFileSize` system property.
+* File increment size: 5 MB. Configurable as `Sdk.cacheIncrementFileSize` system property.
+
 #### Cache interface
+
 The cache interface is defined by the functions presented below. They are called through the `Cache` object returned by the `getCache` function described above.
 
 ``` java
@@ -532,6 +717,16 @@ void close() throws Exception;
 ```
 Closes the cache. Should be called when all read/writes are completed - typically in `StepOutput.close()`.
 
+```java 
+String remove(String key)
+```
+Remove a single record from the cache. It will return the removed cache value if record exists.
+
+```java 
+void clear()
+```
+Remove all records from a cache.
+
 ``` java
 void delete() throws Exception;
 ```
@@ -540,8 +735,8 @@ Deletes the cache. Will throw an exception if in use.
 ``` java
 long getCreateTime();
 ```
-
 Gets the time when the cache was created.
+
 ``` java
 long getModifiedTime();
 ```
@@ -774,7 +969,7 @@ The steps below show how to generate a compatible jar file using Gradle:
 4. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
 5. To build your parser, you can run `gradle build` either from IDE or command prompt. Refer to the [documentation](ExampleSteps/README.md) of 
    ExampleStep module for more detail on the build step.
-6. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps.jar`.
+6. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps-all.jar`.
 
 ## Generating a custom parser from a new or existing project 
 
@@ -797,8 +992,8 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
    }
    
    dependencies {
-       compileOnly("com.experian.aperture:sdk:1.4.0")
-       testCompile("com.experian.aperture:sdk-test-framework:1.4.0")
+       compileOnly("com.experian.aperture:sdk:1.5.0")
+       testCompile("com.experian.aperture:sdk-test-framework:1.5.0")
    }
    ```
    
@@ -830,13 +1025,13 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk</artifactId>
-               <version>1.4.0</version>
+               <version>1.5.0</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk-test-framework</artifactId>
-               <version>1.4.0</version>
+               <version>1.5.0</version>
                <scope>test</scope>
            </dependency>
        </dependencies>
@@ -1136,29 +1331,45 @@ See the `TableSDK` interface in the Javadoc for more details.
 Various Data Studio properties are accessible through the SDK:
  
 ### Constants
-This function obtains the value of a constant value stored in Data Studio (the Glossary area under the Constants tab). The name to pass to the function is typically the constant name, written in uppercase and with underscores replacing spaces. For example, to obtain the regular expression for validating emails:
+
+This function obtains the value of a constant value stored in Data Studio (the Glossary area under the Constants tab). 
+The name to pass to the function is typically the constant name, written in uppercase and with underscores replacing 
+spaces. For example, to obtain the regular expression for validating emails:
 
 ``` java
-Object res = getConstantByName("EMAIL_ADDRESS");
+final Optional<String> constantValue = ServerValueUtil.getGlossaryConstant("EMAIL_ADDRESS");
 ```
+
+Since 1.5, `StepOutput#getConstantByName(String)` has been marked as deprecated in favor of 
+`ServerValueUtil.getGlossaryConstant(String)`. `ServerValueUtil` provide more flexibility such as retrieving constant 
+inside a constructor of `StepConfiguration`.  
  
 ### Glossary values
 This function obtains groups of values defined under one glossary item in Data Studio. 
-For example, to get a list of all the blocking keys:
+This is only used to get a list of the DNS servers.
 
 ``` java
-List<Object> values = getGlossaryValues("EXPERIAN_MATCH_BLOCKING_KEYS");
+List<Object> values = getGlossaryValues("DNS_SERVERS");
 ```
  
 ### Server properties
-You can obtain a list of values under a particular Data Studio property by using:
+
+To obtain a server property as defined in Data Studio, or set in the server's `server.properties` file:
+
+```java 
+final Optional<Object> serverPropertyValue = ServerValueUtil.getServerProperty("System.locale");
+```
+
+Alternatively, you can obtain a list of values under a particular Data Studio property by using (note that this method 
+only accessible inside child class of `StepOutput`):
+
 ``` java
 List<String> dnsServers = getServerObjectProperties("DNSServers", "CONTENT");
 ```
-Alternatively, you can obtain a single server property, as defined in Data Studio, or set in the server's server.properties file:
-``` java
-Object value = getServerProperty("NAME");
-```
+
+Since 1.5, `StepOutput#getServerProperty(String)` has been marked as deprecated in favor of 
+`ServerValueUtil.getServerProperty(String)`. `ServerValueUtil` provide more flexibility such as retrieving constant 
+inside a constructor of `StepConfiguration`.  
 
 ## Debugging
 To enable Java's standard remote debugging feature:
