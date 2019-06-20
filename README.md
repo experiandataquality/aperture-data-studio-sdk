@@ -662,11 +662,11 @@ public class MyCustomStepOutput extend StepOutput {
 }
 ```
 
-Each record inside a cache is tied to _time-to-leave_ value. _Time-to-leave_ value is uniform across a single cache, 
-however, eviction event for each record is different as it's based on `creation time + _time-to-leave_ value`. To 
+Each record inside a cache is tied to _time-to-live_ value. _Time-to-live_ value is uniform across a single cache, 
+however, eviction event for each record is different as it's based on `creation time + _time-to-live_ value`. To 
 illustrate this:
 
-CacheA: Time-to-leave 1 hour
+CacheA: Time-to-live 1 hour
 
 * Record A: 
     * creation time 10:00 AM
@@ -675,7 +675,7 @@ CacheA: Time-to-leave 1 hour
     * creation time 10:05 AM
     * eviction time approximately 11:05 AM
     
-Example below illustrate how to create a cache with custom time-to-leave: 
+Example below illustrate how to create a cache with custom time-to-live: 
 
 ```java 
 public class MyCustomStepOutput extend StepOutput {
@@ -692,7 +692,7 @@ eviction time due to the asynchronous nature of the mechanism.
 
 Cache default properties values: 
 
-* Time-to-leave: 1 day. Configurable as `Sdk.cacheTTL` system property.
+* Time-to-live: 1 day. Configurable as `Sdk.cacheTTL` system property.
 * Eviction pool size: 2. Configurable as `Sdk.cacheEvictionPoolSize` system property.
 * Eviction interval: 10 seconds. Configurable as `Sdk.cacheEvictionInterval` system property.
 * Initial allocation file size: 5 MB. Configurable as `Sdk.cacheAllocateFileSize` system property.
