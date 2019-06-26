@@ -670,7 +670,7 @@ CacheA: Time-to-live 1 hour
 
 * Record A: 
     * creation time 10:00 AM
-    * eviction time approximately 10:01 AM
+    * eviction time approximately 11:00 AM
 * Record B: 
     * creation time 10:05 AM
     * eviction time approximately 11:05 AM
