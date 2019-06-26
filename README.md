@@ -560,6 +560,17 @@ and Aperture Data Studio itself without the need to _shade_ into different packa
 
 Some note on the custom step packaging: 
 
+1. These libraries cannot be replaced by custom step to prevent class mismatch issues: 
+
+    * org.json:json:20160810
+    * org.apache.logging.log4j:log4j-api:2.11.1
+    * com.googlecode.json-simple:json-simple:1.1.1
+    
+    In addition to those libraries above, anything that falls under `com.experian.aperture.datastudio.sdk`, `sun`, 
+    `java`, and `javax` packages will always be loaded from parent class loader. 
+    
+    Please contact us if your custom step needs a newer version of any of the libraries above.  
+    
 1. When using [Gradle shadow plugin](https://imperceptiblethoughts.com/shadow/) or [Maven shade plugin](https://maven.apache.org/plugins/maven-shade-plugin/),
    try not to `minimize` the resulting jar as it may remove dependencies that are loaded through reflection or service-provider-interface, i.e.
    
@@ -600,7 +611,7 @@ Some note on the custom step packaging:
     
     ```
     Manifest-Version: 1.0
-    Class-Path: libs/DQTSCommon-1.4.jar libs/json-20160810.jar libs/log4j-
+    Class-Path: libs/DQTSCommon-1.4.jar libs/log4j-
      api-2.10.0.jar libs/jackson-datatype-jsr310-2.8.11.jar libs/jackson-d
      atabind-2.8.11.1.jar libs/jackson-core-2.8.11.jar libs/jackson-annota
      tions-2.8.11.jar libs/guava-21.0.jar libs/commons-io-2.5.jar libs/com
