@@ -611,19 +611,13 @@ Some note on the custom step packaging:
     
     ```
     Manifest-Version: 1.0
-    Class-Path: libs/DQTSCommon-1.4.jar libs/jackson-datatype-jsr310-2.8.11.jar 
-    libs/jackson-databind-2.8.11.1.jar libs/jackson-core-2.8.11.jar 
-    libs/jackson-annotations-2.8.11.jar libs/guava-21.0.jar libs/commons-io-2.5.jar 
-    libs/commons-text-1.2.jar libs/commons-lang3-3.7.jar libs/minimal-json-0.9.1.jar
+    Class-Path: libs/DQTSCommon-2.0.jar libs/jackson-datatype-jsr310-2.8.1
+     1.jar libs/jackson-databind-2.8.11.1.jar libs/jackson-core-2.8.11.jar
+      libs/jackson-annotations-2.8.11.jar libs/guava-21.0.jar libs/commons
+     -io-2.5.jar libs/commons-text-1.2.jar libs/commons-lang3-3.7.jar libs
+     /minimal-json-0.9.1.jar
     ```
     
-### Feature Toggle
-
-Toggle off _Sdk Use Custom Classloader_ to revert the behavior to pre-1.5.0. When toggled off, all custom steps will be 
-loaded by single system class loader.
-
-![Class loader toggle](images/classloader-toggle.PNG)
-
 ## Optimizing a step
 Your custom step can be optimized by using the following function:
 
