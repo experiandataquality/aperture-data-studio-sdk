@@ -100,8 +100,8 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
    }
    
    dependencies {
-       compileOnly("com.experian.aperture:sdk:1.5.0")
-       testCompile("com.experian.aperture:sdk-test-framework:1.5.0")
+       compileOnly("com.experian.aperture:sdk:1.6.0")
+       testCompile("com.experian.aperture:sdk-test-framework:1.6.0")
    }
    ```
    
@@ -133,13 +133,13 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk</artifactId>
-               <version>1.5.0</version>
+               <version>1.6.0</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk-test-framework</artifactId>
-               <version>1.5.0</version>
+               <version>1.6.0</version>
                <scope>test</scope>
            </dependency>
        </dependencies>
@@ -617,13 +617,10 @@ Some note on the custom step packaging:
      -io-2.5.jar libs/commons-text-1.2.jar libs/commons-lang3-3.7.jar libs
      /minimal-json-0.9.1.jar
     ```
-    
+
 ## Optimizing a step
 Your custom step can be optimized by using the following function:
 
-``` java
-Object value = getServerProperty("NAME");
-```
 ### Step type
 You can specify (optionally) if your step is a process flow step. Process nodes should be used to perform operations that don’t change the data, e.g. downloading new reference data, or sending an email notification. Process flow steps differ from normal steps: they have different connecting nodes, and pass data through unchanged. You do not have to specify any input or output arguments as a single input and output node will be added automatically. Set the step type to process by adding the following line to the step definition:
 
@@ -995,8 +992,8 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
    }
    
    dependencies {
-       compileOnly("com.experian.aperture:sdk:1.5.0")
-       testCompile("com.experian.aperture:sdk-test-framework:1.5.0")
+       compileOnly("com.experian.aperture:sdk:1.6.0")
+       testCompile("com.experian.aperture:sdk-test-framework:1.6.0")
    }
    ```
    
@@ -1028,13 +1025,13 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk</artifactId>
-               <version>1.5.0</version>
+               <version>1.6.0</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk-test-framework</artifactId>
-               <version>1.5.0</version>
+               <version>1.6.0</version>
                <scope>test</scope>
            </dependency>
        </dependencies>

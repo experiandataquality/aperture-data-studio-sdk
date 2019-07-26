@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2017 Experian plc.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@ package com.experian.aperture.datastudio.sdk.step.examples;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.Cache;
+import com.experian.aperture.datastudio.sdk.step.ServerValueUtil;
 import com.experian.aperture.datastudio.sdk.step.StepColumn;
 import com.experian.aperture.datastudio.sdk.step.StepConfiguration;
 import com.experian.aperture.datastudio.sdk.step.StepOutput;
@@ -24,6 +25,7 @@ import com.experian.aperture.datastudio.sdk.step.StepPropertyType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This example step demonstrates the new ability to call Business Constants into custom steps from Aperture
@@ -178,10 +180,8 @@ public class BasicVehicleRegistrationValidateStep extends StepConfiguration {
             }
             if (regNumberPattern == null) {
                 //The string is the name of the Business constant in Aperture as it appears in the UI (database style case)
-                final Object res = getConstantByName("UK_VEHICLE_REGISTRATION_NUMBER");
-                if (res instanceof String) {
-                    regNumberPattern = (String) res;
-                }
+                final Optional<String> registrationNumberConstant = ServerValueUtil.getGlossaryConstant("UK_VEHICLE_REGISTRATION_NUMBER");
+                registrationNumberConstant.ifPresent(s -> regNumberPattern = s);
             }
             return regNumber.matches(regNumberPattern);
         }

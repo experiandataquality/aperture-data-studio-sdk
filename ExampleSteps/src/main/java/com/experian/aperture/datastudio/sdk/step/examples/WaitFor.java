@@ -8,6 +8,7 @@ import com.experian.aperture.datastudio.sdk.step.StepPropertyType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A simple demonstration of process steps.
@@ -34,12 +35,12 @@ public class WaitFor extends StepConfiguration {
                     if (sp.getValue() == null || sp.getValue().toString().isEmpty()) {
                         return "Wait for milliseconds";
                     } else {
-                        try {
-                            return "Wait for milliseconds: " + Integer.parseInt(sp.getValue().toString());
-                        } catch (final NumberFormatException ex) {
-                            return "Enter milliseconds";
-                        }
+                        String stringValue = sp.getValue().toString();
+                        return tryParsePositiveInteger(stringValue).isPresent() ? "Wait for milliseconds: " + stringValue : "Enter milliseconds";
                     }
+                })
+                .withStatusIndicator(sp -> () -> {
+                    return sp.getValue() != null && tryParsePositiveInteger(sp.getValue().toString()).isPresent();
                 })
                 .validateAndReturn();
 
@@ -47,6 +48,23 @@ public class WaitFor extends StepConfiguration {
 
         // Define and set the step output class
         setStepOutput(new MyStepOutput());
+    }
+
+    private static Optional<Integer> tryParsePositiveInteger(String millisecondsString){
+        Integer milliseconds = null;
+
+        try {
+            milliseconds = Integer.parseInt(millisecondsString);
+
+            if (milliseconds >= 0) {
+                return Optional.of(milliseconds);
+            } else {
+                return Optional.empty();
+            }
+
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -63,7 +81,7 @@ public class WaitFor extends StepConfiguration {
         final List<StepProperty> properties = getStepProperties();
         if (properties != null && !properties.isEmpty()) {
             final StepProperty arg1 = properties.get(0);
-            if (arg1 != null && arg1.getValue() != null && !arg1.getValue().toString().isEmpty()) {
+            if (arg1 != null && arg1.getValue() != null && !arg1.getValue().toString().isEmpty() && tryParsePositiveInteger(arg1.getValue().toString()).isPresent()) {
                 return true;
             }
         }
@@ -85,10 +103,14 @@ public class WaitFor extends StepConfiguration {
         public long execute() throws SDKException {
             try {
                 final String millisecondsString = getArgument(0);
-                final Integer milliseconds = Integer.parseInt(millisecondsString);
-                Thread.sleep(milliseconds);
-            } catch (InterruptedException | NumberFormatException e) {
-                Thread.currentThread().interrupt();
+                final Optional<Integer> milliseconds = tryParsePositiveInteger(millisecondsString);
+
+                if (milliseconds.isPresent()){
+                    Thread.sleep(milliseconds.get());
+                }
+
+            } catch (InterruptedException e) {
+                // do nothing instead of interrupting the thread.
             }
             return 0;
         }

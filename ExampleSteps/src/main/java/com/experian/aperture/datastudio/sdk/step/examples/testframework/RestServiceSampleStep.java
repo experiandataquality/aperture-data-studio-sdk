@@ -2,6 +2,7 @@ package com.experian.aperture.datastudio.sdk.step.examples.testframework;
 
 import com.experian.aperture.datastudio.sdk.exception.SDKException;
 import com.experian.aperture.datastudio.sdk.step.ColumnManager;
+import com.experian.aperture.datastudio.sdk.step.ServerValueUtil;
 import com.experian.aperture.datastudio.sdk.step.StepColumn;
 import com.experian.aperture.datastudio.sdk.step.StepConfiguration;
 import com.experian.aperture.datastudio.sdk.step.StepOutput;
@@ -10,6 +11,7 @@ import com.experian.aperture.datastudio.sdk.step.StepPropertyType;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
@@ -97,9 +99,8 @@ public class RestServiceSampleStep extends StepConfiguration {
 
         @Override
         public void initialise() {
-            if (this.getConstantByName(COLOR_SERVICE_URL_KEY) != null) {
-                this.colorService.setBaseUri(this.getConstantByName(COLOR_SERVICE_URL_KEY).toString());
-            }
+            Optional<String> urlConstant = ServerValueUtil.getGlossaryConstant(COLOR_SERVICE_URL_KEY);
+            urlConstant.ifPresent(colorService::setBaseUri);
 
             final ColumnManager columnManager = this.getColumnManager();
             columnManager.addColumn(this, COLOR_NAME_COLUMN, COLOR_NAME_COLUMN);
