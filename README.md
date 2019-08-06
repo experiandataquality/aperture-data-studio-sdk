@@ -461,7 +461,7 @@ The `initialise` method initializes the view and is therefore where you would se
 In the example below, the ColumnManager clears the columns, retrieves the column selected by the user, and adds a column next to it.
 
 ``` java
-public void initialise() throws Exception {
+public void initialise() throws SDKException {
 
     getColumnManager().clearColumns();
 
@@ -479,6 +479,32 @@ public void initialise() throws Exception {
     }
 }
 ```
+##### Column's Expected Type
+When you add a new column, you can set the column's expected data type by calling `setExpectedType(ColumnDataType)` method. This allow the user of your custom step, to get the data type by calling `getExpectedType()` method. 
+By default, the column's expected type is set to `STRING`.
+
+Please take note, the value of the column might be different from the expected data type.
+
+|ColumnDataType|Description|
+|---|---|
+|STRING |String, sequence of characters|
+|BOOLEAN|`true` or `false`, can be used as a rule in Validate step|
+|INTEGER|Number without fraction|
+|DECIMAL|Number with fraction|
+|DATE   |Date object|
+|UNKNOWN|Unknown data type, e.g. source file column's `Datatype` is set to `Automatic` or `Custom` |
+
+If the expected type is set to `BOOLEAN`, the column can be used as a rule in Validate step.
+```java
+@Override
+public void initialise() throws SDKException {
+    getColumnManager().addColumn(this, "Rule", "To be used in validate step")
+            .setExpectedType(ColumnDataType.BOOLEAN);
+}
+
+```
+
+![Edit Configurations](images/validate-rule.png)
 
 #### getValueAt
 The `getValueAt` method is called for each cell when generating the view or executing the workflow. By default, it displays the data as it is. If you override this, you can set the values in a specific column. In the example below you can see that the row and column are passed in. The example also shows how to use `getValueAt` to get the column selected by the user and use those values for another column.
