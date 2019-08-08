@@ -357,12 +357,27 @@ By default, the _select all_ checkbox is visible:
 To hide _select all_ checkbox: 
 
 ```java 
-// Note that this features is only available in Aperture Data Studio 1.4.0 onwards.
+// Note that this feature is only available in Aperture Data Studio 1.4.0 onwards.
 final StepProperty multiChooser = new StepProperty()
     .ofType(StepPropertyType.MULTI_COLUMN_CHOOSER)
     // detail omitted
     .withSelectAllOption(false);
 ```
+
+##### Enable filter for custom chooser
+
+![Custom Chooser Filter](images/chooser-filter.png)
+
+To enable _filter_ for a custom chooser: 
+
+```java 
+// Note that this feature is only available in Aperture Data Studio 1.4.0 onwards.
+final StepProperty customChooser = new StepProperty()
+    .ofType(StepPropertyType.CUSTOM_CHOOSER)
+    // detail omitted
+    .withChooserFilter(true);
+```
+
 
 ##### Automatically select column based on data tag
 Data Studio allows columns to be tagged columns with an additional label. Refer to [Data Tagging](https://www.edq.com/documentation/aperture-data-studio/user-guide/#data-tagging) for more info. 
