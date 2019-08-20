@@ -378,7 +378,6 @@ final StepProperty customChooser = new StepProperty()
     .withChooserFilter(true);
 ```
 
-
 ##### Automatically select column based on data tag
 Data Studio allows columns to be tagged columns with an additional label. Refer to [Data Tagging](https://www.edq.com/documentation/aperture-data-studio/user-guide/#data-tagging) for more info. 
 
