@@ -7,6 +7,8 @@ import com.experian.aperture.datastudio.sdk.step.StepConfiguration;
 import com.experian.aperture.datastudio.sdk.step.StepOutput;
 import com.experian.aperture.datastudio.sdk.step.StepProperty;
 import com.experian.aperture.datastudio.sdk.step.StepPropertyType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Collections;
 import java.util.Random;
@@ -32,19 +34,21 @@ public final class NewCacheStep extends StepConfiguration {
     }
 
     private static final class NewCacheOutput extends StepOutput {
-
         private static final String FIRST_CACHE = "1ST";
         private static final String SECOND_CACHE = "2ND";
         private Cache firstCache = null;
+        private Cache secondCache = null;
         private final Random random = new Random();
         private int startColumn = 0;
+        private Logger log = LogManager.getLogger();
 
         @Override
         public void initialise() {
             startColumn = getColumnManager().getColumnCount();
             getColumnManager().addColumn(this, "First", "");
             getColumnManager().addColumn(this, "Second", "");
-            firstCache = getCache(CacheConfiguration.withName(FIRST_CACHE).withTtl(60, TimeUnit.SECONDS));
+            firstCache = getCache(CacheConfiguration.withName(FIRST_CACHE).withTtl(600, TimeUnit.SECONDS));
+            secondCache = getCache(CacheConfiguration.withName(SECOND_CACHE).withTtl(30, TimeUnit.SECONDS));
         }
 
         @Override
@@ -62,10 +66,10 @@ public final class NewCacheStep extends StepConfiguration {
                         Thread.sleep(100);
                         value = String.valueOf(random.nextLong());
                         firstCache.write(key, value);
+                        log.info("Creating new key [{}] value [{}]", key, value);
                     }
                     return value;
                 } else if (col == startColumn + 1) {
-                    final Cache secondCache = getCache(CacheConfiguration.withName(SECOND_CACHE).withTtl(30, TimeUnit.SECONDS));
                     String value = secondCache.read(key);
                     if (value == null) {
                         Thread.sleep(100);
@@ -77,6 +81,21 @@ public final class NewCacheStep extends StepConfiguration {
                 return null;
             } catch (Exception ex) {
                 throw new SDKException(ex);
+            }
+        }
+
+        @Override
+        public void close() {
+            if (firstCache != null) {
+                try {
+                    firstCache.close();
+                } catch (Exception ex) {}
+            }
+
+            if (secondCache != null) {
+                try {
+                    secondCache.close();
+                } catch (Exception ex) {}
             }
         }
     }

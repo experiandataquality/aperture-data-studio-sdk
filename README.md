@@ -100,8 +100,8 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
    }
    
    dependencies {
-       compileOnly("com.experian.aperture:sdk:1.5.0")
-       testCompile("com.experian.aperture:sdk-test-framework:1.5.0")
+       compileOnly("com.experian.aperture:sdk:1.6.0")
+       testCompile("com.experian.aperture:sdk-test-framework:1.6.0")
    }
    ```
    
@@ -133,13 +133,13 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk</artifactId>
-               <version>1.5.0</version>
+               <version>1.6.0</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk-test-framework</artifactId>
-               <version>1.5.0</version>
+               <version>1.6.0</version>
                <scope>test</scope>
            </dependency>
        </dependencies>
@@ -357,11 +357,25 @@ By default, the _select all_ checkbox is visible:
 To hide _select all_ checkbox: 
 
 ```java 
-// Note that this features is only available in Aperture Data Studio 1.4.0 onwards.
+// Note that this feature is only available in Aperture Data Studio 1.4.0 onwards.
 final StepProperty multiChooser = new StepProperty()
     .ofType(StepPropertyType.MULTI_COLUMN_CHOOSER)
     // detail omitted
     .withSelectAllOption(false);
+```
+
+##### Enable filter for custom chooser
+
+![Custom Chooser Filter](images/chooser-filter.png)
+
+To enable _filter_ for a custom chooser: 
+
+```java 
+// Note that this feature is only available in Aperture Data Studio 1.4.0 onwards.
+final StepProperty customChooser = new StepProperty()
+    .ofType(StepPropertyType.CUSTOM_CHOOSER)
+    // detail omitted
+    .withChooserFilter(true);
 ```
 
 ##### Automatically select column based on data tag
@@ -461,7 +475,7 @@ The `initialise` method initializes the view and is therefore where you would se
 In the example below, the ColumnManager clears the columns, retrieves the column selected by the user, and adds a column next to it.
 
 ``` java
-public void initialise() throws Exception {
+public void initialise() throws SDKException {
 
     getColumnManager().clearColumns();
 
@@ -479,6 +493,32 @@ public void initialise() throws Exception {
     }
 }
 ```
+##### Column's Expected Type
+When you add a new column, you can set the column's expected data type by calling `setExpectedType(ColumnDataType)` method. This allow the user of your custom step, to get the data type by calling `getExpectedType()` method. 
+By default, the column's expected type is set to `STRING`.
+
+Please take note, the value of the column might be different from the expected data type.
+
+|ColumnDataType|Description|
+|---|---|
+|STRING |String, sequence of characters|
+|BOOLEAN|`true` or `false`, can be used as a rule in Validate step|
+|INTEGER|Number without fraction|
+|DECIMAL|Number with fraction|
+|DATE   |Date object|
+|UNKNOWN|Unknown data type, e.g. source file column's `Datatype` is set to `Automatic` or `Custom` |
+
+If the expected type is set to `BOOLEAN`, the column can be used as a rule in Validate step.
+```java
+@Override
+public void initialise() throws SDKException {
+    getColumnManager().addColumn(this, "Rule", "To be used in validate step")
+            .setExpectedType(ColumnDataType.BOOLEAN);
+}
+
+```
+
+![Edit Configurations](images/validate-rule.png)
 
 #### getValueAt
 The `getValueAt` method is called for each cell when generating the view or executing the workflow. By default, it displays the data as it is. If you override this, you can set the values in a specific column. In the example below you can see that the row and column are passed in. The example also shows how to use `getValueAt` to get the column selected by the user and use those values for another column.
@@ -617,13 +657,10 @@ Some note on the custom step packaging:
      -io-2.5.jar libs/commons-text-1.2.jar libs/commons-lang3-3.7.jar libs
      /minimal-json-0.9.1.jar
     ```
-    
+
 ## Optimizing a step
 Your custom step can be optimized by using the following function:
 
-``` java
-Object value = getServerProperty("NAME");
-```
 ### Step type
 You can specify (optionally) if your step is a process flow step. Process nodes should be used to perform operations that don’t change the data, e.g. downloading new reference data, or sending an email notification. Process flow steps differ from normal steps: they have different connecting nodes, and pass data through unchanged. You do not have to specify any input or output arguments as a single input and output node will be added automatically. Set the step type to process by adding the following line to the step definition:
 
@@ -995,8 +1032,8 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
    }
    
    dependencies {
-       compileOnly("com.experian.aperture:sdk:1.5.0")
-       testCompile("com.experian.aperture:sdk-test-framework:1.5.0")
+       compileOnly("com.experian.aperture:sdk:1.6.0")
+       testCompile("com.experian.aperture:sdk-test-framework:1.6.0")
    }
    ```
    
@@ -1028,13 +1065,13 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk</artifactId>
-               <version>1.5.0</version>
+               <version>1.6.0</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk-test-framework</artifactId>
-               <version>1.5.0</version>
+               <version>1.6.0</version>
                <scope>test</scope>
            </dependency>
        </dependencies>
