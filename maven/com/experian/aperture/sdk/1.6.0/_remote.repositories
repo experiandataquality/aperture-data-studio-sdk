@@ -1,0 +1,5 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Tue Sep 10 15:56:08 SGT 2019
+sdk-1.6.0.jar>=
+sdk-1.6.0.pom>=
+sdk-1.6.0-javadoc.jar>=
