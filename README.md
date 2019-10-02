@@ -71,7 +71,7 @@ The steps below show how to generate a compatible jar file using Gradle:
 
 1. Clone the repo.
 2. Open the project in your IDE of choice.
-3. Custom step skeleton is available at [StepTemplate.java](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/addons/StepTemplate.java). 
+3. Custom step skeleton is available at [StepTemplate.java](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/StepTemplate.java). 
    Please take note that the package structure `com.experian.aperture.datastudio.sdk.step.addons` must be respected as 
    it's where Aperture Data Studio scan for custom steps. 
 4. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
