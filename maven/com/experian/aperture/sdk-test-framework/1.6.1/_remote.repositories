@@ -1,0 +1,5 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Fri Nov 01 13:38:31 SGT 2019
+sdk-test-framework-1.6.1.pom>=
+sdk-test-framework-1.6.1-javadoc.jar>=
+sdk-test-framework-1.6.1.jar>=
