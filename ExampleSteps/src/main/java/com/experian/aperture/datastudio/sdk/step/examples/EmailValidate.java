@@ -122,7 +122,7 @@ public class EmailValidate extends StepConfiguration {
             final String selectedColumnName = getArgument(0);
             final StepColumn selectedColumn = getColumnManager().getColumnByName(selectedColumnName);
 
-            // queue up to 1000 threads, for processing BLOCK_SIZE times simultaneously
+            // queue up to THREAD_SIZE threads, for processing BLOCK_SIZE times simultaneously
             final List<Future> futures = new ArrayList<>();
             for (long rowId = 0L; rowId < rowCount; rowId++) {
                 try {
