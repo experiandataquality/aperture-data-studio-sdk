@@ -100,8 +100,8 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
    }
    
    dependencies {
-       compileOnly("com.experian.aperture:sdk:1.6.0")
-       testCompile("com.experian.aperture:sdk-test-framework:1.6.0")
+       compileOnly("com.experian.aperture:sdk:1.6.1")
+       testCompile("com.experian.aperture:sdk-test-framework:1.6.1")
    }
    ```
    
@@ -133,13 +133,13 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk</artifactId>
-               <version>1.6.0</version>
+               <version>1.6.1</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk-test-framework</artifactId>
-               <version>1.6.0</version>
+               <version>1.6.1</version>
                <scope>test</scope>
            </dependency>
        </dependencies>
@@ -1032,8 +1032,8 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
    }
    
    dependencies {
-       compileOnly("com.experian.aperture:sdk:1.6.0")
-       testCompile("com.experian.aperture:sdk-test-framework:1.6.0")
+       compileOnly("com.experian.aperture:sdk:1.6.1")
+       testCompile("com.experian.aperture:sdk-test-framework:1.6.1")
    }
    ```
    
@@ -1065,13 +1065,13 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk</artifactId>
-               <version>1.6.0</version>
+               <version>1.6.1</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                <groupId>com.experian.aperture</groupId>
                <artifactId>sdk-test-framework</artifactId>
-               <version>1.6.0</version>
+               <version>1.6.1</version>
                <scope>test</scope>
            </dependency>
        </dependencies>
