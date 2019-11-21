@@ -38,12 +38,12 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
    repositories {
        mavenCentral()
        maven {
-            url '[TO BE CHANGED]'
+           url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
        }
    }
 
    dependencies {
-       compileOnly("com.experian.datastudio:sdkapi:[VERSION TO BE CHANGED]")
+       compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
    }
    ```
 
@@ -70,8 +70,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
        <repositories>
            <repository>
-               <id>aperture-data-studio-github-repo</id>
-               <url>[TO BE CHANGED]</url>
+               <id>aperture-data-studio-github-repo-snapshot</id>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven/</url>
            </repository>
        </repositories>
 
@@ -79,7 +79,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
            <dependency>
                <groupId>com.experian.datastudio</groupId>
                <artifactId>sdkapi</artifactId>
-               <version>[TO BE CHANGED]</version>
+               <version>2.0.0-SNAPSHOT</version>
                <scope>provided</scope>
            </dependency>
        </dependencies>
