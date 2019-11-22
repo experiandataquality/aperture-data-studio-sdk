@@ -24,6 +24,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 		- [StepProcessorBuilder sample code](#stepprocessorbuilder-sample-code)
 - [The logging library](#the-logging-library)
 - [The cache configuration](#the-cache-configuration)
+- [The http client library](#the-http-client-library)
 
 
 ## Generating a custom step from a new or existing project
@@ -167,6 +168,21 @@ Nodes represent the input and output nodes in the step. You can define how many 
                         .addOutputNode(OUTPUT_ID)
                         .build())
 ```	
+
+##### Process Node
+``` java
+.withNodes(stepNodeBuilder -> stepNodeBuilder
+		.addInputNode(inputNodeBuilder -> inputNodeBuilder
+				.withId(INPUT_ID)
+				.withType(NodeType.PROCESS)
+				.build())
+		.addOutputNode(outputNodeBuilder -> outputNodeBuilder
+				.withId(OUTPUT_ID)
+				.withType(NodeType.PROCESS)
+				.build())
+		.build())
+
+```
 
 #### Adding step properties
 
@@ -366,6 +382,17 @@ This method is used to apply logic to the input source and the computed value wi
                 .build();
     }
 ```
+#### isInteractive() flag
+Interactive is a flag that set to `true` when the user explores the output of a step on the Data Studio Grid. 
+It is set to `false` when running the whole workflow.
+``` java
+@Override
+public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+	return processorBuilder
+			.forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
+				if (processorContext.isInteractive()) {
+                    ...
+```
 
 ## The logging library
 ``` java
@@ -392,4 +419,72 @@ private static final Logger LOGGER = StepLogManager.getLogger(StepsTemplate.clas
 ### Getting value from cache
 ```java
     cache1.get(cacheKey);
+```
+
+## The http client library
+### Create http client object
+```java
+    WebHttpClient
+        .builder()
+        .withHttpVersion(..) // Http protocol version
+        .withProxy(..) // specifying any required proxy
+        .withConnectionTimeout(..) // maximum time to establish connection
+        .withSocketTimeout(..) // maximum time to retrieve data
+        .build()    
+```
+
+### Create http GET request object
+```java
+    WebHttpRequest
+        .builder()
+        .get(..) // passing in the url
+        .withQueryString(..) // specifying query string in key value pair, alternatively can use .addQueryString(..)
+        .withHeader(..) // specifying headers value, alternatively can use .addHeader(..)
+        .build()
+```
+
+### Create http POST request object
+```java
+    WebHttpRequest
+        .builder()
+        .post(..) // passing in the url
+        .withBody(..) // specifying the body
+        .withQueryString(..) // specifying query string in key value pair, alternatively can use .addQueryString(..)
+        .withHeader(..) // specifying headers value, alternatively can use .addHeader(..)
+        .build()
+```
+
+### Create http PUT request object
+```java
+    WebHttpRequest
+        .builder()
+        .put(..) // passing in the url
+        .withBody(..) // specifying the body
+        .withQueryString(..) // specifying query string in key value pair, alternatively can use .addQueryString(..)
+        .withHeader(..) // specifying headers value, alternatively can use .addHeader(..)
+        .build()
+```
+
+### Create http DELETE request object
+```java
+    WebHttpRequest
+        .builder()
+        .delete(..) // passing in the url
+        .withBody(..) // specifying the body
+        .withQueryString(..) // specifying query string in key value pair, alternatively can use .addQueryString(..)
+        .withHeader(..) // specifying headers value, alternatively can use .addHeader(..)
+        .build()
+```
+
+### Send http request through WebHttpClient
+```java
+    WebHttpClient client = WebHttpClient
+                                   .builder()
+                                   .withHttpVersion(..) // Http protocol version
+                                   .withProxy(..) // specifying any required proxy
+                                   .withConnectionTimeout(..) // maximum time to establish connection
+                                   .withSocketTimeout(..) // maximum time to retrieve data
+                                   .build();
+   
+    client.sendAsync(request);
 ```
