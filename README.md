@@ -94,15 +94,15 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 Here are the main differences between the v1.0 and v2.0 of the SDK:
 
-| Features                      |            SDK v1.0           |                                       SDK v2.0                                    |
-|-------------------------------|-------------------------------|-----------------------------------------------------------------------------------|
-| Design                        | Extending Abstract class      | Implementing interface                                                            |
-| Register step details         | Using `setStepDefinition` methods in `StepConfiguration` class | Using  `CustomTypeMetadataBuilder`  [Sample code](#metadata-sample-code)            |
-| Configure step property  | Using `setStepProperties()` in `StepConfiguration` class | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) |
-| Configure *isComplete* handling | Override `isComplete()` in `StepConfiguration` class | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) |
-| Configure column step         | Override `initialise()` in `StepOutput` class                                      | Using `StepConfigurationBuilder` [Sample code](#stepprocessorbuilder-sample-code)         |  
-| Execute and retrieve value from step    | Override `execute()` and `getValueAt()` in `StepOutput` class        | Using `StepProcessorBuilder` [Sample code](#stepprocessorbuilder-sample-code)         |
-| Logging in step               | Using `logError()` from base class                                                     | Using `StepLogManager` library [Sample Code](#logging-library)                          |
+| Features                          |            SDK v1.0           |                                       SDK v2.0                                    |
+|-----------------------------------|-------------------------------|-----------------------------------------------------------------------------------|
+| Design                            | Extending Abstract class                                                  | Implementing interface                                                                |
+| Register step details             | Using `setStepDefinition` methods in `StepConfiguration` class            | Using  `CustomTypeMetadataBuilder`  [Sample code](#metadata-sample-code)              |
+| Configure step property           | Using `setStepProperties()` in `StepConfiguration` class                  | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) |
+| Configure *isComplete* handling   | Override `isComplete()` in `StepConfiguration` class                      | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) |
+| Configure column step             | Override `initialise()` in `StepOutput` class                             | Using `StepConfigurationBuilder` [Sample code](#stepprocessorbuilder-sample-code)     |  
+| Execute and retrieve value from step    | Override `execute()` and `getValueAt()` in `StepOutput` class       | Using `StepProcessorBuilder` [Sample code](#stepprocessorbuilder-sample-code)         |
+| Logging in step                   | Using `logError()` from base class                                        | Using `SdkLogManager` library [Sample Code](#the-logging-library)                     |
 
  
 ## Creating a custom step
@@ -158,18 +158,24 @@ public CustomTypeMetadata createMetadata(final CustomTypeMetadataBuilder metadat
 ### Configuring your step
 
 Use `StepConfigurationBuilder` in `createConfiguration` method to configure your custom step (e.g. nodes, step properties, column layouts) and ensure it displays correctly in the Data Studio UI.
+
 #### Adding nodes
 
 Nodes represent the input and output nodes in the step. You can define how many nodes the step will have. For example, to create a step with 1 input and 1 output node:
 
 ``` java
 .withNodes(stepNodeBuilder -> stepNodeBuilder
-                        .addInputNode(INPUT_ID)
-                        .addOutputNode(OUTPUT_ID)
-                        .build())
+        .addInputNode(INPUT_ID)
+        .addOutputNode(OUTPUT_ID)
+        .build())
 ```	
 
 ##### Process Node
+
+By default, the input and output nodes are DATA node, which receive data or produce data.
+You can create a custom step that doesn't change the data in the workflow.
+For example, a custom step that sends email or calls REST API when the execution reaches that step.
+Please take note that PROCESS output node cannot connect to DATA input node.
 ``` java
 .withNodes(stepNodeBuilder -> stepNodeBuilder
 		.addInputNode(inputNodeBuilder -> inputNodeBuilder
@@ -199,72 +205,63 @@ For example, to add a column chooser to the step:
                         .build()))
 ```
 
-|StepPropertyType|Description                |
-|----------------|---------------------------|
-|asBoolean       |A `true` or `false` field  |
-|asString        |A text field               |
-|asNumber        |A number without fraction    |
+|StepPropertyType|Description                   |
+|----------------|------------------------------|
+|asBoolean       |A `true` or `false` field     |
+|asString        |A text field                  |
+|asNumber        |A number without fraction     |
 |asColumnChooser |An input column drop-down list|
-|asCustomChooser |A custom drop-down list      |
-|asInputLabel    |A label for the input node    |
+|asCustomChooser |A custom drop-down list       |
 
 ##### asBoolean
 
-| Method           | Description                       |
-|------------------|-----------------------------------|
-| asBoolean        |Set a Boolean field              |
-| withDefaultValue |Set a default value in the field |
-| build            |Build the step property        |
+| Method           | Description                    |
+|------------------|--------------------------------|
+| asBoolean        |Set a Boolean field             |
+| withDefaultValue |Set a default value in the field|
+| build            |Build the step property         |
 
 ##### asString
 
-| Method           | Description                            |
-|------------------|----------------------------------------|
-| asString         | Set a string field                    |
-| withIsRequired   | Set whether the field is mandatory  |
-| withDefaultValue | Set a default value in the field      |
-| build            | Build the step property             |
+| Method           | Description                        |
+|------------------|------------------------------------|
+| asString         | Set a string field                 |
+| withIsRequired   | Set whether the field is mandatory |
+| withDefaultValue | Set a default value in the field   |
+| build            | Build the step property            |
 
 ##### asNumber
 
-| Method           | Description                             |
-|------------------|-----------------------------------------|
-| asNumber         | Set a number field                     |
-| withAllowDecimal | Set whether the field accepts decimal values |
-| withMaxValue     | Set a maximum value in the field       |
-| withMinValue     | Set a minimum value in the field       |
-| withIsRequired   | Set whether the field is mandatory   |
-| withDefaultValue | Set a default value in the field       |
-| build            | Build the step property              |
+| Method           | Description                                    |
+|------------------|------------------------------------------------|
+| asNumber         | Set a number field                             |
+| withAllowDecimal | Set whether the field accepts decimal values   |
+| withMaxValue     | Set a maximum value in the field               |
+| withMinValue     | Set a minimum value in the field               |
+| withIsRequired   | Set whether the field is mandatory             |
+| withDefaultValue | Set a default value in the field               |
+| build            | Build the step property                        |
 
 ##### asColumnChooser
 
-| Method             | Description                                           |
-|--------------------|-------------------------------------------------------|
-| asColumnChooser    | Set an input column from a drop-down list               |
-| forInputNode       | Set an input node                    |
-| withMultipleSelect | Set whether multiple fields are allowed |
-| build              | Build the step property                            |
+| Method           | Description                                    |
+|------------------|------------------------------------------------|
+| asColumnChooser    | Set an input column from a drop-down list    |
+| forInputNode       | Set an input node                            |
+| withMultipleSelect | Set whether multiple fields are allowed      |
+| build              | Build the step property                      |
 
 ##### asCustomChooser
 
-| Method                  | Description                                           |
-|-------------------------|-------------------------------------------------------|
-| asCustomChooser         | Set an input column from a custom drop-down list        |
-| withAllowValuesProvider | Set the custom list for selection                  |
-| withAllowSearch         | Set whether there's a field search             |
-| withAllowSelectAll()    | Set whether you can select all fields        |
-| withIsRequired()        | Set whether the field is mandatory                 |
-| withMultipleSelect()    | Set whether multiple fields can be selected |
-| build                   | Build the step property                            |
-
-##### asInputLabel
-
-| Method       | Description                        |
-|--------------|------------------------------------|
-| asInputLabel | Set a label for the input node     |
-| forInputNode | Set an input node |
-| build        | Build the step property         |
+| Method                  | Description                                         |
+|-------------------------|-----------------------------------------------------|
+| asCustomChooser         | Set an input column from a custom drop-down list    |
+| withAllowValuesProvider | Set the custom list for selection                   |
+| withAllowSearch         | Set whether there's a field search                  |
+| withAllowSelectAll()    | Set whether you can select all fields               |
+| withIsRequired()        | Set whether the field is mandatory                  |
+| withMultipleSelect()    | Set whether multiple fields can be selected         |
+| build                   | Build the step property                             |
 
 
 #### Configure isCompleteHandler
@@ -281,19 +278,23 @@ Column layouts represent column(s) that will be displayed in the step. For examp
   
 ``` java
 .withOutputLayouts(outputLayoutBuilder -> outputLayoutBuilder
-                        .forOutputNode(OUTPUT_ID, outputColumnBuilder -> outputColumnBuilder
-                            .addColumns(context -> {
-                                final Boolean hasLimit = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
-                                final List<Column> columns = context.getInputContext(INPUT_ID).getColumns();
-                                final Number limit = context.getStepPropertyValue(ARG_ID_COLUMN_LIMIT);
-                                if (Boolean.TRUE.equals(hasLimit) && limit != null) {
-                                    return columns.stream().limit(limit.intValue()).collect(Collectors.toList());
-                                }
-                                return columns;
-                            })
-                            .addColumn(MY_OUTPUT_COLUMN)
-                            .build())
-                        .build())
+		.forOutputNode(OUTPUT_ID, outputColumnBuilder -> outputColumnBuilder
+				.addColumns(context -> {
+					final Optional<Boolean> hasLimitOptional = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
+					final Boolean hasLimit = hasLimitOptional.orElse(Boolean.FALSE);
+					final List<Column> columns = context.getInputContext(INPUT_ID).getColumns();
+					if (Boolean.TRUE.equals(hasLimit)) {
+						final Optional<Number> limitOptional = context.getStepPropertyValue(ARG_ID_COLUMN_LIMIT);
+						if (limitOptional.isPresent()) {
+							final Number limit = limitOptional.get();
+							return columns.stream().limit(limit.intValue()).collect(Collectors.toList());
+						}
+					}
+					return columns;
+				})
+				.addColumn(MY_OUTPUT_COLUMN)
+				.build())
+		.build())
 
 ```
 						
@@ -301,58 +302,57 @@ Column layouts represent column(s) that will be displayed in the step. For examp
 
 ``` java
 @Override
-    public StepConfiguration createConfiguration(final StepConfigurationBuilder configurationBuilder) {
-        return configurationBuilder
-                /** Define input and output node */
-                .withNodes(stepNodeBuilder -> stepNodeBuilder
-                        .addInputNode(INPUT_ID)
-                        .addOutputNode(OUTPUT_ID)
-                        .build())
-                /** Define step properties */
-                .withStepProperties(stepPropertiesBuilder -> stepPropertiesBuilder
-                        .addStepProperty(stepPropertyBuilder ->
-                                stepPropertyBuilder
-                                        .asInputLabel("Input coin")
-                                        .forInputNode(INPUT_ID)
-                                        .build())
-                        .addStepProperty(stepPropertyBuilder ->
-                                stepPropertyBuilder
-                                        .asBoolean(ARG_ID_HAS_LIMIT)
-                                        .withLabelSupplier(context -> "columns?")
-                                        .build())
-                        .addStepProperty(stepPropertyBuilder ->
-                                stepPropertyBuilder
-                                        .asNumber(ARG_ID_COLUMN_LIMIT)
-                                        .withAllowDecimal(false)
-                                        .withIsDisabledSupplier(context -> {
-                                            final Boolean hasLimit = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
-                                            return !hasLimit;
-                                        })
-                                        .withIsRequired(true)
-                                        .withLabelSupplier(context -> "limit?")
-                                        .build())
-                        .build())
-                /** Prevent the step from executing until the input node has been completed.
-                 *  This is an optional value, in below case which is always true
-                 */
-                .withIsCompleteHandler(context -> true)
-                /** Define how the output will look like, i.e. the columns and rows*/
-                .withOutputLayouts(outputLayoutBuilder -> outputLayoutBuilder
-                        .forOutputNode(OUTPUT_ID, outputColumnBuilder -> outputColumnBuilder
-                            .addColumns(context -> {
-                                final Boolean hasLimit = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
-                                final List<Column> columns = context.getInputContext(INPUT_ID).getColumns();
-                                final Number limit = context.getStepPropertyValue(ARG_ID_COLUMN_LIMIT);
-                                if (Boolean.TRUE.equals(hasLimit) && limit != null) {
-                                    return columns.stream().limit(limit.intValue()).collect(Collectors.toList());
-                                }
-                                return columns;
-                            })
-                            .addColumn(MY_OUTPUT_COLUMN)
-                            .build())
-                        .build())
-                .build();
-    }
+public StepConfiguration createConfiguration(final StepConfigurationBuilder configurationBuilder) {
+	return configurationBuilder
+            /** Define input and output node */
+			.withNodes(stepNodeBuilder -> stepNodeBuilder
+					.addInputNode(INPUT_ID)
+					.addOutputNode(OUTPUT_ID)
+					.build())
+            /** Define step properties */
+			.withStepProperties(stepPropertiesBuilder -> stepPropertiesBuilder
+					.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+							.asBoolean(ARG_ID_HAS_LIMIT)
+							.withLabelSupplier(context -> "columns?")
+							.build())
+					.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+							.asNumber(ARG_ID_COLUMN_LIMIT)
+							.withAllowDecimal(false)
+							.withIsDisabledSupplier(context -> {
+								final Optional<Boolean> hasLimitOptional = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
+								final Boolean hasLimit = hasLimitOptional.orElse(Boolean.FALSE);
+								return !hasLimit;
+							})
+							.withIsRequired(true)
+							.withLabelSupplier(context -> "limit?")
+							.build())
+					.build())
+            /** Prevent the step from executing until the input node has been completed.
+            *  This is an optional value, in below case which is always true
+            */
+            .withIsCompleteHandler(context -> true)
+            /** Define how the output will look like, i.e. the columns and rows */
+			.withOutputLayouts(outputLayoutBuilder -> outputLayoutBuilder
+					.forOutputNode(OUTPUT_ID, outputColumnBuilder -> outputColumnBuilder
+							.addColumns(context -> {
+								final Optional<Boolean> hasLimitOptional = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
+								final Boolean hasLimit = hasLimitOptional.orElse(Boolean.FALSE);
+								final List<Column> columns = context.getInputContext(INPUT_ID).getColumns();
+								if (Boolean.TRUE.equals(hasLimit)) {
+									final Optional<Number> limitOptional = context.getStepPropertyValue(ARG_ID_COLUMN_LIMIT);
+									if (limitOptional.isPresent()) {
+										final Number limit = limitOptional.get();
+										return columns.stream().limit(limit.intValue()).collect(Collectors.toList());
+									}
+								}
+								return columns;
+							})
+							.addColumn(MY_OUTPUT_COLUMN)
+							.build())
+					.build())
+			.withIcon(StepIcon.ARROW_FORWARD)
+			.build();
+}
 ```
 
 ### Processing your step
@@ -365,22 +365,22 @@ This method is used to apply logic to the input source and the computed value wi
 
 #### StepProcessorBuilder sample code
 
-```java
+``` java
 @Override
-    public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
-        return processorBuilder
-                // execute
-                .forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
-                    final ProcessorInputContext inputManager = processorContext.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new);
-                    final Optional<InputColumn> column = inputManager.getColumns().stream().findFirst();
-                    column.ifPresent(inputColumn -> outputColumnManager.onValue(MY_OUTPUT_COLUMN, rowIndex -> {
-                        final CellValue cellValue = inputColumn.getValueAt(rowIndex);
-                        return cellValue.toString() + "-processed";
-                    }));
-                    return inputManager.getRowCount();
-                })
-                .build();
-    }
+public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+    return processorBuilder
+            // execute
+            .forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
+                final ProcessorInputContext inputManager = processorContext.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new);
+                final Optional<InputColumn> column = inputManager.getColumns().stream().findFirst();
+                column.ifPresent(inputColumn -> outputColumnManager.onValue(MY_OUTPUT_COLUMN, rowIndex -> {
+                    final CellValue cellValue = inputColumn.getValueAt(rowIndex);
+                    return cellValue.toString() + "-processed";
+                }));
+                return inputManager.getRowCount();
+            })
+            .build();
+}
 ```
 #### isInteractive() flag
 Interactive is a flag that set to `true` when the user explores the output of a step on the Data Studio Grid. 
@@ -396,36 +396,35 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
 
 ## The logging library
 ``` java
-private static final Logger LOGGER = StepLogManager.getLogger(StepsTemplate.class, Level.INFO);
+private static final Logger LOGGER = SdkLogManager.getLogger(StepsTemplate.class, Level.INFO);
 ```
 
 ## The cache configuration
 ### Create cache
-```java
-    final StepCacheManager cacheManager = context.getCacheManager();
-    final StepCacheConfiguration<String, String> cacheConfiguration1 = context.getCacheConfigurationBuilder()
-            .withCacheName(CACHE_NAME_1)
-            .withTtlForUpdate(10L, TimeUnit.MINUTES)
-            .withScope(StepCacheScope.STEP)
-            .build(String.class, String.class);
-    final StepCache<String, String> cache1 = cacheManager.getOrCreateCache(cacheConfiguration1);
+``` java
+final StepCacheManager cacheManager = context.getCacheManager();
+final StepCacheConfiguration<String, String> cacheConfiguration1 = context.getCacheConfigurationBuilder()
+        .withCacheName(CACHE_NAME_1)
+        .withTtlForUpdate(10L, TimeUnit.MINUTES)
+        .withScope(StepCacheScope.STEP)
+        .build(String.class, String.class);
+final StepCache<String, String> cache1 = cacheManager.getOrCreateCache(cacheConfiguration1);
 ``` 
 
 ### Assigning value to cache
-```java
-    cache1.put(cacheKey, value);
+``` java
+cache1.put(cacheKey, value);
 ```
 
 ### Getting value from cache
-```java
-    cache1.get(cacheKey);
+``` java
+cache1.get(cacheKey);
 ```
 
 ## The http client library
 ### Create http client object
-```java
-    WebHttpClient
-        .builder()
+``` java
+WebHttpClient.builder()
         .withHttpVersion(..) // Http protocol version
         .withProxy(..) // specifying any required proxy
         .withConnectionTimeout(..) // maximum time to establish connection
@@ -434,9 +433,8 @@ private static final Logger LOGGER = StepLogManager.getLogger(StepsTemplate.clas
 ```
 
 ### Create http GET request object
-```java
-    WebHttpRequest
-        .builder()
+``` java
+WebHttpRequest.builder()
         .get(..) // passing in the url
         .withQueryString(..) // specifying query string in key value pair, alternatively can use .addQueryString(..)
         .withHeader(..) // specifying headers value, alternatively can use .addHeader(..)
@@ -444,9 +442,8 @@ private static final Logger LOGGER = StepLogManager.getLogger(StepsTemplate.clas
 ```
 
 ### Create http POST request object
-```java
-    WebHttpRequest
-        .builder()
+``` java
+WebHttpRequest.builder()
         .post(..) // passing in the url
         .withBody(..) // specifying the body
         .withQueryString(..) // specifying query string in key value pair, alternatively can use .addQueryString(..)
@@ -455,9 +452,8 @@ private static final Logger LOGGER = StepLogManager.getLogger(StepsTemplate.clas
 ```
 
 ### Create http PUT request object
-```java
-    WebHttpRequest
-        .builder()
+``` java
+WebHttpRequest.builder()
         .put(..) // passing in the url
         .withBody(..) // specifying the body
         .withQueryString(..) // specifying query string in key value pair, alternatively can use .addQueryString(..)
@@ -466,9 +462,8 @@ private static final Logger LOGGER = StepLogManager.getLogger(StepsTemplate.clas
 ```
 
 ### Create http DELETE request object
-```java
-    WebHttpRequest
-        .builder()
+``` java
+WebHttpRequest.builder()
         .delete(..) // passing in the url
         .withBody(..) // specifying the body
         .withQueryString(..) // specifying query string in key value pair, alternatively can use .addQueryString(..)
@@ -477,14 +472,13 @@ private static final Logger LOGGER = StepLogManager.getLogger(StepsTemplate.clas
 ```
 
 ### Send http request through WebHttpClient
-```java
-    WebHttpClient client = WebHttpClient
-                                   .builder()
-                                   .withHttpVersion(..) // Http protocol version
-                                   .withProxy(..) // specifying any required proxy
-                                   .withConnectionTimeout(..) // maximum time to establish connection
-                                   .withSocketTimeout(..) // maximum time to retrieve data
-                                   .build();
-   
-    client.sendAsync(request);
+``` java
+WebHttpClient client = WebHttpClient.builder()
+        .withHttpVersion(..) // Http protocol version
+        .withProxy(..) // specifying any required proxy
+        .withConnectionTimeout(..) // maximum time to establish connection
+        .withSocketTimeout(..) // maximum time to retrieve data
+        .build();
+
+client.sendAsync(request);
 ```
