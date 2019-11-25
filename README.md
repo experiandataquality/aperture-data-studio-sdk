@@ -197,12 +197,11 @@ For example, to add a column chooser to the step:
 
 ``` java
 .withStepProperties(stepPropertiesBuilder -> stepPropertiesBuilder
-                        .addStepProperty(stepPropertyBuilder ->
-                                stepPropertyBuilder
-                                        .asColumnChooser(ARG_ID_COLUMN_CHOOSER)
-                                        .forInputNode(INPUT_ID)
-                                        .build())
-                        .build()))
+        .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+                .asColumnChooser(ARG_ID_COLUMN_CHOOSER)
+                .forInputNode(INPUT_ID)
+                .build())
+        .build()))
 ```
 
 |StepPropertyType|Description                   |
