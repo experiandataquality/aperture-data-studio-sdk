@@ -10,18 +10,18 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 - [Comparison of SDK v1.0 and v2.0](#comparison-of-sdk-v1.0-and-v2.0)
 - [Creating a custom step](#creating-a-custom-step)
     - [Importing the step SDK](#importing-the-step-sdk)
-	- [Creating your metadata](#configuring-your-step)
-		- [Adding metadata](#adding-metadata)
-		- [Metadata sample code](#metadata-sample-code)
+    - [Creating your metadata](#configuring-your-step)
+        - [Adding metadata](#adding-metadata)
+        - [Metadata sample code](#metadata-sample-code)
     - [Configuring your step](#configuring-your-step)
         - [Adding nodes](#adding-nodes)
-		- [Adding step properties](#adding-step-properties)
-		- [Configure IsCompleteHandler](#configure-iscompletehandler)
-		- [Configure column layouts](#configure-column-layouts)
-		- [StepConfigurationBuilder sample code](#stepconfigurationbuilder-sample-code)
+        - [Adding step properties](#adding-step-properties)
+        - [Configure IsCompleteHandler](#configure-iscompletehandler)
+        - [Configure column layouts](#configure-column-layouts)
+        - [StepConfigurationBuilder sample code](#stepconfigurationbuilder-sample-code)
     - [Processing your step](#processing-your-step)
         - [Execute step](#execute-step)
-		- [StepProcessorBuilder sample code](#stepprocessorbuilder-sample-code)
+        - [StepProcessorBuilder sample code](#stepprocessorbuilder-sample-code)
 - [The logging library](#the-logging-library)
 - [The cache configuration](#the-cache-configuration)
 - [The http client library](#the-http-client-library)
@@ -168,7 +168,7 @@ Nodes represent the input and output nodes in the step. You can define how many 
         .addInputNode(INPUT_ID)
         .addOutputNode(OUTPUT_ID)
         .build())
-```	
+``` 
 
 ##### Process Node
 
@@ -178,15 +178,15 @@ For example, a custom step that sends email or calls REST API when the execution
 Please take note that PROCESS output node cannot connect to DATA input node.
 ``` java
 .withNodes(stepNodeBuilder -> stepNodeBuilder
-		.addInputNode(inputNodeBuilder -> inputNodeBuilder
-				.withId(INPUT_ID)
-				.withType(NodeType.PROCESS)
-				.build())
-		.addOutputNode(outputNodeBuilder -> outputNodeBuilder
-				.withId(OUTPUT_ID)
-				.withType(NodeType.PROCESS)
-				.build())
-		.build())
+        .addInputNode(inputNodeBuilder -> inputNodeBuilder
+                .withId(INPUT_ID)
+                .withType(NodeType.PROCESS)
+                .build())
+        .addOutputNode(outputNodeBuilder -> outputNodeBuilder
+                .withId(OUTPUT_ID)
+                .withType(NodeType.PROCESS)
+                .build())
+        .build())
 
 ```
 
@@ -277,80 +277,80 @@ Column layouts represent column(s) that will be displayed in the step. For examp
   
 ``` java
 .withOutputLayouts(outputLayoutBuilder -> outputLayoutBuilder
-		.forOutputNode(OUTPUT_ID, outputColumnBuilder -> outputColumnBuilder
-				.addColumns(context -> {
-					final Optional<Boolean> hasLimitOptional = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
-					final Boolean hasLimit = hasLimitOptional.orElse(Boolean.FALSE);
-					final List<Column> columns = context.getInputContext(INPUT_ID).getColumns();
-					if (Boolean.TRUE.equals(hasLimit)) {
-						final Optional<Number> limitOptional = context.getStepPropertyValue(ARG_ID_COLUMN_LIMIT);
-						if (limitOptional.isPresent()) {
-							final Number limit = limitOptional.get();
-							return columns.stream().limit(limit.intValue()).collect(Collectors.toList());
-						}
-					}
-					return columns;
-				})
-				.addColumn(MY_OUTPUT_COLUMN)
-				.build())
-		.build())
+        .forOutputNode(OUTPUT_ID, outputColumnBuilder -> outputColumnBuilder
+                .addColumns(context -> {
+                    final Optional<Boolean> hasLimitOptional = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
+                    final Boolean hasLimit = hasLimitOptional.orElse(Boolean.FALSE);
+                    final List<Column> columns = context.getInputContext(INPUT_ID).getColumns();
+                    if (Boolean.TRUE.equals(hasLimit)) {
+                        final Optional<Number> limitOptional = context.getStepPropertyValue(ARG_ID_COLUMN_LIMIT);
+                        if (limitOptional.isPresent()) {
+                            final Number limit = limitOptional.get();
+                            return columns.stream().limit(limit.intValue()).collect(Collectors.toList());
+                        }
+                    }
+                    return columns;
+                })
+                .addColumn(MY_OUTPUT_COLUMN)
+                .build())
+        .build())
 
 ```
-						
+                        
 #### StepConfigurationBuilder sample code
 
 ``` java
 @Override
 public StepConfiguration createConfiguration(final StepConfigurationBuilder configurationBuilder) {
-	return configurationBuilder
+    return configurationBuilder
             /** Define input and output node */
-			.withNodes(stepNodeBuilder -> stepNodeBuilder
-					.addInputNode(INPUT_ID)
-					.addOutputNode(OUTPUT_ID)
-					.build())
+            .withNodes(stepNodeBuilder -> stepNodeBuilder
+                    .addInputNode(INPUT_ID)
+                    .addOutputNode(OUTPUT_ID)
+                    .build())
             /** Define step properties */
-			.withStepProperties(stepPropertiesBuilder -> stepPropertiesBuilder
-					.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
-							.asBoolean(ARG_ID_HAS_LIMIT)
-							.withLabelSupplier(context -> "columns?")
-							.build())
-					.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
-							.asNumber(ARG_ID_COLUMN_LIMIT)
-							.withAllowDecimal(false)
-							.withIsDisabledSupplier(context -> {
-								final Optional<Boolean> hasLimitOptional = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
-								final Boolean hasLimit = hasLimitOptional.orElse(Boolean.FALSE);
-								return !hasLimit;
-							})
-							.withIsRequired(true)
-							.withLabelSupplier(context -> "limit?")
-							.build())
-					.build())
+            .withStepProperties(stepPropertiesBuilder -> stepPropertiesBuilder
+                    .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+                            .asBoolean(ARG_ID_HAS_LIMIT)
+                            .withLabelSupplier(context -> "columns?")
+                            .build())
+                    .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+                            .asNumber(ARG_ID_COLUMN_LIMIT)
+                            .withAllowDecimal(false)
+                            .withIsDisabledSupplier(context -> {
+                                final Optional<Boolean> hasLimitOptional = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
+                                final Boolean hasLimit = hasLimitOptional.orElse(Boolean.FALSE);
+                                return !hasLimit;
+                            })
+                            .withIsRequired(true)
+                            .withLabelSupplier(context -> "limit?")
+                            .build())
+                    .build())
             /** Prevent the step from executing until the input node has been completed.
             *  This is an optional value, in below case which is always true
             */
             .withIsCompleteHandler(context -> true)
             /** Define how the output will look like, i.e. the columns and rows */
-			.withOutputLayouts(outputLayoutBuilder -> outputLayoutBuilder
-					.forOutputNode(OUTPUT_ID, outputColumnBuilder -> outputColumnBuilder
-							.addColumns(context -> {
-								final Optional<Boolean> hasLimitOptional = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
-								final Boolean hasLimit = hasLimitOptional.orElse(Boolean.FALSE);
-								final List<Column> columns = context.getInputContext(INPUT_ID).getColumns();
-								if (Boolean.TRUE.equals(hasLimit)) {
-									final Optional<Number> limitOptional = context.getStepPropertyValue(ARG_ID_COLUMN_LIMIT);
-									if (limitOptional.isPresent()) {
-										final Number limit = limitOptional.get();
-										return columns.stream().limit(limit.intValue()).collect(Collectors.toList());
-									}
-								}
-								return columns;
-							})
-							.addColumn(MY_OUTPUT_COLUMN)
-							.build())
-					.build())
-			.withIcon(StepIcon.ARROW_FORWARD)
-			.build();
+            .withOutputLayouts(outputLayoutBuilder -> outputLayoutBuilder
+                    .forOutputNode(OUTPUT_ID, outputColumnBuilder -> outputColumnBuilder
+                            .addColumns(context -> {
+                                final Optional<Boolean> hasLimitOptional = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
+                                final Boolean hasLimit = hasLimitOptional.orElse(Boolean.FALSE);
+                                final List<Column> columns = context.getInputContext(INPUT_ID).getColumns();
+                                if (Boolean.TRUE.equals(hasLimit)) {
+                                    final Optional<Number> limitOptional = context.getStepPropertyValue(ARG_ID_COLUMN_LIMIT);
+                                    if (limitOptional.isPresent()) {
+                                        final Number limit = limitOptional.get();
+                                        return columns.stream().limit(limit.intValue()).collect(Collectors.toList());
+                                    }
+                                }
+                                return columns;
+                            })
+                            .addColumn(MY_OUTPUT_COLUMN)
+                            .build())
+                    .build())
+            .withIcon(StepIcon.ARROW_FORWARD)
+            .build();
 }
 ```
 
@@ -387,9 +387,9 @@ It is set to `false` when running the whole workflow.
 ``` java
 @Override
 public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
-	return processorBuilder
-			.forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
-				if (processorContext.isInteractive()) {
+    return processorBuilder
+            .forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
+                if (processorContext.isInteractive()) {
                     ...
 ```
 
