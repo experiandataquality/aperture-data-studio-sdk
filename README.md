@@ -10,7 +10,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 - [Comparison of SDK v1.0 and v2.0](#comparison-of-sdk-v1.0-and-v2.0)
 - [Creating a custom step](#creating-a-custom-step)
     - [Importing the step SDK](#importing-the-step-sdk)
-    - [Creating your metadata](#configuring-your-step)
+    - [Creating your metadata](#creating-your-metadata)
         - [Adding metadata](#adding-metadata)
         - [Metadata sample code](#metadata-sample-code)
     - [Configuring your step](#configuring-your-step)
@@ -115,18 +115,21 @@ Note that you can bundle multiple custom steps into a single JAR, as long as the
 
 To use the interfaces, classes and methods, you have to import the SDK into your class. Add an import statement below the package name to import all the SDK classes and methods:
 ``` java
-import com.experian.datastudio.sdk.api.configuration.*;
-import com.experian.datastudio.sdk.api.processor.*;
+import com.experian.datastudio.sdk.api.*;
 import com.experian.datastudio.sdk.api.step.*;
+import com.experian.datastudio.sdk.api.step.configuration.*;
+import com.experian.datastudio.sdk.api.step.processor.*;
 ```
+
 Your new class should look something like this:
 
 ``` java
 package com.experian.datastudio.customstep;
 
-import com.experian.datastudio.sdk.api.configuration.*;
-import com.experian.datastudio.sdk.api.processor.*;
+import com.experian.datastudio.sdk.api.*;
 import com.experian.datastudio.sdk.api.step.*;
+import com.experian.datastudio.sdk.api.step.configuration.*;
+import com.experian.datastudio.sdk.api.step.processor.*;
 
 public class DemoStep implements CustomStepDefinition{
 }
