@@ -25,8 +25,22 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 - [The logging library](#the-logging-library)
 - [The cache configuration](#the-cache-configuration)
 - [The http client library](#the-http-client-library)
-
-
+- [Generating a custom parser from a new or existing project](#generating-a-custom-parser-from-a-new-or-existing-project)
+- [Creating a custom parser](#creating-a-custom-parser)
+  - [Importing the parser SDK](#importing-the-parser-sdk)
+  - [Creating your metadata](#creating-your-metadata-1)
+  - [Configuring your parser](#configuring-your-parser)
+    - [Supported file extension](#supported-file-extension)
+    - [Parameter definition](#parameter-definition)
+    - [Display type](#display-type)
+    - [Set default value](#set-default-value)
+    - [Set processor](#set-processor)
+  - [Parser Processor](#parser-processor)
+    - [Get table definition](#get-table-definition)
+      - [TableDefinitionContext](#tabledefinitioncontext)
+    - [Get row iterator](#get-row-iterator)
+      - [TableDefinitionContext](#tabledefinitioncontext-1)
+      - [ClosableIteratorBuilder](#closableiteratorbuilder)
 ## Generating a custom step from a new or existing project
 
 1. You can either use Gradle or Maven: 
@@ -109,7 +123,7 @@ Here are the main differences between the v1.0 and v2.0 of the SDK:
 
 Once your project is set up, you can create a new class and implement the `CustomStepDefinition` interface. The newly created class will be picked up by the Data Studio UI.
 
-Note that you can bundle multiple custom steps into a single JAR, as long as they're implementing the `CustomStepDefinition`.
+Note that it is recommended that you bundle *one* custom step per JAR.
 
 ### Importing the step SDK
 
@@ -484,3 +498,224 @@ WebHttpClient client = WebHttpClient.builder()
 
 client.sendAsync(request);
 ```
+
+## Generating a custom parser from a new or existing project
+
+1. You can either use Gradle or Maven: 
+
+  If using Gradle, point to the SDK repository in the `build.gradle`:
+
+   ```gradle
+   apply plugin: 'java'
+
+   repositories {
+       mavenCentral()
+       maven {
+            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
+       }
+   }
+
+   dependencies {
+       compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
+   }
+   ```
+
+  If you don't want to use Gradle, you'll have to configure your own Java project to generate a compatible JAR artifact:
+   - Create a new Java project or open an existing one.
+   - Download and install the [sdkapi.jar]([TO BE CHANGED]) file.
+
+  If using Maven, modify `pom.xml` to add the SDK GitHub repository:
+
+   ```xml
+   <project xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                                http://maven.apache.org/maven-v4_0_0.xsd">
+       <modelVersion>4.0.0</modelVersion>
+       <groupId>com.experian.aperture.datastudio.sdk.custom.addons</groupId>
+       <!-- replace this accordingly with your custom parser name -->
+       <artifactId>MyCustomParser</artifactId>
+       <!-- replace this accordingly with your custom step version -->
+       <version>1.0-SNAPSHOT</version>
+       <packaging>jar</packaging>
+       <!-- replace this accordingly with your custom step name -->
+       <name>MyCustomParser</name>
+
+       <repositories>
+           <repository>
+               <id>aperture-data-studio-github-repo-snapshot</id>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven/</url>
+           </repository>
+       </repositories>
+
+       <dependencies>
+           <dependency>
+               <groupId>com.experian.datastudio</groupId>
+               <artifactId>sdkapi</artifactId>
+               <version>2.0.0-SNAPSHOT</version>
+               <scope>provided</scope>
+           </dependency>
+       </dependencies>
+   </project>
+   ```
+   
+3. (Skip this step if using Maven or Gradle). If you've downloaded the JAR manually, create a *libs* folder and add in the *sdkapi.jar* as a library.
+4. Create a new package and class.
+5. Configure your project to output a .jar file as an artifact. Note that this will be done differently depending on your IDE.
+
+## Creating a custom parser
+
+Once your project is set up, you can create a new class and implement the `CustomParserDefinition` interface. The newly created class will be picked up by the Data Studio UI.
+
+Note that it is recommended that you bundle *one* custom parser per JAR.
+
+### Importing the parser SDK
+
+To use the interfaces, classes and methods, you have to import the SDK into your class. Add an import statement below the package name to import all the SDK classes and methods:
+``` java
+import com.experian.datastudio.sdk.api.*;
+import com.experian.datastudio.sdk.api.parser.*;
+import com.experian.datastudio.sdk.api.parser.configuration.*;
+import com.experian.datastudio.sdk.api.parser.processor.*;
+```
+Your new class should look something like this:
+
+``` java
+package com.experian.datastudio.customparser;
+
+import com.experian.datastudio.sdk.api.*;
+import com.experian.datastudio.sdk.api.parser.*;
+import com.experian.datastudio.sdk.api.parser.configuration.*;
+import com.experian.datastudio.sdk.api.parser.processor.*;
+
+public class DemoParser implements CustomParserDefinition{
+}
+```
+All the SDK interfaces, classes and methods will now available.
+
+### Creating your metadata
+[Same as creating metadata for custom step](#creating-your-metadata)
+ 
+### Configuring your parser
+
+Use `ParserConfigurationBuilder` in `createConfiguration` method to configure your custom parser.
+
+#### Supported file extension
+Define the file extension that the custom parser is able to parse.
+
+``` java
+.withSupportedFileExtensions(supportedFileExtensionsBuilder ->
+                        supportedFileExtensionsBuilder
+                                .add(supportedFileExtensionBuilder ->
+                                        supportedFileExtensionBuilder
+                                                .withSupportedFileExtension(".testFile")
+                                                .withFileExtensionName("Test extension")
+                                                .withFileExtensionDescription("Test extension")
+                                                .build())
+                                .build())
+```
+
+#### Parameter definition
+Each parser can be configured in the UI. It will determine the behaviour of the custom parser.
+You can have multiple parameter defined using the `parameterDefinitionsBuilder` in the `withParserParameterDefinition`.
+
+Example:
+For delimited parser, user can choose either comma, tab, etc as a delimiter. 
+
+``` java
+.withParserParameterDefinition(parameterDefinitionsBuilder ->
+                        parameterDefinitionsBuilder
+                                .add(parameterDefinitionBuilder ->
+                                        parameterDefinitionBuilder
+                                                .withId("delimiter")
+                                                .withName("Delimiter")
+                                                .withDescription("Character that separates columns in plain text")
+                                                .setAsRequired(true)
+                                                .setTypeAs(ParserParameterValueType.STRING)
+                                                .setDisplayTypeAs(ParserParameterDisplayType.TEXTFIELD)
+                                                .withDefaultValueAsString(",")
+                                                .affectsTableStructure(true)
+                                                .build())
+                                .build())
+```
+
+
+| Method                    | Description                                                                                         |
+| ------------------------- | --------------------------------------------------------------------------------------------------- |
+| withId                    | Set Id for the parameter. Id can be used to retrieve the parameter value in the parser processor    |
+| withName                  | Set parameter name                                                                                  |
+| withDescription           | Set parameter description                                                                           |
+| setTypeAs                 | Set data type of the parameter value. The available type are boolean, string, integer and character |
+| setDisplayTypeAs          | Set display format of the parameter                                                                 |
+| withDefaultValueAsString  | Set a default value in the field                                                                    |
+| withDefaultValueAsBoolean | Set a default value in the field                                                                    |
+| withDefaultValueAsString  | Set a default value in the field                                                                    |
+| affectsTableStructure     | Set this flag to true if the parameter value influence the table structure of the parser output     |
+
+
+#### Display type
+
+| ParserParameterDisplayType | Description                                                                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| TEXTFIELD                  | Display a textfield                                                                                                                        |
+| CHECKBOX                   | Display a checkbox                                                                                                                         |
+| CHARSET                    | Display a dropdown where user able to select one of the character set. Example: UTF-8, UTF-16, US-ASCII                                    |
+| DELIMITER                  | Display a dropdown where user able to select one of the delimiter. Example: Comma (,),  Tab(\t), Pipe (                                    | ) |
+| LOCALE                     | Display a dropdown where user able to select one of the locale. Example: English (United States), English (United Kingdom, French (France) |
+| ENDOFLINE                  | Display a dropdown where user able to select one of the end of line flag. Example: eg: \r\n, \n, \r                                        |
+| QUOTE                      | Display a dropdown where user able to select one of the quote. Example: Double ("), Single ('), Grave (`)                                  |
+
+#### Set default value 
+You can set default value based on the content of the file. Use `ParameterContext` to in set default value method, to retrieve the file input stream.
+
+
+### Set processor
+
+Set your parser processor class.
+
+``` java
+.withProcessor(new SampleParserProcessor())
+```
+
+## Parser Processor
+
+Parser processor contains the processor to take the file source and convert it to `ParserTableDefintion` and `ClosableIterator`
+To build a parser processor, create a new class that implements `ParserProcessor`. There are 2 methods in the interface, `getTableDefinition` and `ClosableIterator`
+
+### Get table definition
+
+In Aperture Data Studio, data in the files are present in form of table with rows and columns. `ParserTableDefinition` is the definition of the parsed table. You can have single or multiple table in a file source. For each table, you can have single or multiple columns. Use the `ParserTableDefinitionFactory` and `ParserColumnDefinitionFactory` in the `TableDefinitionContext` to create `ParserTableDefinition`. 
+
+#### TableDefinitionContext
+
+| Method                           | Description                                     |
+| -------------------------------- | ----------------------------------------------- |
+| getStreamSupplier                | Contains the stream of the file source          |
+| getFilename                      | Name of the file source                         |
+| getParameterConfiguration        | Get the parameter value selected by the user    |
+| getParserTableDefinitionFactory  | Factory that generated `ParserTableDefinition`  |
+| getParserColumnDefinitionFactory | Factory that generated `ParserColumnDefinition` |
+
+
+## Get row iterator
+
+Return a closable iterator over a collection of table row. Use the `ClosableIteratorBuilder` in the `RowIteratorContext` to build the `ClosableIterator`
+
+#### TableDefinitionContext
+
+| Method                     | Description                                  |
+| -------------------------- | -------------------------------------------- |
+| getTableId                 | Returns the id of `ParserTableDefinition`    |
+| getStreamSupplier          | Contains the stream of the file source       |
+| getParameterConfiguration  | Get the parameter value selected by the user |
+| getTableDefinition         | Returns the `ParserTableDefinition`          |
+| getClosableIteratorBuilder | Returns the builder for a closable iterator. |
+
+
+#### ClosableIteratorBuilder
+| Method      | Description                                                                    |
+| ----------- | ------------------------------------------------------------------------------ |
+| withHasNext | Returns true if iterations has more rows                                       |
+| withNext    | Returns the next row in the iteration                                          |
+| withClose   | Closes any streams and releases system resources associated with the iterator. |
+
