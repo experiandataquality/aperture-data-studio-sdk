@@ -1,0 +1,33 @@
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    repositories {
+        maven {
+            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository-sdklib/maven'
+        }
+    }
+
+    dependencies {
+        compileOnly urlFile('https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository-sdklib/maven/com/experian/datastudio/sdkapi/2.0.0-SNAPSHOT/sdkapi-2.0.0-SNAPSHOT.jar', 'sdkapi')
+        compileOnly urlFile('https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository-sdklib/maven/com/experian/datastudio/sdklib/2.0.0-SNAPSHOT/sdklib-2.0.0-SNAPSHOT.jar', 'sdklib')
+    }
+}
+
+
+def urlFile(url, name) {
+    File file = new File("$buildDir/download/${name}.jar")
+    file.parentFile.mkdirs()
+    if (!file.exists()) {
+        new URL(url).withInputStream { downloadStream ->
+            file.withOutputStream { fileOut ->
+                fileOut << downloadStream
+            }
+        }
+    }
+    files(file.absolutePath)
+}

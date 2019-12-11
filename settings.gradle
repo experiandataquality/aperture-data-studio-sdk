@@ -1,0 +1,8 @@
+//include 'AddVAT'
+//include 'ConcatValues'
+//include 'IPGeolocation'
+
+include ':ExampleSteps'
+include ':ExampleSteps:AddVAT'
+include ':ExampleSteps:ConcatValues'
+include ':ExampleSteps:IPGeolocation'
