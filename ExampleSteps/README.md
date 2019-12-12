@@ -20,7 +20,7 @@ For more details about the Gradle Shadow Plugin, refer to the [user documentatio
 
     ![gradle build](readme-images/gradle-build.png)
    
-2. The output of the build is located at `build/libs/IPGeolocation.jar`:
+2. The output of the build is located at `build/libs/IPGeolocation-all.jar`:
 
     ![build result](readme-images/build-result.png)
    
@@ -35,8 +35,18 @@ For more details about the Gradle Shadow Plugin, refer to the [user documentatio
 5. Once the `jar` is successfully uploaded, the _example steps_ will be listed in the left-hand side pane:
 
     ![Workflow Steps](readme-images/workflow-steps-pane.png)
-    
-**Note**: 
+
+### Linking the Example Step to a Source
+
+[IPGeolocation](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocation.java) depends on specific input data that contains IPv4 addresses. You can extract the sample data from the test resources folder:
+
+1. The sample data is available at [sample-ip.csv](IPGeolocation/src/test/resources/sample-ip.csv)
+2. Add the sample data as a source under the Datasets tab. 
+3. Select this data as source in the Data Studio UI.
+4. Link it with the custom step:
+
+    ![Restful Step Workflow](readme-images/restful-step-workflow.png)
+5. Execute/Run the workflow or click on `Show step results`.
 
 ## AddVAT Example Step
 
@@ -44,18 +54,40 @@ For more details about the Gradle Shadow Plugin, refer to the [user documentatio
 
 ## IPGeolocation Example Step
 
-[`IPGeolocation.java`](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocation.java) depends on the specific input data that contains color index. You can extract the sample data from the test resources folder:
+The [IPGeolocation](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocation.java) example step takes a list of IPv4 addresses as an input and maps them to their respective countries of origin. 
 
-1. The sample data is available at [InputData.csv](src/test/resources/InputData.csv)
-2. Drag and drop this data into your Data Studio UI.
-3. Link it with the custom step:
+This example step relies on [ip-api](https://ip-api.com/docs), an API endpoint that identifies the country of origin (and other location specific data) based on a provided IP address. In this example, the response is returned in JSON format. 
 
-    ![Restful Step Workflow](readme-images/restful-step-workflow.png)
+The input is taken from a single column from an input node and the output is published to a single column in the output node. As the example step is large, the main class is ['IPGeolocation.java'](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocation.java) which contains the *metadata* and *configuration*. The *processor* is housed in a separate class ([`IPGeolocationProcessor.java`](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocationProcessor.java)) for better readability. 
 
-## Testing 
+The [IPGeolocation](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocation.java) example step demonstrates the following features of the Aperture Data Studio SDK: 
+- HTTP requests (using the SDK HTTP Libraries/Helper Classes)
+- Caching (using SDK Cache)
+- Throttling (using Java Semaphore)
+- Step Settings (retrieving lang settings from the UI for query)
+- Concurrent asynchronous requests (using Java CompletableFuture)
 
-To test your custom steps, please refer to the [sample usage of SDK Test Framework](src/test/java/com/experian/aperture/datastudio/sdk/step/examples/).
+#### HTTP Requests
+The HTTP requests are made using the SDK HTTP libraries/helper classes (i.e. `WebHttpClient`, `WebHttpRequest`, `WebHttpResponse`). First, an HTTP web client (`WebHttpClient`) is set up, and a request (`WebHttpRequest`) is sent through the client using the `sendAsync()` method. This returns a `WebHttpResponse` which contains the location data of the IP address in JSON format. 
 
-### Integration with MockServer
+#### Cache
+When executing the step, it first checks if there is any data stored in the cache. If there is a valid cache, the output is populated from the cache, otherwise the data is pulled from the API endpoint. Caches are created and managed using the SDK Cache libraries/helper classes (i.e. `StepCacheManager`, `StepCache`, `StepCacheConfiguration`).
 
-Refer to [`StepComponentTest`](src/test/java/com/experian/aperture/datastudio/sdk/step/examples/testframework/StepComponentTest.java) to integrate the SDK Test Framework with [MockServer](http://www.mock-server.com/). This allows you to simulate a real HTTP request-response exchange.
+Configuration for the cache includes: 
+- Name
+- Time to Live
+- Scope
+- Key-Value Type
+
+#### Throttling 
+Throttling is demonstrated using Java Semaphore, limiting the number of concurrent HTTP requests to avoid overloading the server at the endpoint. A semaphore is set up, and a limited number of permits (set at 5 permits) are provided. Each request acquires a single permit and when the response is returned, the permit is released. 
+
+#### Step Settings
+Step settings can be set under the "Step Settings" tab in the Data Studio UI. In particular, the JSON response returned by the ip-api endpoint can be configured to be in specified languages. 
+
+In the [`IPGeolocationProcessor.java`](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocationProcessor.java), the step setting field can be found in the `StepProcessorContext` and retrieve using the `getStepSettingFieldValueAsString()` method. 
+
+   ![Lang Step Settings](readme-images/lang-step-settings.png)
+
+#### Concurrent asynchronous requests
+Asynchronous requests are made using the `sendAsync()` method of `WebHttpClient`. The Java CompletableFuture handles the response. A CompletableFuture of type `WebHttpResponse` (i.e. `CompletableFuture<WebHttpResponse>`) allows Data Studio to continue execution and make other asynchronous calls. The `thenAccept()` method of the `CompletableFuture` defines what is done when the response is received. 
