@@ -15,6 +15,9 @@ subprojects {
     dependencies {
         compileOnly urlFile('https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository-sdklib/maven/com/experian/datastudio/sdkapi/2.0.0-SNAPSHOT/sdkapi-2.0.0-SNAPSHOT.jar', 'sdkapi')
         compileOnly urlFile('https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository-sdklib/maven/com/experian/datastudio/sdklib/2.0.0-SNAPSHOT/sdklib-2.0.0-SNAPSHOT.jar', 'sdklib')
+        compileOnly (
+                "org.apache.logging.log4j:log4j-api:2.12.0"
+        )
     }
 }
 
