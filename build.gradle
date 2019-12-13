@@ -13,24 +13,10 @@ subprojects {
     }
 
     dependencies {
-        compileOnly urlFile('https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository-sdklib/maven/com/experian/datastudio/sdkapi/2.0.0-SNAPSHOT/sdkapi-2.0.0-SNAPSHOT.jar', 'sdkapi')
-        compileOnly urlFile('https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository-sdklib/maven/com/experian/datastudio/sdklib/2.0.0-SNAPSHOT/sdklib-2.0.0-SNAPSHOT.jar', 'sdklib')
+        compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
+        compileOnly("com.experian.datastudio:sdklib:2.0.0-SNAPSHOT")
         compileOnly (
                 "org.apache.logging.log4j:log4j-api:2.12.0"
         )
     }
-}
-
-
-def urlFile(url, name) {
-    File file = new File("$buildDir/download/${name}.jar")
-    file.parentFile.mkdirs()
-    if (!file.exists()) {
-        new URL(url).withInputStream { downloadStream ->
-            file.withOutputStream { fileOut ->
-                fileOut << downloadStream
-            }
-        }
-    }
-    files(file.absolutePath)
 }
