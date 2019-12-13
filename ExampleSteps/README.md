@@ -40,7 +40,7 @@ For more details about the Gradle Shadow Plugin, refer to the [user documentatio
 
 [IPGeolocation](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocation.java) depends on specific input data that contains IPv4 addresses. You can extract the sample data from the test resources folder:
 
-1. The sample data is available at [sample-ip.csv](IPGeolocation/src/test/resources/sample-ip.csv)
+1. The sample data is available at [IPGeolocationData.csv](IPGeolocation/src/test/resources/IPGeolocationData.csv)
 2. Add the sample data as a source under the Datasets tab. 
 3. Select this data as source in the Data Studio UI.
 4. Link it with the custom step:
@@ -48,9 +48,24 @@ For more details about the Gradle Shadow Plugin, refer to the [user documentatio
     ![Restful Step Workflow](readme-images/restful-step-workflow.png)
 5. Execute/Run the workflow or click on `Show step results`.
 
+#### Sample Data for Example Steps 
+- AddVAT: [AddVATData.csv](AddVAT/src/test/resources/AddVATData.csv)
+- ConcatValues: [ConcatValuesData.csv](ConcatValues/src/test/resources/ConcatValuesData.csv)
+- IPGeolocation: [IPGeolocationData.csv](IPGeolocation/src/test/resources/IPGeolocationData.csv)
+
 ## AddVAT Example Step
+The [AddVAT](AddVAT/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/AddVAT.java) example step adds a user-defined VAT percentage to an input column. The column will be renamed and returns the total + VAT amount.
+
+The input is taken from a single column from an input node and the output is published to a single column in the output node (replacing the input column). As the example step class is [`AddVAT.java`](AddVAT/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/AddVAT.java) which contains the *metadata*, *configuration* and *processor*.  
+
+The VAT percentage is specified using a "Number" step property. This is demonstrated in [`AddVAT.java`](AddVAT/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/AddVAT.java). 
 
 ## ConcatValues Example Step
+The [ConcatValues](ConcatValues/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/ConcatValues.java) example step concatenates two columns together using a user-defined delimiter into a new output column inserted after the input columns.
+
+The input is taken from two columns from an input node and the output is published to a single column in the output node. As the example step class is [`ConcatValues.java`](ConcatValues/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/ConcatValues.java) which contains the *metadata*, *configuration* and *processor*.  
+
+The two input columns are selected using two "Column Chooser" step properties whereas the delimiter is selected using a "Custom Chooser" step property. This is demonstrated in [`ConcatValues.java`](ConcatValues/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/ConcatValues.java). 
 
 ## IPGeolocation Example Step
 
@@ -58,7 +73,7 @@ The [IPGeolocation](IPGeolocation/src/main/java/com/experian/aperture/datastudio
 
 This example step relies on [ip-api](https://ip-api.com/docs), an API endpoint that identifies the country of origin (and other location specific data) based on a provided IP address. In this example, the response is returned in JSON format. 
 
-The input is taken from a single column from an input node and the output is published to a single column in the output node. As the example step is large, the main class is ['IPGeolocation.java'](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocation.java) which contains the *metadata* and *configuration*. The *processor* is housed in a separate class ([`IPGeolocationProcessor.java`](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocationProcessor.java)) for better readability. 
+The input is taken from a single column from an input node and the output is published to a single column in the output node. As the example step is large, the main class is [`IPGeolocation.java`](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocation.java) which contains the *metadata* and *configuration*. The *processor* is housed in a separate class ([`IPGeolocationProcessor.java`](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocationProcessor.java)) for better readability. 
 
 The [IPGeolocation](IPGeolocation/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/IPGeolocation.java) example step demonstrates the following features of the Aperture Data Studio SDK: 
 - HTTP requests (using the SDK HTTP Libraries/Helper Classes)
