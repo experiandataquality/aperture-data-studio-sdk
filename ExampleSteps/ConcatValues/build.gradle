@@ -1,0 +1,24 @@
+buildscript {
+    // build script plugins and dependencies for root project
+
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.1.0'
+    }
+}
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
+}
+
+/*
+Package the step into a jar together with its dependencies.
+Relocate the dependencies to ensure dependencies version doesn't conflict with data studio
+*/
+shadowJar {
+    //minimize() - DO NOT USE minimize() because classes initialized through reflections or service loader pattern will be excluded
+    zip64 = true
+}
+
+tasks.test.dependsOn tasks.shadowJar
+jar.enabled = false
+assemble.dependsOn(shadowJar)

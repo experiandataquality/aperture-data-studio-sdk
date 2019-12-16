@@ -59,12 +59,13 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
    dependencies {
        compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
+       compileOnly("com.experian.datastudio:sdklib:2.0.0-SNAPSHOT")
    }
    ```
 
   If you don't want to use Gradle, you'll have to configure your own Java project to generate a compatible JAR artifact:
    - Create a new Java project or open an existing one.
-   - Download and install the [sdkapi.jar]([TO BE CHANGED]) file.
+   - Download and install the [sdkapi.jar]([TO BE CHANGED]) & [sdklib.jar]([TO BE CHANGED]) files.
 
   If using Maven, modify `pom.xml` to add the SDK GitHub repository:
 
@@ -97,10 +98,16 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
                <version>2.0.0-SNAPSHOT</version>
                <scope>provided</scope>
            </dependency>
+           <dependency>
+              <groupId>com.experian.datastudio</groupId>
+              <artifactId>sdklib</artifactId>
+              <version>2.0.0-SNAPSHOT</version>
+              <scope>provided</scope>
+          </dependency>
        </dependencies>
    </project>
    ```
-3. (Skip this step if using Maven or Gradle). If you've downloaded the JAR manually, create a *libs* folder and add in the *sdkapi.jar* as a library.
+3. (Skip this step if using Maven or Gradle). If you've downloaded the JAR manually, create a *libs* folder and add in the *sdkapi.jar* & *sdklib.jar* as a library.
 4. Create a new package and class.
 5. Configure your project to output a .jar file as an artifact. Note that this will be done differently depending on your IDE.
 

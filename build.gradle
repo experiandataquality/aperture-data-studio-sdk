@@ -1,0 +1,19 @@
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    repositories {
+        maven {
+            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
+        }
+    }
+
+    dependencies {
+        compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
+        compileOnly("com.experian.datastudio:sdklib:2.0.0-SNAPSHOT")
+    }
+}
