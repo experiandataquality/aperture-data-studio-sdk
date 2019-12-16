@@ -22,10 +22,3 @@ shadowJar {
 tasks.test.dependsOn tasks.shadowJar
 jar.enabled = false
 assemble.dependsOn(shadowJar)
-
-task copyToAddons(type: Copy) {
-    from "$buildDir/libs"
-    include "**/*.jar"
-    into "../../addons"
-    dependsOn(shadowJar)
-}
