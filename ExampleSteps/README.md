@@ -1,6 +1,6 @@
 # ExampleSteps
 
-This project provides instructions on how to generate an *individual* example custom step jar, upload it into Data Studio, and deploy your custom step. 
+This project provides instructions on how to generate an *individual* example custom step jar, move it into Data Studio, and deploy your custom step. 
 
 Example custom steps provided are: 
 - AddVAT
@@ -28,7 +28,7 @@ For more details about the Gradle Shadow Plugin, refer to the [user documentatio
 
     ![copy jar](readme-images/copy-jar.png)
    
-4. Once the `jar` is moved into the Data Studio addons folder, the _example steps_ will be listed in the left-hand side pane:
+4. Once the `jar` is moved into the Data Studio0 addons folder, the _example steps_ will be listed in the left-hand side pane:
 
     ![Workflow Steps](readme-images/workflow-steps-pane.png)
 
