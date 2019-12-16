@@ -8,7 +8,7 @@ subprojects {
 
     repositories {
         maven {
-            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository-sdklib/maven'
+            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
         }
     }
 
