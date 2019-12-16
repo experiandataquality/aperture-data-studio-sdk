@@ -28,11 +28,7 @@ For more details about the Gradle Shadow Plugin, refer to the [user documentatio
 
     ![copy jar](readme-images/copy-jar.png)
    
-4. Make sure that the upload is successful.
-
-    **Note**: if the upload fails, the most likely reason is that you already have a `jar` with the same name uploaded. To fix the issue, stop Data Studio and delete the existing `jar` from the Data Studio installation directory, `addons` folder. Afterwards, launch Data Studio again and drag and drop your new `jar`. 
-   
-5. Once the `jar` is successfully uploaded, the _example steps_ will be listed in the left-hand side pane:
+4. Once the `jar` is moved into the Data Studio addons folder, the _example steps_ will be listed in the left-hand side pane:
 
     ![Workflow Steps](readme-images/workflow-steps-pane.png)
 
