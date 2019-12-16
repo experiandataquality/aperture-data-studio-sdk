@@ -1,6 +1,6 @@
 # ExampleSteps
 
-This project provides instructions on how to generate an `ExampleStep jar`, upload it into Data Studio, and deploy your custom step. 
+This project provides instructions on how to generate an *individual* example custom step jar, upload it into Data Studio, and deploy your custom step. 
 
 Example custom steps provided are: 
 - AddVAT
