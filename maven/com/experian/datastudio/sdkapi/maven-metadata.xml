@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
   <groupId>com.experian.datastudio</groupId>
-  <artifactId>sdklib</artifactId>
+  <artifactId>sdkapi</artifactId>
   <versioning>
+    <latest>2.0.0-SNAPSHOT</latest>
     <versions>
       <version>2.0.0-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20191210100517</lastUpdated>
+    <lastUpdated>20191217043316</lastUpdated>
   </versioning>
 </metadata>
