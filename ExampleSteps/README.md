@@ -19,6 +19,8 @@ For more details about the Gradle Shadow Plugin, refer to the [user documentatio
 1. Run `gradle build` either from the command line or from IntelliJ IDEA:
 
     ![gradle build](readme-images/gradle-build.png)
+    
+    **Note:** This deployment uses the IPGeolocation step as an example. For AddVAT and ConcatValues (and any other custom step), repeat these steps in their respective folders. 
    
 2. The output of the build is located at `build/libs/IPGeolocation-all.jar`:
 
