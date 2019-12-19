@@ -24,6 +24,15 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
         - [StepProcessorBuilder sample code](#stepprocessorbuilder-sample-code)
 - [The logging library](#the-logging-library)
 - [The cache configuration](#the-cache-configuration)
+    - [Cache scope](#cache-scope)
+      - [Workflow](#workflow)
+      - [Step](#step)
+    - [Create cache](#create-cache)
+      - [Cache configuration](#cache-configuration)
+      - [Get or create cache](#get-or-create-cache)
+    - [Destroy cache](#destroy-cache)
+    - [Assigning value to cache](#assigning-value-to-cache)
+    - [Getting value from cache](#getting-value-from-cache)
 - [The http client library](#the-http-client-library)
 - [Generating a custom parser from a new or existing project](#generating-a-custom-parser-from-a-new-or-existing-project)
 - [Creating a custom parser](#creating-a-custom-parser)
@@ -65,7 +74,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
   If you don't want to use Gradle, you'll have to configure your own Java project to generate a compatible JAR artifact:
    - Create a new Java project or open an existing one.
-   - Download and install the [sdkapi.jar]([TO BE CHANGED]) & [sdklib.jar]([TO BE CHANGED]) files.
+   - Download and install the [sdkapi.jar]([TO BE CHANGED]) file.
 
   If using Maven, modify `pom.xml` to add the SDK GitHub repository:
 
@@ -83,6 +92,11 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
        <packaging>jar</packaging>
        <!-- replace this accordingly with your custom step name -->
        <name>MyCustomStep</name>
+    
+       <properties>
+            <maven.compiler.source>1.8</maven.compiler.source>
+            <maven.compiler.target>1.8</maven.compiler.target>
+       </properties>
 
        <repositories>
            <repository>
@@ -99,15 +113,14 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
                <scope>provided</scope>
            </dependency>
            <dependency>
-              <groupId>com.experian.datastudio</groupId>
-              <artifactId>sdklib</artifactId>
-              <version>2.0.0-SNAPSHOT</version>
-              <scope>provided</scope>
-          </dependency>
+                <groupId>com.experian.datastudio</groupId>
+                <artifactId>sdklib</artifactId>
+                <version>2.0.0-SNAPSHOT</version>
+           </dependency>
        </dependencies>
    </project>
    ```
-3. (Skip this step if using Maven or Gradle). If you've downloaded the JAR manually, create a *libs* folder and add in the *sdkapi.jar* & *sdklib.jar* as a library.
+3. (Skip this step if using Maven or Gradle). If you've downloaded the JAR manually, create a *libs* folder and add in the *sdkapi.jar* as a library.
 4. Create a new package and class.
 5. Configure your project to output a .jar file as an artifact. Note that this will be done differently depending on your IDE.
 
@@ -406,8 +419,11 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
 }
 ```
 #### isInteractive() flag
-Interactive is a flag that set to `true` when the user explores the output of a step on the Data Studio Grid. 
-It is set to `false` when running the whole workflow.
+Interactive is a flag that set to `true` when the step is used as an interactive drilldown. 
+It is set to `false` when the step is invoked as part of a workflow execution step, 
+or as an input to a view that requires all its data. This flag can be used to negate the need to 
+process all the input data when being viewed interactively. Instead, you can just process values when required.
+
 ``` java
 @Override
 public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
@@ -419,20 +435,85 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
 
 ## The logging library
 ``` java
-private static final Logger LOGGER = SdkLogManager.getLogger(StepsTemplate.class, Level.INFO);
+public class StepsTemplate implements CustomStepDefinition {
+    private static final Logger LOGGER = SdkLogManager.getLogger(StepsTemplate.class, Level.INFO);
+
+     @Override
+     public StepConfiguration createConfiguration(StepConfigurationBuilder stepConfigurationBuilder) {
+        LOGGER.info("Create configuration");
+        ...
 ```
 
 ## The cache configuration
+The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and 
+referenced by a particular name. It is useful for storing responses from slow services between instances of custom steps. 
+The backing key/value datastore is fast enough on reads to be used for random access lookups, and 
+it can handle reads/writes from multiple steps at once. The cache is managed by Data Studio, but 
+it is the responsibility of the custom step to delete or refresh the cache as necessary.
+
+
+It is encouraged to use the key that decides the output of the result as cache name or the cache key. 
+For example, country in the step property will determine the address returned, and United Kingdom is selected, 
+you may set the cache name as `address-GB` instead of `address`. So that when the step property is changed, the new 
+cache will be created instead of reusing the old cache. 
+
+
+### Cache scope
+There 2 types of caching scope: `Workflow` and `Step`
+
+#### Workflow
+The cache is scoped to each custom step class within a workflow, which means that 2 instances of the same custom step in the same 
+workflow can use the same cache if both supplied the same cache name. Same custom step in a different workflow will not able
+to access the same cache.
+
+#### Step
+The cache is scoped to each custom step instance, which means that 2 instances of the same custom step in the same 
+workflow will access a separate cache, even though both supplied with the same cache name.
+
 ### Create cache
+To create or obtain cache, you will need to build the `StepCacheConfiguration`.
+
+#### Cache configuration
+Use `StepCacheConfigurationBuilder` to build the `StepCacheConfiguration`. Here you may set the cache name, 
+time to live for update of the cache, cache scope and specify the type for cache key and cache value. 
+Cache key and cache value can be any type under Java.*.
+`StepCacheConfigurationBuilder` is supplied by `StepProcessorContext`.
+
+#### Get or create cache
+Caches are created or obtained by calling `getOrCreateCache` from the `StepCacheManager`. You will need to pass the 
+`StepCacheConfiguration` to create or retrieve the cache. `StepCacheManager` is supplied by `StepProcessorContext`. 
+
+Example below illustrate how to create a cache with the following configurations
+
+| Name             | Value        |
+| ---------------- | ------------ |
+| Cache name       | cache-name-1 |
+| Time-to-live     | 10 minutes   |
+| Cache scope      | STEP         |
+| Cache key type   | String       |
+| Cache value type | String       |
+
 ``` java
-final StepCacheManager cacheManager = context.getCacheManager();
-final StepCacheConfiguration<String, String> cacheConfiguration1 = context.getCacheConfigurationBuilder()
-        .withCacheName(CACHE_NAME_1)
-        .withTtlForUpdate(10L, TimeUnit.MINUTES)
-        .withScope(StepCacheScope.STEP)
-        .build(String.class, String.class);
-final StepCache<String, String> cache1 = cacheManager.getOrCreateCache(cacheConfiguration1);
+ private static final String CACHE_NAME_1 = "cache-name-1";
+ 
+ ....
+
+@Override
+    public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+        return processorBuilder
+                .forOutputNode(OUTPUT_ID, (context, columnManager) -> {
+                    final StepCacheManager cacheManager = context.getCacheManager();
+                    final StepCacheConfiguration<String, String> cacheConfiguration = context.getCacheConfigurationBuilder()
+                            .withCacheName(CACHE_NAME_1)
+                            .withTtlForUpdate(10L, TimeUnit.MINUTES)
+                            .withScope(StepCacheScope.STEP)
+                            .build(String.class, String.class);
+                    final StepCache<String, String> cache1 = cacheManager.getOrCreateCache(cacheConfiguration1);
 ``` 
+### Destroy cache
+``` java
+cacheManager.destroyCache(cacheConfiguration);
+```
 
 ### Assigning value to cache
 ``` java
