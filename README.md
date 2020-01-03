@@ -1,3 +1,5 @@
+![](https://github.com/experiandataquality/aperture-data-studio-sdk/workflows/Java%20CI/badge.svg)
+
 # Aperture Data Studio SDK
 
 The SDK provides a simple Java library to create and test your own custom steps, and extend the capabilities of [Data Studio](https://www.edq.com/documentation/aperture-data-studio/). You can also add your own custom parsers, which will enable Data Studio to load data from files in a variety of different formats. 
