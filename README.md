@@ -67,17 +67,19 @@ You can view the Javadoc [here](https://experiandataquality.github.io/aperture-d
 
 ## Compatibility matrix between SDK and Data Studio version
 
-| SDK version       | Data Studio version    |
-|:-----------------:|:----------------------:|
-| 1.6.2             |    1.^6.^2             |
-| 1.6.1             |    1.^6.^2             |
-| 1.6.0             |    1.^6.^2             |
-| 1.5.0             |    1.^6.^2             |
-| 1.4.0             |    1.^6.^2             |
+| SDK version       | Compatible Data Studio version    |
+|:-----------------:|:---------------------------------:|
+| 1.6.2             |    1.^6.^2                        |
+| 1.6.1             |    1.^6.^2                        |
+| 1.6.0             |    1.^6.^2                        |
+| 1.5.0             |    1.^6.^2                        |
+| 1.4.0             |    1.^6.^2                        |
 
 ### Notes
 - Both the Data Studio and SDK version follows [semantic version](https://semver.org/) notation where for version *a.b.c*; *a*, *b*, *c* indicate the major, minor and patch version respectively.
-- `^` in the version number indicates that SDK is compatible with any version up to  the specified number in the category. For example, *1.6.^2* indicates that the SDK is compatible with Data Studio version 1.6.0 up to the 1.6.2.
+- Prefix `^` in the version number indicates that SDK is compatible with any version **up to**  the specified number in the category. For example, *1.6.^2* indicates that the SDK is compatible with Data Studio version 1.6.0 up to the 1.6.2.
+- Suffix `^` in the version number indicates that SDK is compatible with any version **starting from**  the specified number (inclusive) up to latest available in the category. For example, *1.4^.0* indicates that the SDK is compatible with Data Studio version starting from 1.4.0 to the 1.6.2, assuming the latest available minor version for 1.x.x is 1.6.2.
+- Combining the prefix and suffix together will form a range of compatible version. For example, *1.4^6.0* indicates that the SDK is compatible with Data Studio from version 1.4.0 to 1.6.2, assuming the latest available minor version for 1.x.x is 1.6.2.
 - Although an older SDK version is compatible with the newer Data Studio version, e.g SDK 1.4.0 is compatible up to Data Studio 1.6.2, the SDK might not support the new features released in the new Data Studio version. As such, SDK user is always encouraged to upgrade to the latest SDK version supported by their current version of Data Studio.
 
 ## Generating a custom step with the sample project
