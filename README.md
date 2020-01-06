@@ -69,11 +69,11 @@ You can view the Javadoc [here](https://experiandataquality.github.io/aperture-d
 
 | Data Studio version       | Compatible SDK version            | 
 |:-------------------------:|:---------------------------------:|
-| 1.6.2                     |    1.^6.2                         |
-| 1.6.1                     |    1.^6.2                         |
-| 1.6.0                     |    1.^6.0                         |
-| 1.5.0                     |    1.^5.0                         |
-| 1.4.0                     |    1.^4.0                         |
+| 1.6.2                     |    [1.^6.2](https://github.com/experiandataquality/aperture-data-studio-sdk)                                     |
+| 1.6.1                     |    [1.^6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1)                         |
+| 1.6.0                     |    [1.^6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0)                         |
+| 1.5.1                     |    [1.^5.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.1)                         |
+| 1.5.0                     |    [1.^5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0)                         |
 
 ### Legends
 
