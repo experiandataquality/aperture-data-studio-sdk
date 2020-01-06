@@ -1,5 +1,9 @@
 # SDK Test Framework
 
+Apart from providing all the resources you need to develop custom steps, the SDK also contains a test framework that can help you test custom steps at component level. The test framework uses JUnit.
+
+The test framework helps mock the behavior of Data Studio where a custom step is installed and used in a workflow. This ensures the custom step works as intended. The test framework is also useful for creating regression tests.
+
 **Purpose:** The SDK test framework is a standalone environment that mimics Aperture Data Studio to test the custom steps built by developers to ensure they work as designed. 
 
 The SDK test framework is not a complete duplicate of the Aperture Data Studio environment but only a limited simulation without the full features of Data Studio. However it provides sufficient resources to ensure a custom step is compatible with an actual Data Studio environment and should run as intended. 
@@ -11,7 +15,7 @@ Example custom steps tested are:
 
 # Test Framework Configuration
 
-The SDK Test Framework tests are run using [JUnit](https://junit.org/) (a user interface is not provided). For more details about the Gradle Shadow Plugin, refer to the [user documentation](https://junit.org/).
+The SDK Test Framework tests are run using [JUnit](https://junit.org/) (a user interface is not provided). For more details about JUnit, refer to the [user documentation](https://junit.org/).
 
 The steps to test a custom step using the SDK Test Framework can be roughly simplified over the following steps: 
 1. [Writing a Test using the SDK Test Framework](#writing-a-test-using-the-sdk-test-framework)
@@ -74,7 +78,7 @@ An example workflow with the AddVAT Step in Data Studio would look similar to th
 
 ![example workflow](readme-images/example-workflow.png)
 
-To reiterate, the SDK Test Framework is designed to replicate the functionality of Data Studio (with only limited features) to test a custom step. Using AddVATTest.java as an example, the Java class can be found at: `/aperture-data-studio-sdk/SDKTestFramework/src/test/java/com/experian/datastudio/sdk/testframework/sample/`
+To reiterate, the SDK Test Framework is designed to replicate the above functionality of Data Studio (with only limited features) to test a custom step. Using AddVATTest.java as an example, the Java class can be found at: `/aperture-data-studio-sdk/SDKTestFramework/src/test/java/com/experian/datastudio/sdk/testframework/sample/`
 
 #### Test Setting Example: 
 
