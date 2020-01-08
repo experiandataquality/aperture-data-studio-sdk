@@ -51,6 +51,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
     - [Get row iterator](#get-row-iterator)
       - [TableDefinitionContext](#tabledefinitioncontext-1)
       - [ClosableIteratorBuilder](#closableiteratorbuilder)
+- [Debugging](#debugging)
+
 
 ## Compatibility matrix between SDK and Data Studio version
 
@@ -831,3 +833,34 @@ Return a closable iterator over a collection of table row. Use the `ClosableIter
 | withNext    | Returns the next row in the iteration                                          |
 | withClose   | Closes any streams and releases system resources associated with the iterator. |
 
+## Debugging
+To enable Java's standard remote debugging feature:
+1. Install Data Studio. Please [contact us](https://www.edq.com/data-quality-management/aperture-data-quality-management-platform/) to get the latest version.
+2. Go to the installation directory of Data Studio.
+3. Find and edit `Aperture Data Studio Service 64bit.ini`. You might need *Administrator* permission to edit this file if the installation is in "Program Files" folder.
+4. Alter the **`Virtual Machine Parameters`** property.
+    ```properties
+    Virtual Machine Parameters=-Xms66:1000:16000P -Xmx66:1000:16000P -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+    ```
+5. Open IntelliJ IDEA project containing the source code of your custom addon code.
+6. Click the toolbar __Edit Configurations...__. This could also be found by going to the menu __Run__ > __Edit Configurations__
+
+    ![Edit Configurations](images/edit-configurations.PNG)
+
+7. Click the `+` button and add new __Remote__ debugging:
+
+    ![Add Remote Debugging](images/new-remote-debugging.PNG)
+
+8. Fill in the __Name__ with *Aperture Data Studio Remote Debugging* or any other name that you can recognize later.
+
+    ![Editing Remote Debugging](images/editing-remote-debugging.PNG)
+9. Click __OK__. This will create a new *Debug* configuration.
+10. Place break points in your addons code where you want the debugger to stop.
+11. Start debugging by clicking the __Debug__ icon button, or menu __Run__ > __Debug...__ > *Select __Aperture Data Studio Remote Debugging__ configuration*.
+
+    ![Start debugging](images/debug-button.PNG)
+12. Restart Data Studio.
+13. Now you can debug your custom addons code. Create a workflow containing your custom step and interact with UI depending on where you want to debug, e.g: If you want to debug processor, click *Show step results*.
+
+**NOTE**: make sure `-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005` is removed in the production
+environment.
