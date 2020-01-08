@@ -6,6 +6,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 ## Table of contents
 
+- [Compatibility matrix between SDK and Data Studio version](#compatibility-matrix-between-sdk-and-data-studio-version)
 - [Generating a custom step from a new or existing project](#generating-a-custom-step-from-a-new-or-existing-project)
 - [Comparison of SDK v1.0 and v2.0](#comparison-of-sdk-v1.0-and-v2.0)
 - [Creating a custom step](#creating-a-custom-step)
@@ -51,6 +52,29 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
       - [TableDefinitionContext](#tabledefinitioncontext-1)
       - [ClosableIteratorBuilder](#closableiteratorbuilder)
 - [Debugging](#debugging)
+
+
+## Compatibility matrix between SDK and Data Studio version
+
+| Data Studio version       | Compatible SDK version            | 
+|:-------------------------:|:---------------------------------:|
+| 1.6.2                     |    [1.^6.2](https://github.com/experiandataquality/aperture-data-studio-sdk)                                     |
+| 1.6.1                     |    [1.^6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1)                         |
+| 1.6.0                     |    [1.^6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0)                         |
+| 1.5.1                     |    [1.^5.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.1)                         |
+| 1.5.0                     |    [1.^5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0)                         |
+
+### Legends
+
+- Prefix `^` in the version number indicates that SDK is compatible with any version **up to**  the specified number in the category. For example, *1.6.^2* indicates that the SDK is compatible with Data Studio version 1.6.0 up to the 1.6.2.
+- Suffix `^` in the version number indicates that SDK is compatible with any version **starting from**  the specified number (inclusive) up to latest available in the category. For example, *1.4^.0* indicates that the SDK is compatible with Data Studio version starting from 1.4.0 to the 1.6.2, assuming the latest available minor version for 1.x.x is 1.6.2.
+- Combining the prefix and suffix together will form a range of compatible version. For example, *1.4^6.0* indicates that the SDK is compatible with Data Studio from version 1.4.0 to 1.6.2, assuming the latest available minor version for 1.x.x is 1.6.2.
+
+### Notes
+
+- Both the Data Studio and SDK version follows [semantic version](https://semver.org/) notation where for version *a.b.c*; *a*, *b*, *c* indicate the major, minor and patch version respectively.
+- Although an older SDK version is compatible with the newer Data Studio version, e.g SDK 1.4.0 is compatible up to Data Studio 1.6.2, the SDK might not support the new features released in the new Data Studio version. As such, SDK user is always encouraged to upgrade to the latest SDK version supported by their current version of Data Studio.
+- For newer SDK version, the existing features will always be backward compatible to older Data Studio version, e.g: For SDK version 1.6.2, feature that was release in previous 1.4.0 will still be compatible with Data Studio 1.4.0. Even with this backward compatibility support, you are not encouraged to upgrade the SDK version for older Data Studio version, using SDK 1.6.2 for Data Studio 1.4.0, as you might be using new SDK features that isn't supported by that Data Studio.
 
 ## Generating a custom step from a new or existing project
 
