@@ -581,7 +581,7 @@ WebHttpClient.builder()
 ```
 
 ### Create an HTTP request
-The requests available are: 
+The request supports the following http methods: 
 - [GET request](#get-request)
 - [POST request](#post-request)
 - [PUT request](#put-request)
