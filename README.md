@@ -23,8 +23,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
     - [Processing your step](#processing-your-step)
         - [Execute step](#execute-step)
         - [StepProcessorBuilder sample code](#stepprocessorbuilder-sample-code)
-- [The logging library](#the-logging-library)
-- [The cache configuration](#the-cache-configuration)
+- [The Logging library](#the-logging-library)
+- [The Cache configuration](#the-cache-configuration)
     - [Cache scope](#cache-scope)
       - [Workflow](#workflow)
       - [Step](#step)
@@ -34,7 +34,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
     - [Destroy cache](#destroy-cache)
     - [Assigning value to cache](#assigning-value-to-cache)
     - [Getting value from cache](#getting-value-from-cache)
-- [The http client library](#the-http-client-library)
+- [The HTTP Client library](#the-http-client-library)
 - [Generating a custom parser from a new or existing project](#generating-a-custom-parser-from-a-new-or-existing-project)
 - [Creating a custom parser](#creating-a-custom-parser)
   - [Importing the parser SDK](#importing-the-parser-sdk)
@@ -459,7 +459,7 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
                     ...
 ```
 
-## The logging library
+## The Logging library
 ``` java
 public class StepsTemplate implements CustomStepDefinition {
     private static final Logger LOGGER = SdkLogManager.getLogger(StepsTemplate.class, Level.INFO);
@@ -470,7 +470,7 @@ public class StepsTemplate implements CustomStepDefinition {
         ...
 ```
 
-## The cache configuration
+## The Cache configuration
 The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and 
 referenced by a particular name. It is useful for storing responses from slow services between instances of custom steps. 
 The backing key/value datastore is fast enough on reads to be used for random access lookups, and 
@@ -551,8 +551,26 @@ cache1.put(cacheKey, value);
 cache1.get(cacheKey);
 ```
 
-## The http client library
-### Create http client object
+## The HTTP Client library
+
+The HTTP client library provides an interface for accessing external endpoints through the HTTP protocol. 
+
+The HTTP requests are made using the SDK HTTP libraries/helper classes: 
+- `WebHttpClient` 
+- `WebHttpRequest` 
+- `WebHttpResponse` 
+
+First, an HTTP web client (`WebHttpClient`) is set up, and a request (`WebHttpRequest`) is sent through the client using the `sendAsync()` method with the request as an argument. This returns a `WebHttpResponse` which contains the response from the endpoint.
+
+#### Steps to use the HTTP client library: 
+1. [Create an HTTP client](#create-an-http-client)
+2. [Create an HTTP request (GET/POST/PUT/DELETE)](#create-an-http-request)
+3. [Send the HTTP request through WebHttpClient](#send-the-http-request-through-webhttpclient)
+4. [Retrieving the HTTP Response through WebHttpResponse](#retrieving-the-http-response-through-webhttpresponse)
+
+A [GET example](#example-of-sending-an-http-get-request-through-webhttpclient) and a [POST example](#example-of-sending-an-http-post-request-through-webhttpclient) is provided at the end of this section. 
+
+### Create an HTTP client
 ``` java
 WebHttpClient.builder()
         .withHttpVersion(..) // Http protocol version
@@ -562,7 +580,14 @@ WebHttpClient.builder()
         .build()    
 ```
 
-### Create http GET request object
+### Create an HTTP request
+The request supports the following http methods: 
+- [GET request](#get-request)
+- [POST request](#post-request)
+- [PUT request](#put-request)
+- [DELETE request](#delete-request)
+
+#### GET request
 ``` java
 WebHttpRequest.builder()
         .get(..) // passing in the url
@@ -571,7 +596,7 @@ WebHttpRequest.builder()
         .build()
 ```
 
-### Create http POST request object
+#### POST request
 ``` java
 WebHttpRequest.builder()
         .post(..) // passing in the url
@@ -581,7 +606,7 @@ WebHttpRequest.builder()
         .build()
 ```
 
-### Create http PUT request object
+#### PUT request
 ``` java
 WebHttpRequest.builder()
         .put(..) // passing in the url
@@ -591,7 +616,7 @@ WebHttpRequest.builder()
         .build()
 ```
 
-### Create http DELETE request object
+#### DELETE request
 ``` java
 WebHttpRequest.builder()
         .delete(..) // passing in the url
@@ -601,16 +626,84 @@ WebHttpRequest.builder()
         .build()
 ```
 
-### Send http request through WebHttpClient
+### Send the HTTP request through WebHttpClient
+``` java
+client.sendAsync(request);
+```
+
+Calling the `sendAsync()` method returns a `CompletableFuture<WebHttpResponse>` object. 
+
+### Retrieving the HTTP Response through WebHttpResponse 
+
+The methods provided to retrieve information from WebHttpResponse are: 
+- `getStatus()`
+- `getMessage()` 
+- `getBody()`
+- `getHeaders()`
+
+An example: 
+
+``` java
+CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
+
+webHttpResponse
+        .thenAccept(response -> {
+            String responseBody = response.getBody();
+        })
+        .exceptionally(e -> {
+            // error handling 
+        });
+```
+
+### Example of Sending an HTTP GET Request through WebHttpClient
+
+This example step relies on [ip-api](https://ip-api.com/docs), an API endpoint that identifies the country of origin (and other location specific data) based on a provided IP address. In this example, the response is returned in JSON format. 
+
 ``` java
 WebHttpClient client = WebHttpClient.builder()
-        .withHttpVersion(..) // Http protocol version
-        .withProxy(..) // specifying any required proxy
-        .withConnectionTimeout(..) // maximum time to establish connection
-        .withSocketTimeout(..) // maximum time to retrieve data
+        .withHttpVersion(HttpVersion.HTTP1_1)
+        .withProxy(Proxy.NO_PROXY)
+        .withConnectionTimeout(10L, TimeUnit.SECONDS) 
+        .withSocketTimeout(10L, TimeUnit.SECONDS)
         .build();
 
-client.sendAsync(request);
+WebHttpRequest request = WebHttpRequest.builder()
+        .get("http://ip-api.com/json/205.174.40.1") 
+        .withQueryString("fields", "status,message,country") 
+        .build()
+
+CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
+
+webHttpResponse
+        .thenAccept(response -> {
+            String webHttpResponseBody = response.getBody();
+            JSONObject jsonObject = new JSONObject(webHttpResponseBody);
+            String countryName = (String) jsonObject.opt("country");
+        })
+        .exceptionally(e -> {
+            // error handling 
+        });
+```
+
+### Example of Sending an HTTP POST Request through WebHttpClient
+
+``` java
+JSONObject json = new JSONObject(); 
+json.put("test", "value");
+
+WebHttpClient client = WebHttpClient.builder()
+        .withHttpVersion(HttpVersion.HTTP1_1)
+        .withProxy(Proxy.NO_PROXY)
+        .withConnectionTimeout(10L, TimeUnit.SECONDS) 
+        .withSocketTimeout(10L, TimeUnit.SECONDS)
+        .build();
+
+WebHttpRequest request = WebHttpRequest.builder()
+        .post(<URL>) 
+        .withBody(json.toString()) 
+        .build()
+
+CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
 ```
 
 ## Generating a custom parser from a new or existing project
