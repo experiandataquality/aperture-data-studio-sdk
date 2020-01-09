@@ -568,7 +568,7 @@ First, an HTTP web client (`WebHttpClient`) is set up, and a request (`WebHttpRe
 3. [Send the HTTP request through WebHttpClient](#send-the-http-request-through-webhttpclient)
 4. [Retrieving the HTTP Response through WebHttpResponse](#retrieving-the-http-response-through-webhttpresponse)
 
-An [example](#example-of-sending-an-http-request-through-webhttpclient) is provided at the end of this section. 
+A [GET example](#example-of-sending-an-http-get-request-through-webhttpclient) and a [POST example](#example-of-sending-an-http-post-request-through-webhttpclient) is provided at the end of this section. 
 
 ### Create an HTTP client
 ``` java
@@ -631,11 +631,11 @@ WebHttpRequest.builder()
 client.sendAsync(request);
 ```
 
-Calling the sendAsync method returns a WebHttpResponse object. 
+Calling the `sendAsync()` method returns a `CompletableFuture<WebHttpResponse>` object. 
 
 ### Retrieving the HTTP Response through WebHttpResponse 
 
-The methods provided to retrieve information from WebHttpReponse are: 
+The methods provided to retrieve information from WebHttpResponse are: 
 - `getStatus()`
 - `getMessage()` 
 - `getBody()`
@@ -644,11 +644,18 @@ The methods provided to retrieve information from WebHttpReponse are:
 An example: 
 
 ``` java
-WebHttpResponse response = client.sendAsync(request); 
-String responseBody = response.getBody(); 
+CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
+
+webHttpResponse
+        .thenAccept(response -> {
+            String responseBody = response.getBody();
+        })
+        .exceptionally(e -> {
+            // error handling 
+        });
 ```
 
-### Example of Sending an HTTP Request through WebHttpClient
+### Example of Sending an HTTP GET Request through WebHttpClient
 
 This example step relies on [ip-api](https://ip-api.com/docs), an API endpoint that identifies the country of origin (and other location specific data) based on a provided IP address. In this example, the response is returned in JSON format. 
 
@@ -665,11 +672,38 @@ WebHttpRequest request = WebHttpRequest.builder()
         .withQueryString("fields", "status,message,country") 
         .build()
 
-WebHttpResponse webHttpResponse client.sendAsync(request);
+CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
 
-String webHttpResponseBody = webHttpResponse.getBody();
-JSONObject jsonObject = new JSONObject(webHttpResponseBody);
-String countryName = (String) jsonObject.opt("country");
+webHttpResponse
+        .thenAccept(response -> {
+            String webHttpResponseBody = response.getBody();
+            JSONObject jsonObject = new JSONObject(webHttpResponseBody);
+            String countryName = (String) jsonObject.opt("country");
+        })
+        .exceptionally(e -> {
+            // error handling 
+        });
+```
+
+### Example of Sending an HTTP POST Request through WebHttpClient
+
+``` java
+JSONObject json = new JSONObject(); 
+json.put("test", "value");
+
+WebHttpClient client = WebHttpClient.builder()
+        .withHttpVersion(HttpVersion.HTTP1_1)
+        .withProxy(Proxy.NO_PROXY)
+        .withConnectionTimeout(10L, TimeUnit.SECONDS) 
+        .withSocketTimeout(10L, TimeUnit.SECONDS)
+        .build();
+
+WebHttpRequest request = WebHttpRequest.builder()
+        .post(<URL>) 
+        .withBody(json.toString()) 
+        .build()
+
+CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
 ```
 
 ## Generating a custom parser from a new or existing project
