@@ -58,7 +58,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 | Data Studio version       | Compatible SDK version            | 
 |:-------------------------:|:---------------------------------:|
-| 1.6.2                     |    [1.^6.2](https://github.com/experiandataquality/aperture-data-studio-sdk)                                     |
+| 2.0.0                     |    [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk)                                     |
+| 1.6.2                     |    [1.^6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2)                                     |
 | 1.6.1                     |    [1.^6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1)                         |
 | 1.6.0                     |    [1.^6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0)                         |
 | 1.5.1                     |    [1.^5.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.1)                         |
