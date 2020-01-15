@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This is a custom step definition that concatenates two
@@ -87,7 +88,10 @@ public class ConcatValues implements CustomStepDefinition {
     public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
         return processorBuilder
                 .forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
-                    final List<String> customChooser = (List<String>) processorContext.getStepPropertyValue(ARG_ID_CUSTOM_CHOOSER).orElse(Collections.emptyList());
+                    @SuppressWarnings("unchecked")
+                    final List<String> customChooser = (List<String>) processorContext
+                            .getStepPropertyValue(ARG_ID_CUSTOM_CHOOSER)
+                            .orElse(Collections.emptyList());
                     final String delimiterString = customChooser.isEmpty() ? "" : customChooser.get(0);
                     String delimiter;
 
