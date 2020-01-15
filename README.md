@@ -1,4 +1,4 @@
-![](https://github.com/experiandataquality/aperture-data-studio-sdk/workflows/Java%20CI/badge.svg)
+![](https://github.com/experiandataquality/aperture-data-studio-sdk/workflows/Java%20CI/badge.svg?branch=2.0.0)
 
 # Aperture Data Studio SDK
 
