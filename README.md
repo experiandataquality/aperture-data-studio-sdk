@@ -89,13 +89,13 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
    repositories {
        mavenCentral()
        maven {
-           url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
+           url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
        }
    }
 
    dependencies {
-       compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
-       compileOnly("com.experian.datastudio:sdklib:2.0.0-SNAPSHOT")
+       compileOnly("com.experian.datastudio:sdkapi:2.0.0")
+       compileOnly("com.experian.datastudio:sdklib:2.0.0")
    }
    ```
 
@@ -115,7 +115,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
        <!-- replace this accordingly with your custom step name -->
        <artifactId>MyCustomStep</artifactId>
        <!-- replace this accordingly with your custom step version -->
-       <version>1.0-SNAPSHOT</version>
+       <version>1.0</version>
        <packaging>jar</packaging>
        <!-- replace this accordingly with your custom step name -->
        <name>MyCustomStep</name>
@@ -127,8 +127,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
        <repositories>
            <repository>
-               <id>aperture-data-studio-github-repo-snapshot</id>
-               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven/</url>
+               <id>aperture-data-studio-github-repo</id>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/</url>
            </repository>
        </repositories>
 
@@ -136,13 +136,13 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
            <dependency>
                <groupId>com.experian.datastudio</groupId>
                <artifactId>sdkapi</artifactId>
-               <version>2.0.0-SNAPSHOT</version>
+               <version>2.0.0</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                 <groupId>com.experian.datastudio</groupId>
                 <artifactId>sdklib</artifactId>
-                <version>2.0.0-SNAPSHOT</version>
+                <version>2.0.0</version>
            </dependency>
        </dependencies>
    </project>
@@ -719,12 +719,12 @@ CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
    repositories {
        mavenCentral()
        maven {
-            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
+            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
        }
    }
 
    dependencies {
-       compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
+       compileOnly("com.experian.datastudio:sdkapi:2.0.0")
    }
    ```
 
@@ -744,15 +744,15 @@ CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
        <!-- replace this accordingly with your custom parser name -->
        <artifactId>MyCustomParser</artifactId>
        <!-- replace this accordingly with your custom step version -->
-       <version>1.0-SNAPSHOT</version>
+       <version>1.0</version>
        <packaging>jar</packaging>
        <!-- replace this accordingly with your custom step name -->
        <name>MyCustomParser</name>
 
        <repositories>
            <repository>
-               <id>aperture-data-studio-github-repo-snapshot</id>
-               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven/</url>
+               <id>aperture-data-studio-github-repo</id>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/</url>
            </repository>
        </repositories>
 
@@ -760,7 +760,7 @@ CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
            <dependency>
                <groupId>com.experian.datastudio</groupId>
                <artifactId>sdkapi</artifactId>
-               <version>2.0.0-SNAPSHOT</version>
+               <version>2.0.0</version>
                <scope>provided</scope>
            </dependency>
        </dependencies>
