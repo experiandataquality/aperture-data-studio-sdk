@@ -89,13 +89,14 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
    repositories {
        mavenCentral()
        maven {
-           url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
+            // TODO: to be updated to release repository
+           url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
        }
    }
 
    dependencies {
-       compileOnly("com.experian.datastudio:sdkapi:2.0.0")
-       compileOnly("com.experian.datastudio:sdklib:2.0.0")
+       compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
+       compileOnly("com.experian.datastudio:sdklib:2.0.0-SNAPSHOT")
    }
    ```
 
@@ -127,8 +128,9 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
        <repositories>
            <repository>
-               <id>aperture-data-studio-github-repo</id>
-               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/</url>
+               <!-- TODO: to be updated to release repository -->           
+               <id>aperture-data-studio-github-repo-snapshot</id>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven/</url>
            </repository>
        </repositories>
 
@@ -136,13 +138,13 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
            <dependency>
                <groupId>com.experian.datastudio</groupId>
                <artifactId>sdkapi</artifactId>
-               <version>2.0.0</version>
+               <version>2.0.0-SNAPSHOT</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                 <groupId>com.experian.datastudio</groupId>
                 <artifactId>sdklib</artifactId>
-                <version>2.0.0</version>
+                <version>2.0.0-SNAPSHOT</version>
            </dependency>
        </dependencies>
    </project>
@@ -719,12 +721,13 @@ CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
    repositories {
        mavenCentral()
        maven {
-            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
+            // TODO: to be updated to release repository
+            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
        }
    }
 
    dependencies {
-       compileOnly("com.experian.datastudio:sdkapi:2.0.0")
+       compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
    }
    ```
 
@@ -751,8 +754,9 @@ CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
 
        <repositories>
            <repository>
-               <id>aperture-data-studio-github-repo</id>
-               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/</url>
+               <!-- TODO: to be updated to release repository -->
+               <id>aperture-data-studio-github-repo-snapshot</id>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven/</url>
            </repository>
        </repositories>
 
@@ -760,7 +764,7 @@ CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
            <dependency>
                <groupId>com.experian.datastudio</groupId>
                <artifactId>sdkapi</artifactId>
-               <version>2.0.0</version>
+               <version>2.0.0-SNAPSHOT</version>
                <scope>provided</scope>
            </dependency>
        </dependencies>
