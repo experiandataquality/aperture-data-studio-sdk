@@ -17,3 +17,7 @@ subprojects {
         testImplementation("com.experian.datastudio:sdktestframework:2.0.0-SNAPSHOT")
     }
 }
+
+task createGradleWrapper(type: Wrapper) {
+    gradleVersion = '6.0.1'
+}
