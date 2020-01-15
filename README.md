@@ -487,12 +487,12 @@ Some notes on jar packaging:
     Please contact us if your plugin needs a newer version of any of the libraries above.  
     
 1. It's not recommended to bundle native driver that involved JNI/JNA as it's not trivial to load native libraries from 
-   a jar in a distributed environment. Please contact us if your custom step needs a specific native drivers.
+   a jar in a distributed environment. Please contact us if your plugin needs a specific native drivers.
     
 1. When using [Gradle shadow plugin](https://imperceptiblethoughts.com/shadow/) or [Maven shade plugin](https://maven.apache.org/plugins/maven-shade-plugin/),
    **do not** `minimize` the uber jar as it may remove dependencies that are loaded through reflection and _service-provider-interface_. 
    
-   Basically, **don't do any of the following**:
+   Essentially, **don't do any of the following**:
    
    Gradle:
    
