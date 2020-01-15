@@ -490,9 +490,9 @@ Some notes on jar packaging:
    a jar in a distributed environment. Please contact us if your custom step needs a specific native drivers.
     
 1. When using [Gradle shadow plugin](https://imperceptiblethoughts.com/shadow/) or [Maven shade plugin](https://maven.apache.org/plugins/maven-shade-plugin/),
-   **Do not** `minimize` the uber jar as it may remove dependencies that are loaded through reflection and _service-provider-interface_. 
+   **do not** `minimize` the uber jar as it may remove dependencies that are loaded through reflection and _service-provider-interface_. 
    
-   Basically, **don't do any of this**:
+   Basically, **don't do any of the following**:
    
    Gradle:
    
