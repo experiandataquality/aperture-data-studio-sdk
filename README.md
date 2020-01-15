@@ -2,76 +2,69 @@
 
 # Aperture Data Studio SDK
 
-The SDK provides a simple Java library to create and test your own custom steps, and extend the capabilities of [Data Studio](https://www.edq.com/documentation/aperture-data-studio/). You can also add your own custom parsers, which will enable Data Studio to load data from files in a variety of different formats. 
+The SDK provides a simple Java library to create and test your own custom Workflow steps, extending Aperture Data Studio capabilities. You can also add your own custom parsers which will enable Data Studio to load data from files. 
 
-This repo contains the SDK jar and a pre-configured Java project that uses Gradle, which allows you to easily build your own custom step. Alternatively, you can add the SDK as a dependency to your own project by downloading the SDK jar from the `libs` folder.
+This repo contains the SDK JAR and a pre-configured Java project that uses Gradle, allowing you to easily build your own custom step. Alternatively, you can add the SDK as a dependency to your own project by downloading the SDK JAR from the `sdkapi` folder.
 
-The project comes with an `ExampleSteps` module as a sample guide to use the SDK. The [example classes](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) 
-demonstrate some key functionality of the SDK and provide a template class which can be used as a starting point for your 
-own custom steps. There is also a `TemplateParser` which generates some simple output for any input file with a .template 
-extension. For more detail, please refer to `ExampleSteps`'s [`README.md`](ExampleSteps/README.md).
-
-You can view the Javadoc [here](https://experiandataquality.github.io/aperture-data-studio-sdk/) for full reference documentation.
+[Javadoc reference](https://experiandataquality.github.io/aperture-data-studio-sdk) for full reference documentation.
 
 ## Table of contents
 
-<!-- TOC -->
-
 - [Compatibility matrix between SDK and Data Studio version](#compatibility-matrix-between-sdk-and-data-studio-version)
-- [Generating a custom step with the sample project](#generating-a-custom-step-with-the-sample-project)
 - [Generating a custom step from a new or existing project](#generating-a-custom-step-from-a-new-or-existing-project)
+- [Comparison of SDK v1.0 and v2.0](#comparison-of-sdk-v1.0-and-v2.0)
 - [Creating a custom step](#creating-a-custom-step)
     - [Importing the step SDK](#importing-the-step-sdk)
+    - [Creating your metadata](#creating-your-metadata)
+        - [Adding metadata](#adding-metadata)
+        - [Metadata sample code](#metadata-sample-code)
     - [Configuring your step](#configuring-your-step)
-        - [Adding step information](#adding-step-information)
+        - [Adding nodes](#adding-nodes)
         - [Adding step properties](#adding-step-properties)
-    - [Step output](#step-output)
-        - [initialise](#initialise)
-        - [getValueAt](#getvalueat)
-        - [getInputRow](#getinputrow)
-- [Multi-threading](#multi-threading)
+        - [Configure IsCompleteHandler](#configure-iscompletehandler)
+        - [Configure column layouts](#configure-column-layouts)
+        - [StepConfigurationBuilder sample code](#stepconfigurationbuilder-sample-code)
+    - [Processing your step](#processing-your-step)
+        - [Execute step](#execute-step)
+        - [StepProcessorBuilder sample code](#stepprocessorbuilder-sample-code)
 - [Class-isolation](#class-isolation)
-- [Optimizing a Step](#optimizing-a-step)
-    - [Step type](#step-type)
-    - [isInteractive flag](#isinteractive-flag)
-    - [Caching](#caching)
-        - [Cache interface](#cache-interface)
-    - [Progress](#progress)
-- [Testing a custom step](#testing-a-custom-step)
-    - [Adding the test framework SDK dependency](#adding-the-test-framework-sdk-dependency)
-    - [Writing custom step tests](#writing-custom-step-tests)
-    - [Test Framework API](#test-framework-api)
-        - [Configuration API](#configuration-api)
-        - [Execution and Assertion API](#execution-and-assertion-api)
-- [Adding a custom step to Data Studio](#adding-a-custom-step-to-data-studio)
-- [Generating a custom parser with the sample project](#generating-a-custom-parser-with-the-sample-project)
+- [The Logging library](#the-logging-library)
+- [The Cache configuration](#the-cache-configuration)
+    - [Cache scope](#cache-scope)
+      - [Workflow](#workflow)
+      - [Step](#step)
+    - [Create cache](#create-cache)
+      - [Cache configuration](#cache-configuration)
+      - [Get or create cache](#get-or-create-cache)
+    - [Destroy cache](#destroy-cache)
+    - [Assigning value to cache](#assigning-value-to-cache)
+    - [Getting value from cache](#getting-value-from-cache)
+- [The HTTP Client library](#the-http-client-library)
 - [Generating a custom parser from a new or existing project](#generating-a-custom-parser-from-a-new-or-existing-project)
 - [Creating a custom parser](#creating-a-custom-parser)
-    - [Importing the parser SDK](#importing-the-parser-sdk)
-    - [Configuring the supported filetypes](#configuring-the-supported-filetypes)
-    - [Instantiating your parser and creating any required parameters](#instantiating-your-parser-and-creating-any-required-parameters)
-    - [Providing a method that attempts to parse the data file](#providing-a-method-that-attempts-to-parse-the-data-file)
-        - [Result status](#result-status)
-    - [Performing the actual parse](#performing-the-actual-parse)
-    - [Exceptions](#exceptions)
-- [Adding a custom parser to Data Studio](#adding-a-custom-parser-to-data-studio)
-- [Working with datastores](#working-with-datastores)
-    - [Get datastores](#get-datastores)
-    - [Datastore interface](#datastore-interface)
-    - [TableSDK interface](#tablesdk-interface)
-- [Reading Data Studio properties](#reading-data-studio-properties)
-    - [Constants](#constants)
-    - [Glossary values](#glossary-values)
-    - [Server properties](#server-properties)
+  - [Importing the parser SDK](#importing-the-parser-sdk)
+  - [Creating your metadata](#creating-your-metadata-1)
+  - [Configuring your parser](#configuring-your-parser)
+    - [Supported file extension](#supported-file-extension)
+    - [Parameter definition](#parameter-definition)
+    - [Display type](#display-type)
+    - [Set default value](#set-default-value)
+    - [Set processor](#set-processor)
+  - [Parser Processor](#parser-processor)
+    - [Get table definition](#get-table-definition)
+      - [TableDefinitionContext](#tabledefinitioncontext)
+    - [Get row iterator](#get-row-iterator)
+      - [TableDefinitionContext](#tabledefinitioncontext-1)
+      - [ClosableIteratorBuilder](#closableiteratorbuilder)
 - [Debugging](#debugging)
 
-<!-- /TOC -->
 
 ## Compatibility matrix between SDK and Data Studio version
 
 | Data Studio version       | Compatible SDK version            | 
 |:-------------------------:|:---------------------------------:|
-| 1.6.2                     |    [1.^6.2](https://github.com/experiandataquality/aperture-data-studio-sdk)                                     |
+| 2.0.0                     |    [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk)                                     |
+| 1.6.2                     |    [1.^6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2)                                     |
 | 1.6.1                     |    [1.^6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1)                         |
 | 1.6.0                     |    [1.^6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0)                         |
 | 1.5.1                     |    [1.^5.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.1)                         |
@@ -89,49 +82,36 @@ You can view the Javadoc [here](https://experiandataquality.github.io/aperture-d
 - Although an older SDK version is compatible with the newer Data Studio version, e.g SDK 1.4.0 is compatible up to Data Studio 1.6.2, the SDK might not support the new features released in the new Data Studio version. As such, SDK user is always encouraged to upgrade to the latest SDK version supported by their current version of Data Studio.
 - For newer SDK version, the existing features will always be backward compatible to older Data Studio version, e.g: For SDK version 1.6.2, feature that was release in previous 1.4.0 will still be compatible with Data Studio 1.4.0. Even with this backward compatibility support, you are not encouraged to upgrade the SDK version for older Data Studio version, using SDK 1.6.2 for Data Studio 1.4.0, as you might be using new SDK features that isn't supported by that Data Studio.
 
-## Generating a custom step with the sample project
+## Generating a custom step from a new or existing project
 
-The steps below show how to generate a compatible jar file using Gradle:
+1. You can either use Gradle or Maven: 
 
-1. Clone the repo.
-2. Open the project in your IDE of choice.
-3. Custom step skeleton is available at [StepTemplate.java](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/StepTemplate.java). 
-   Please take note that the package structure `com.experian.aperture.datastudio.sdk.step.addons` must be respected as 
-   it's where Aperture Data Studio scan for custom steps. 
-4. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
-5. To build your step, you can run `gradle build` either from IDE or command prompt. Refer to the [documentation](ExampleSteps/README.md) of 
-   ExampleStep for more detail on the build step.
-6. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps-all.jar`.
+  If using Gradle, point to the SDK repository in the `build.gradle`:
 
-## Generating a custom step from a new or existing project 
-
-If you don't wish to use Gradle, you'll need to configure your own Java project to generate a compatible jar artifact:
-
-1. Create a new Java project or open an existing one.
-2. Download the [sdk.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk.jar) file 
-   and optionally [sdk-test-framework](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk-test-framework.jar). 
-   
-   Alternatively if you use Gradle, you can point to sdk repository in the `build.gradle`: 
-   
    ```gradle
    apply plugin: 'java'
-  
+
    repositories {
        mavenCentral()
        maven {
-            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
+            // TODO: to be updated to release repository
+           url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
        }
    }
-   
+
    dependencies {
-       compileOnly("com.experian.aperture:sdk:1.6.2")
-       testCompile("com.experian.aperture:sdk-test-framework:1.6.2")
+       compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
+       compileOnly("com.experian.datastudio:sdklib:2.0.0-SNAPSHOT")
    }
    ```
-   
-   If you're using Maven, modify `pom.xml` to add SDK github repository: 
-   
-   ```xml 
+
+  If you don't want to use Gradle, you'll have to configure your own Java project to generate a compatible JAR artifact:
+   - Create a new Java project or open an existing one.
+   - Download and install the [sdkapi.jar]([TO BE CHANGED]) file.
+
+  If using Maven, modify `pom.xml` to add the SDK GitHub repository:
+
+   ```xml
    <project xmlns="http://maven.apache.org/POM/4.0.0"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
@@ -141,508 +121,384 @@ If you don't wish to use Gradle, you'll need to configure your own Java project 
        <!-- replace this accordingly with your custom step name -->
        <artifactId>MyCustomStep</artifactId>
        <!-- replace this accordingly with your custom step version -->
-       <version>1.0-SNAPSHOT</version>
+       <version>1.0</version>
        <packaging>jar</packaging>
        <!-- replace this accordingly with your custom step name -->
        <name>MyCustomStep</name>
-   
+    
+       <properties>
+            <maven.compiler.source>1.8</maven.compiler.source>
+            <maven.compiler.target>1.8</maven.compiler.target>
+       </properties>
+
        <repositories>
            <repository>
-               <id>aperture-data-studio-github-repo</id>
-               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/</url>
+               <!-- TODO: to be updated to release repository -->           
+               <id>aperture-data-studio-github-repo-snapshot</id>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven/</url>
            </repository>
        </repositories>
-   
+
        <dependencies>
            <dependency>
-               <groupId>com.experian.aperture</groupId>
-               <artifactId>sdk</artifactId>
-               <version>1.6.2</version>
+               <groupId>com.experian.datastudio</groupId>
+               <artifactId>sdkapi</artifactId>
+               <version>2.0.0-SNAPSHOT</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
-               <groupId>com.experian.aperture</groupId>
-               <artifactId>sdk-test-framework</artifactId>
-               <version>1.6.2</version>
-               <scope>test</scope>
+                <groupId>com.experian.datastudio</groupId>
+                <artifactId>sdklib</artifactId>
+                <version>2.0.0-SNAPSHOT</version>
            </dependency>
        </dependencies>
    </project>
    ```
-   
-3. If in the previous step you downloaded the jar manually, create a libs folder and add in the sdk.jar as a library. 
-   You can skip this step if you're using maven or gradle.
-4. Create a new package called `com.experian.aperture.datastudio.sdk.step.addons`.
-5. Create a new class in the package you just created.
-6. Configure your project to output a jar file as an artifact. Note that this will be done differently depending on your IDE.
+3. (Skip this step if using Maven or Gradle). If you've downloaded the JAR manually, create a *libs* folder and add in the *sdkapi.jar* as a library.
+4. Create a new package and class.
+5. Configure your project to output a .jar file as an artifact. Note that this will be done differently depending on your IDE.
 
-## Creating a custom step 
+## Comparison of SDK v1.0 and v2.0
 
-The sample project in the repository has a pre-configured Gradle build, it includes the SDK, and has the
- correct package name configured. However, if you want to start your own project, then follow the [instructions above](#generating-a-custom-step-from-a-new-or-existing-project).
+Here are the main differences between the v1.0 and v2.0 of the SDK:
 
-With your project set up, you can now create a new class. If you cloned the sample project, you will have a
-`ExampleSteps` module. Inside that module, you'll find the `com.experian.aperture.datastudio.sdk.step.addons` package.
-Create your new classes in this package so that they are correctly picked up by the Data Studio UI.
+| Features                          |            SDK v1.0           |                                       SDK v2.0                                    |
+|-----------------------------------|-------------------------------|-----------------------------------------------------------------------------------|
+| Design                            | Extending Abstract class                                                  | Implementing interface                                                                |
+| Register step details             | Using `setStepDefinition` methods in `StepConfiguration` class            | Using  `CustomTypeMetadataBuilder`  [Sample code](#metadata-sample-code)              |
+| Configure step property           | Using `setStepProperties()` in `StepConfiguration` class                  | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) |
+| Configure *isComplete* handling   | Override `isComplete()` in `StepConfiguration` class                      | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) |
+| Configure column step             | Override `initialise()` in `StepOutput` class                             | Using `StepConfigurationBuilder` [Sample code](#stepprocessorbuilder-sample-code)     |  
+| Execute and retrieve value from step    | Override `execute()` and `getValueAt()` in `StepOutput` class       | Using `StepProcessorBuilder` [Sample code](#stepprocessorbuilder-sample-code)         |
+| Logging in step                   | Using `logError()` from base class                                        | Using `SdkLogManager` library [Sample Code](#the-logging-library)                     |
 
-You can bundle multiple custom steps into a single jar as long as they're located under `com.experian.aperture.datastudio.sdk.parser.addons` 
+ 
+## Creating a custom step
+
+Once your project is set up, you can create a new class and implement the `CustomStepDefinition` interface. The newly created class will be picked up by the Data Studio UI.
+
+Note that it is recommended that you bundle *one* custom step per JAR.
 
 ### Importing the step SDK
 
-To use the classes and methods, you need to import the SDK into your class. Add an import statement below the package name to import all the SDK classes and methods.
+To use the interfaces, classes and methods, you have to import the SDK into your class. Add an import statement below the package name to import all the SDK classes and methods:
 ``` java
-import com.experian.aperture.datastudio.sdk.step.*
+import com.experian.datastudio.sdk.api.*;
+import com.experian.datastudio.sdk.api.step.*;
+import com.experian.datastudio.sdk.api.step.configuration.*;
+import com.experian.datastudio.sdk.api.step.processor.*;
 ```
+
 Your new class should look something like this:
 
 ``` java
-package com.experian.aperture.datastudio.sdk.step.addons;
+package com.experian.datastudio.customstep;
 
-import com.experian.aperture.datastudio.sdk.step.*;
+import com.experian.datastudio.sdk.api.*;
+import com.experian.datastudio.sdk.api.step.*;
+import com.experian.datastudio.sdk.api.step.configuration.*;
+import com.experian.datastudio.sdk.api.step.processor.*;
 
-public class DemoStep {
+public class DemoStep implements CustomStepDefinition{
 }
 ```
-All the SDK classes and methods are now available to you.
+All the SDK interfaces, classes and methods will now available.
+
+### Creating your metadata
+
+#### Adding metadata
+
+Use `CustomTypeMetadataBuilder` in `createMetadata` method to create metadata such as the custom step name, description, version and licenses. 
+
+#### Metadata sample code
+``` java
+@Override
+public CustomTypeMetadata createMetadata(final CustomTypeMetadataBuilder metadataBuilder) {
+        return metadataBuilder
+                .withName("Example: StepsTemplate")
+                .withDescription("Step Template Example")
+                .withMajorVersion(0)
+                .withMinorVersion(0)
+                .withPatchVersion(0)
+                .withDeveloper("Experian")
+                .withLicense("Apache License Version 2.0")
+                .build();
+}
+```
 
 ### Configuring your step
 
-The SDK has a `StepConfiguration` class. You should use a custom step class to extend the `StepConfiguration` class. This will allow you to correctly configure your custom step and ensure it displays correctly in the Data Studio UI.
+Use `StepConfigurationBuilder` in `createConfiguration` method to configure your custom step (e.g. nodes, step properties, column layouts) and ensure it displays correctly in the Data Studio UI.
 
-You can create a new method in your class to set up your step. 
+#### Adding nodes
 
-#### Adding step information
-
-Each step needs some basic information to identify it in the Data Studio UI. You'll need to make sure your step has a name, description and icon:
+Nodes represent the input and output nodes in the step. You can define how many nodes the step will have. For example, to create a step with 1 input and 1 output node:
 
 ``` java
-package com.experian.aperture.datastudio.sdk.step.addons;
+.withNodes(stepNodeBuilder -> stepNodeBuilder
+        .addInputNode(INPUT_ID)
+        .addOutputNode(OUTPUT_ID)
+        .build())
+``` 
 
-import com.experian.aperture.datastudio.sdk.step.*;
+##### Process Node
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Base64;
+By default, the input and output nodes are DATA node, which receive data or produce data.
+You can create a custom step that doesn't change the data in the workflow.
+For example, a custom step that sends email or calls REST API when the execution reaches that step.
+Please take note that PROCESS output node cannot connect to DATA input node.
+``` java
+.withNodes(stepNodeBuilder -> stepNodeBuilder
+        .addInputNode(inputNodeBuilder -> inputNodeBuilder
+                .withId(INPUT_ID)
+                .withType(NodeType.PROCESS)
+                .build())
+        .addOutputNode(outputNodeBuilder -> outputNodeBuilder
+                .withId(OUTPUT_ID)
+                .withType(NodeType.PROCESS)
+                .build())
+        .build())
 
-public class DemoStep extends StepConfiguration {
-
-    public DemoStep() {
-        // Basic step information
-        setStepDefinitionName("DemoStep");
-        setStepDefinitionDescription("Demonstrates a step");
-        setStepDefinitionIcon("INFO");
-    }
-}
 ```
-##### Setting Step Icon
-As demonstrated above, a custom step icon can be set via the `setStepDefinitionIcon` method. 
-
-![Step Icon](images/step-icon.png)
-
-Below are the standard icons that can be used.
-
-|Icon Name|Image||Icon Name|Image|
-|---|---|---|---|---|
-|ALPHA_NUMERIC|![ALPHA_NUMERIC](images/icons/ALPHA_NUMERIC.png)||DATABASE|![DATABASE](images/icons/DATABASE.png)|
-|EMAIL|![EMAIL](images/icons/EMAIL.png)||ERROR|![ERROR](images/icons/ERROR.png)|
-|INFO|![INFO](images/icons/INFO.png)||INTEGER|![INTEGER](images/icons/INTEGER.png)|
-|OK|![OK](images/icons/OK.png)||PERCENT|![PERCENT](images/icons/PERCENT.png)|
-|ROWS|![ROWS](images/icons/ROWS.png)||TABLES|![TABLES](images/icons/TABLES.png)|
-
-Beside these standard icons, you can define your own custom icon too.
-
-![Custom Icon](images/custom-icon.png)
-1.  Create your own icon file in PNG format. Preferable size is 64 x 64 pixels.
-2.  Put your icon file in `/src/main/resources/` folder, so that it will be bundled inside your JAR file.
-3.  Call `setStepDefinitionIcon` method inside your `StepConfiguration` constructor with the icon filename.
-    ```java
-    public CustomIconStep() {
-        setStepDefinitionName("Custom - Icon");
-        setStepDefinitionDescription("Custom step with custom icon");
-        setStepDefinitionIcon("experian.png");
-    ```
-Please refer to `CustomIconStep` source code in [ExampleSteps](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples).
 
 #### Adding step properties
 
-Step properties represent step UI elements. These properties include displaying information about the step, allowing the user to input something, or selecting a column to manipulate. The property type is set using the `ofType` method. For example, setting the property to be a column chooser can be done with the following code:
-``` java
-StepProperty arg1 = new StepProperty()
-        .ofType(StepPropertyType.COLUMN_CHOOSER);
-```
-
-|StepPropertyType|Description|
-|---|---|
-|BOOLEAN        |`true` or `false` field|
-|STRING         |Text field|
-|INTEGER        |Number without fraction|
-|DECIMAL        |Number with fraction|
-|COLUMN_CHOOSER |Input column drop down list|
-|MULTI_COLUMN_CHOOSER|Input column drop down list that allow multiple selection|
-|CUSTOM_CHOOSER      |Custom drop down list|
-|MULTI_CUSTOM_CHOOSER|Custom drop down list that allow multiple selection (Version 1.5+)|
-|INPUT_LABEL         |Display text|
-
-It is also recommended that you update the UI with some prompts and error icons to show the user that more interaction is required before the step will work correctly. You can do this by using the `withStatusIndicator`, `withIconTypeSupplier` and `withArgTextSupplier` methods. The example below will show an error icon and display a couple of prompts if no data input is present and subsequently if no column is selected. If all is correct, then the name of the column will be displayed.
+Step properties represent the UI elements of the step. These properties include displaying information about the step, allowing the user to input something or selecting a column to manipulate. 
+For example, to add a column chooser to the step:
 
 ``` java
-StepProperty arg1 = new StepProperty()
-        .ofType(StepPropertyType.COLUMN_CHOOSER)
-        .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null)
-        .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider == null ? "ERROR" : "OK")
-        .withArgTextSupplier(sp -> () -> sp.allowedValuesProvider == null ? "Connect an input for columns" : (sp.getValue() == null ? "Select a column" : sp.getValue().toString()));
+.withStepProperties(stepPropertiesBuilder -> stepPropertiesBuilder
+        .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+                .asColumnChooser(ARG_ID_COLUMN_CHOOSER)
+                .forInputNode(INPUT_ID)
+                .build())
+        .build()))
 ```
-Most workflow steps will take in an input and then output something at the other end. To allow input and output you'll need to use `havingInputNode` and `havingOutputNode`. The final part of the initial setup for a step property is to call `validateAndReturn` to perform the validation.
+
+|StepPropertyType|Description                   |
+|----------------|------------------------------|
+|asBoolean       |A `true` or `false` field     |
+|asString        |A text field                  |
+|asNumber        |A number without fraction     |
+|asColumnChooser |An input column drop-down list|
+|asCustomChooser |A custom drop-down list       |
+
+##### asBoolean
+
+| Method           | Description                    |
+|------------------|--------------------------------|
+| asBoolean        |Set a Boolean field             |
+| withDefaultValue |Set a default value in the field|
+| build            |Build the step property         |
+
+##### asString
+
+| Method           | Description                        |
+|------------------|------------------------------------|
+| asString         | Set a string field                 |
+| withIsRequired   | Set whether the field is mandatory |
+| withDefaultValue | Set a default value in the field   |
+| build            | Build the step property            |
+
+##### asNumber
+
+| Method           | Description                                    |
+|------------------|------------------------------------------------|
+| asNumber         | Set a number field                             |
+| withAllowDecimal | Set whether the field accepts decimal values   |
+| withMaxValue     | Set a maximum value in the field               |
+| withMinValue     | Set a minimum value in the field               |
+| withIsRequired   | Set whether the field is mandatory             |
+| withDefaultValue | Set a default value in the field               |
+| build            | Build the step property                        |
+
+##### asColumnChooser
+
+| Method           | Description                                    |
+|------------------|------------------------------------------------|
+| asColumnChooser    | Set an input column from a drop-down list    |
+| forInputNode       | Set an input node                            |
+| withMultipleSelect | Set whether multiple fields are allowed      |
+| build              | Build the step property                      |
+
+##### asCustomChooser
+
+| Method                  | Description                                         |
+|-------------------------|-----------------------------------------------------|
+| asCustomChooser         | Set an input column from a custom drop-down list    |
+| withAllowValuesProvider | Set the custom list for selection                   |
+| withAllowSearch         | Set whether there's a field search                  |
+| withAllowSelectAll()    | Set whether you can select all fields               |
+| withIsRequired()        | Set whether the field is mandatory                  |
+| withMultipleSelect()    | Set whether multiple fields can be selected         |
+| build                   | Build the step property                             |
+
+
+#### Configure isCompleteHandler
+
+The *CompleteHandler* determines the completeness based on the condition of the step prior to execution or data exploration. For example, you can set the step to always be in a complete state:
 
 ``` java
-StepProperty arg1 = new StepProperty()
-        .ofType(StepPropertyType.COLUMN_CHOOSER)
-        .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null)
-        .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider == null ? "ERROR" : "OK")
-        .withArgTextSupplier(sp -> () -> sp.allowedValuesProvider == null ? "Connect an input for columns" : (sp.getValue() == null ? "Select a column" : sp.getValue().toString()))
-        .havingInputNode(() -> "input0")
-        .havingOutputNode(() -> "output0")
-        .validateAndReturn();
+.withIsCompleteHandler(context -> true)
 ```
-The property is now ready to be added. The `setStepProperties` method takes a list of properties. For a single property, use a `SingletonList`. To add multiple properties, use `Arrays.asList`.
 
+#### Configure column layouts
+
+Column layouts represent column(s) that will be displayed in the step. For example, to configure existing columns from an input source and a new "MyColumn" for the output columns:  
+  
 ``` java
-setStepProperties(Collections.singletonList(arg1));
-```
-
-The `StepOutput` is where the main work is done. You'll need to define a new output class and set it by using `setStepOutput`. This method takes a new `StepOutput` class:
-
-``` java
-setStepOutput(new DemoOutput());
-```
-
-##### Multiple inputs
-
-From Data Studio version 1.5 onward, custom step support multiple inputs.
-``` java
-final StepProperty arg0 = new StepProperty()
-        .ofType(StepPropertyType.COLUMN_CHOOSER)
-        .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null)
-        .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null ? ICON_OK : ICON_ERROR)
-        .withArgTextSupplier(sp -> () -> sp.allowedValuesProvider == null ? "<Connect 1st input>" : (sp.getValue() == null ? "<Select 1st Input 1st column>" : sp.getValue().toString()))
-        .havingInputNode(() -> "input0") // add new input node `input0` and define arg0's options
-        .havingOutputNode(() -> "output0")
-        .validateAndReturn();
-
-final StepProperty arg1 = new StepProperty()
-        .ofType(StepPropertyType.COLUMN_CHOOSER)
-        .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null)
-        .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null ? ICON_OK : ICON_ERROR)
-        .withArgTextSupplier(sp -> () -> sp.allowedValuesProvider == null ? "<Connect 2nd input>" : (sp.getValue() == null ? "<Select 2nd input 1st column>" : sp.getValue().toString()))
-        .havingInputNode(() -> "input1") // add new input node `input1` and define arg1's options
-        .validateAndReturn();
-
-final StepProperty arg2 = new StepProperty()
-        .ofType(StepPropertyType.MULTI_COLUMN_CHOOSER)
-        .withStatusIndicator(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null)
-        .withIconTypeSupplier(sp -> () -> sp.allowedValuesProvider != null && sp.getValue() != null ? ICON_OK : ICON_ERROR)
-        .withArgTextSupplier(sp -> () -> sp.allowedValuesProvider == null ? "<Connect 2nd input>" : (sp.getValue() == null ? "<Select 2nd input multi columns>" : sp.getValue().toString()))
-        .havingInputNode(() -> "input1") // define arg2's options with input1's columns
-        .validateAndReturn();
+.withOutputLayouts(outputLayoutBuilder -> outputLayoutBuilder
+        .forOutputNode(OUTPUT_ID, outputColumnBuilder -> outputColumnBuilder
+                .addColumns(context -> {
+                    final Optional<Boolean> hasLimitOptional = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
+                    final Boolean hasLimit = hasLimitOptional.orElse(Boolean.FALSE);
+                    final List<Column> columns = context.getInputContext(INPUT_ID).getColumns();
+                    if (Boolean.TRUE.equals(hasLimit)) {
+                        final Optional<Number> limitOptional = context.getStepPropertyValue(ARG_ID_COLUMN_LIMIT);
+                        if (limitOptional.isPresent()) {
+                            final Number limit = limitOptional.get();
+                            return columns.stream().limit(limit.intValue()).collect(Collectors.toList());
+                        }
+                    }
+                    return columns;
+                })
+                .addColumn(MY_OUTPUT_COLUMN)
+                .build())
+        .build())
 
 ```
-
-`havingInputNode` method on `StepProperty` will add input node to the custom step, if the returning name is unique. `arg2.havingInputNode(() -> "input1")` in the code above only defines the drop down list item with `input1`'s columns. As `input1` already defined in `arg2`, no new input node is added.
-
-```java
-@Override
-public Object getValueAt(long row, int columnIndex) {
-    final String firstInputFirstColumn = getArgument(0);
-    final String secondInputFirstColumn = getArgument(1);
-    final Optional<StepColumn> firstArg = getInputColumn(0, firstInputFirstColumn);
-    final Optional<StepColumn> secondArg = getInputColumn(1, secondInputFirstColumn);
-    final StringBuilder sb = new StringBuilder();
-    try {
-        if (firstArg.isPresent()) {
-            sb.append(firstArg.get().getValue(row).toString()).append(", "); 
-        }
-        if (secondArg.isPresent()) {
-            sb.append(secondArg.get().getValue(row).toString());
-        }
-    } catch (Exception ignore) {
-        // intentionally empty
-    }
-```
-In the `StepOutput`, you can get the data from second input by calling `getInputColumn(inputIndex=1, columnName)` method.
-
-Please refer the full source code of `MultiInputColumnChooserStep` in [ExampleSteps](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples).
-
-
-##### Disable multi column chooser's select all
-By default, the _select all_ checkbox is visible: 
-
-![Select all enabled (default)](images/select-all.png)
-
-To hide _select all_ checkbox: 
-
-```java 
-// Note that this feature is only available in Aperture Data Studio 1.4.0 onwards.
-final StepProperty multiChooser = new StepProperty()
-    .ofType(StepPropertyType.MULTI_COLUMN_CHOOSER)
-    // detail omitted
-    .withSelectAllOption(false);
-```
-
-##### Enable filter for custom chooser
-
-![Custom Chooser Filter](images/chooser-filter.png)
-
-To enable _filter_ for a custom chooser: 
-
-```java 
-// Note that this feature is only available in Aperture Data Studio 1.4.0 onwards.
-final StepProperty customChooser = new StepProperty()
-    .ofType(StepPropertyType.CUSTOM_CHOOSER)
-    // detail omitted
-    .withChooserFilter(true);
-```
-
-##### Automatically select column based on data tag
-Data Studio allows columns to be tagged columns with an additional label. Refer to [Data Tagging](https://www.edq.com/documentation/aperture-data-studio/user-guide/#data-tagging) for more info. 
-
-The column chooser step property can automatically select a column tagged with specific label (e.g. 'Phone') once the custom step connected with an input.
-
-![Tagged Column](images/tagged.png)
-
-```java
-public class ColumnTagStep extends StepConfiguration {
-
-    private static final String TAG_PHONE = "Phone";
-    
-    public ColumnTagStep() {
-        setStepDefinitionName("Custom - Column Tag");
-        setStepDefinitionIcon("INFO");
-
-        final StepProperty spPhone = new StepProperty()
-                .ofType(StepPropertyType.COLUMN_CHOOSER)
-                .withStatusIndicator(sp -> () -> isPhoneArgOk(sp))
-                .withIconTypeSupplier(sp -> () -> isPhoneArgOk(sp) ? "OK" : "ERROR")
-                .withArgTextSupplier(sp -> () -> getPhoneArgText(sp))
-                .havingInputNode(() -> "input0")
-                .havingOutputNode(() -> "output0")
-                .validateAndReturn();
-        setStepProperties(Arrays.asList(spPhone));
-
-        setStepOutput(new ColumnTagOutput());
-    }
-
-    private boolean isPhoneArgOk(final StepProperty sp) {
-        autoSelectTaggedColumn(sp, TAG_PHONE);
-        return sp.allowedValuesProvider != null && sp.getValue() != null;
-    }
-
-    private String getPhoneArgText(final StepProperty sp) {
-        autoSelectTaggedColumn(sp, TAG_PHONE);
-        if (sp.allowedValuesProvider == null) {
-            return "<Connect an input>";
-        } else {
-            return sp.getValue() == null ? "<Select a phone column>" : sp.getValue().toString();
-        }
-    }
-```
-
-The code above is very similar to normal step configuration, except it will call the `autoSelectTaggedColumn` method every time it updates the UI with `withStatusIndicator`, `withIconTypeSupplier` and `withArgTextSupplier` methods.
-
-```java
-
-/**
-* Automatically set step property's value to a column tagged with specific label name.
-* This is done by comparing data tags in all input columns.
-* @param sp StepProperty
-* @param tag tag name
-*/
-private void autoSelectTaggedColumn(final StepProperty sp, final String tag) {
-    if (sp.allowedValuesProvider != null) {
-        if (sp.getValue() == null) {
-            final Optional<StepColumn> tagColumn = sp.getInputColumns().stream().filter(c -> c.getDataTags().contains(tag)).findFirst();
-            if (tagColumn.isPresent()) {
-                final String colName = tagColumn.get().getDisplayName();
-                sp.setValue(colName);
-            }
-        }
-    }
-}
-```
-
-`autoSelectTaggedColumn` method will only perform if the input is connected and the step property value is null. It will find the first input column with the data tag matched the `tag` value. If found, that input column's name is set as the step property value.
-
-`StepColumn.getDataTags` method is used to get the tagged label of the column.
-
-Please refer the full source code of `ColumnTagStep` in [ExampleSteps](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples).
-
-
-### Step output
-
-Step output classes are configured by extending the `StepOutput` class.
-
-```java
-private class DemoOutput extends StepOutput {
-}
-```
-
-First up, you can set the name that appears when viewing the output data by overriding the `getName` method.
+                        
+#### StepConfigurationBuilder sample code
 
 ``` java
 @Override
-public String getName() { return "Demo step"; }
-```
-
-#### initialise
-
-The `initialise` method initializes the view and is therefore where you would set up your output columns. You may want to add some columns or replace values in an existing column. You can use the `ColumnManager` class to do so.
-
-In the example below, the ColumnManager clears the columns, retrieves the column selected by the user, and adds a column next to it.
-
-``` java
-public void initialise() throws SDKException {
-
-    getColumnManager().clearColumns();
-
-    String selectedColumnName = getArgument(0);
-    if (selectedColumnName != null) {
-
-        getColumnManager().setColumnsFromInput(getInput(0));
-
-        StepColumn selectedColumn = getColumnManager().getColumnByName(selectedColumnName);
-        if (selectedColumn != null) {
-            int selectedColumnPosition = getColumnManager().getColumnPosition(selectedColumnName);
-
-            getColumnManager().addColumnAt(this, selectedColumnName, "Base64 Encoded column", selectedColumnPosition);
-        }
-    }
-}
-```
-##### Column's Expected Type
-When you add a new column, you can set the column's expected data type by calling `setExpectedType(ColumnDataType)` method. This allow the user of your custom step, to get the data type by calling `getExpectedType()` method. 
-By default, the column's expected type is set to `STRING`.
-
-Please take note, the value of the column might be different from the expected data type.
-
-|ColumnDataType|Description|
-|---|---|
-|STRING |String, sequence of characters|
-|BOOLEAN|`true` or `false`, can be used as a rule in Validate step|
-|INTEGER|Number without fraction|
-|DECIMAL|Number with fraction|
-|DATE   |Date object|
-|UNKNOWN|Unknown data type, e.g. source file column's `Datatype` is set to `Automatic` or `Custom` |
-
-If the expected type is set to `BOOLEAN`, the column can be used as a rule in Validate step.
-```java
-@Override
-public void initialise() throws SDKException {
-    getColumnManager().addColumn(this, "Rule", "To be used in validate step")
-            .setExpectedType(ColumnDataType.BOOLEAN);
-}
-
-```
-
-![Edit Configurations](images/validate-rule.png)
-
-#### getValueAt
-The `getValueAt` method is called for each cell when generating the view or executing the workflow. By default, it displays the data as it is. If you override this, you can set the values in a specific column. In the example below you can see that the row and column are passed in. The example also shows how to use `getValueAt` to get the column selected by the user and use those values for another column.
-
-``` java
-@Override
-public Object getValueAt(long row, int col) throws Exception {
-
-    // get the user-defined column
-    String selectedColumnName = getArgument(0);
-
-    // get the column object from the first input
-    Optional<StepColumn> inputColumn = null;
-    if (selectedColumnName != null && !selectedColumnName.isEmpty()) {
-        inputColumn = getInputColumn(0, selectedColumnName);
-    }
-    if (inputColumn.isPresent()) {
-        // get the input column's value for the selected row
-        String value = inputColumn.get().getValue(row).toString();
-        // add text and return it
-        return Base64.getEncoder().encodeToString(value.getBytes("utf-8"));
-    } else {
-        // if not found return an empty value. We could alternatively throw an error.
-        return "";
-    }
+public StepConfiguration createConfiguration(final StepConfigurationBuilder configurationBuilder) {
+    return configurationBuilder
+            /** Define input and output node */
+            .withNodes(stepNodeBuilder -> stepNodeBuilder
+                    .addInputNode(INPUT_ID)
+                    .addOutputNode(OUTPUT_ID)
+                    .build())
+            /** Define step properties */
+            .withStepProperties(stepPropertiesBuilder -> stepPropertiesBuilder
+                    .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+                            .asBoolean(ARG_ID_HAS_LIMIT)
+                            .withLabelSupplier(context -> "columns?")
+                            .build())
+                    .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+                            .asNumber(ARG_ID_COLUMN_LIMIT)
+                            .withAllowDecimal(false)
+                            .withIsDisabledSupplier(context -> {
+                                final Optional<Boolean> hasLimitOptional = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
+                                final Boolean hasLimit = hasLimitOptional.orElse(Boolean.FALSE);
+                                return !hasLimit;
+                            })
+                            .withIsRequired(true)
+                            .withLabelSupplier(context -> "limit?")
+                            .build())
+                    .build())
+            /** Prevent the step from executing until the input node has been completed.
+            *  This is an optional value, in below case which is always true
+            */
+            .withIsCompleteHandler(context -> true)
+            /** Define how the output will look like, i.e. the columns and rows */
+            .withOutputLayouts(outputLayoutBuilder -> outputLayoutBuilder
+                    .forOutputNode(OUTPUT_ID, outputColumnBuilder -> outputColumnBuilder
+                            .addColumns(context -> {
+                                final Optional<Boolean> hasLimitOptional = context.getStepPropertyValue(ARG_ID_HAS_LIMIT);
+                                final Boolean hasLimit = hasLimitOptional.orElse(Boolean.FALSE);
+                                final List<Column> columns = context.getInputContext(INPUT_ID).getColumns();
+                                if (Boolean.TRUE.equals(hasLimit)) {
+                                    final Optional<Number> limitOptional = context.getStepPropertyValue(ARG_ID_COLUMN_LIMIT);
+                                    if (limitOptional.isPresent()) {
+                                        final Number limit = limitOptional.get();
+                                        return columns.stream().limit(limit.intValue()).collect(Collectors.toList());
+                                    }
+                                }
+                                return columns;
+                            })
+                            .addColumn(MY_OUTPUT_COLUMN)
+                            .build())
+                    .build())
+            .withIcon(StepIcon.ARROW_FORWARD)
+            .build();
 }
 ```
 
-#### getInputRow
+### Processing your step
 
-Similar to `getValueAt`, the `getInputRow` object array can be called to retrieve data from the view row-by-row.
- You can do something simple like return a row from a user specified ID by using `getInputRow` in an overridden
- `getValueAt` method.
+Use `StepProcessorBuilder` in the `createProcessor` method to implement the logic of the output step. 
+
+#### Execute step
+
+This method is used to apply logic to the input source and the computed value will become the output to a specified output column. The example below shows the logic of appending "-processed" to the value from `MY_INPUT_COLUMN` and displayed into `MY_OUTPUT_COLUMN`
+
+#### StepProcessorBuilder sample code
 
 ``` java
 @Override
-public Object getValueAt(long row, int col) throws Exception {
-    List<StepProperty> properties = getStepProperties();
-    if (properties != null && !properties.isEmpty()) {
-        String arg1 = getArgument(1);
-
-        if (arg1 != null) {
-            try {
-                Integer userDefinedInt = Integer.parseInt(arg1);
-                // Our custom column
-                if (col == 0) {
-                    return userDefinedInt;
-                }
-
-                // Need to correct the userDefinedInt as it gets passed to getInputRow,
-                // Because users will expect 1 to be the index of the first row, but we have a zero-based index here.
-                Object[] rowValues = getInputRow(0, userDefinedInt - 1);
-
-                // Need to correct the column index that we get the value for, 
-                // to allow for our extra column which we have already defined a value for.
-                // e.g. we want the value from the previous column Index because they have all shifted right by one
-                return rowValues[col - 1];
-
-            } catch (NumberFormatException ex) {
-                logError(ex.getMessage());
-            }
-        }
-    } else {
-        return new NullPointerException("Properties is null or empty");
-    }
-    return null;
+public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+    return processorBuilder
+            // execute
+            .forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
+                final ProcessorInputContext inputManager = processorContext.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new);
+                final Optional<InputColumn> column = inputManager.getColumns().stream().findFirst();
+                column.ifPresent(inputColumn -> outputColumnManager.onValue(MY_OUTPUT_COLUMN, rowIndex -> {
+                    final CellValue cellValue = inputColumn.getValueAt(rowIndex);
+                    return cellValue.toString() + "-processed";
+                }));
+                return inputManager.getRowCount();
+            })
+            .build();
 }
 ```
+#### isInteractive() flag
+Interactive is a flag that set to `true` when the step is used as an interactive drilldown. 
+It is set to `false` when the step is invoked as part of a workflow execution step, 
+or as an input to a view that requires all its data. This flag can be used to negate the need to 
+process all the input data when being viewed interactively. Instead, you can just process values when required.
 
-## Multi-threading
-
-In order to improve performance, especially when calling a web service that may have slower response times, we recommend using multiple threads. The `EmailValidate` example step demonstrates how to make use of multi-threading within a custom step.
+``` java
+@Override
+public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+    return processorBuilder
+            .forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
+                if (processorContext.isInteractive()) {
+                    ...
+```
 
 ## Class-isolation
 
-By default every custom step `JAR` files are isolated in its own class-loader. The class-loader used will scan libraries 
-relative to the custom-step. This allow custom-step to use libraries that have different version from other custom steps   
-and Aperture Data Studio itself without the need to _shade_ into different packages. 
+By default each and every plugin's `JAR` files are isolated in their own class-loader. This class-loader will prioritize 
+libraries that are bundled inside the jar. This allow plugin to depends on specific version of libraries without 
+affecting other plugin.
 
-Some note on the custom step packaging: 
+Some notes on jar packaging: 
 
-1. These libraries cannot be replaced by custom step to prevent class mismatch issues: 
+1. Always bundle dependencies into a single jar together with the plugin.
+1. If you plan to use sdklib, your plugin jar must not contains these packages:
 
-    * org.json:json:20160810
-    * org.apache.logging.log4j:log4j-api:2.11.1
-    * com.googlecode.json-simple:json-simple:1.1.1
+    * _org.apache.logging.log4j:log4j-api:2.12.0_
+    * _com.google.code.findbugs:jsr305:3.0.2_
     
-    In addition to those libraries above, anything that falls under `com.experian.aperture.datastudio.sdk`, `sun`, 
-    `java`, and `javax` packages will always be loaded from parent class loader. 
+    In addition to that, anything that falls under these Java packages: `com.experian.datastudio.sdk`, `sun`, 
+    `java`, and `javax` will always be loaded from parent class loader. 
     
-    Please contact us if your custom step needs a newer version of any of the libraries above.  
+    Please contact us if your plugin needs a newer version of any of the libraries above.  
+    
+1. It's not recommended to bundle native driver that involved JNI/JNA as it's not trivial to load native libraries from 
+   a jar in a distributed environment. Please contact us if your plugin needs a specific native drivers.
     
 1. When using [Gradle shadow plugin](https://imperceptiblethoughts.com/shadow/) or [Maven shade plugin](https://maven.apache.org/plugins/maven-shade-plugin/),
-   try not to `minimize` the resulting jar as it may remove dependencies that are loaded through reflection or service-provider-interface, i.e.
+   **do not** `minimize` the uber jar as it may remove dependencies that are loaded through reflection and _service-provider-interface_. 
+   
+   Essentially, **don't do any of the following**:
    
    Gradle:
    
    ```groovy
    shadowJar {
-       minimize() // don't use this
+       minimize() // don't 
    }
    ```
    
@@ -660,802 +516,511 @@ Some note on the custom step packaging:
              <goal>shade</goal>
            </goals>
            <configuration>
-             <!-- don't use this -->
+             <!-- don't -->
              <minimizeJar>true</minimizeJar>
            </configuration>
          </execution>
        </executions>
     </plugin>
    ```
-   
-1. When using centralized libs folder, make sure that all of the dependencies jars are referred inside the custom step's 
-   `MANIFEST.MF`:
 
-    ![Centralized lib](images/lib-with-manifest-structure.PNG)
-    
-    ```
-    Manifest-Version: 1.0
-    Class-Path: libs/DQTSCommon-2.0.jar libs/jackson-datatype-jsr310-2.8.1
-     1.jar libs/jackson-databind-2.8.11.1.jar libs/jackson-core-2.8.11.jar
-      libs/jackson-annotations-2.8.11.jar libs/guava-21.0.jar libs/commons
-     -io-2.5.jar libs/commons-text-1.2.jar libs/commons-lang3-3.7.jar libs
-     /minimal-json-0.9.1.jar
-    ```
+## The Logging library
+``` java
+public class StepsTemplate implements CustomStepDefinition {
+    private static final Logger LOGGER = SdkLogManager.getLogger(StepsTemplate.class, Level.INFO);
 
-## Optimizing a step
-Your custom step can be optimized by using the following function:
+     @Override
+     public StepConfiguration createConfiguration(StepConfigurationBuilder stepConfigurationBuilder) {
+        LOGGER.info("Create configuration");
+        ...
+```
 
-### Step type
-You can specify (optionally) if your step is a process flow step. Process nodes should be used to perform operations that don’t change the data, e.g. downloading new reference data, or sending an email notification. Process flow steps differ from normal steps: they have different connecting nodes, and pass data through unchanged. You do not have to specify any input or output arguments as a single input and output node will be added automatically. Set the step type to process by adding the following line to the step definition:
+## The Cache configuration
+The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and 
+referenced by a particular name. It is useful for storing responses from slow services between instances of custom steps. 
+The backing key/value datastore is fast enough on reads to be used for random access lookups, and 
+it can handle reads/writes from multiple steps at once. The cache is managed by Data Studio, but 
+it is the responsibility of the custom step to delete or refresh the cache as necessary.
+
+
+It is encouraged to use the key that decides the output of the result as cache name or the cache key. 
+For example, country in the step property will determine the address returned, and United Kingdom is selected, 
+you may set the cache name as `address-GB` instead of `address`. So that when the step property is changed, the new 
+cache will be created instead of reusing the old cache. 
+
+
+### Cache scope
+There 2 types of caching scope: `Workflow` and `Step`
+
+#### Workflow
+The cache is scoped to each custom step class within a workflow, which means that 2 instances of the same custom step in the same 
+workflow can use the same cache if both supplied the same cache name. Same custom step in a different workflow will not able
+to access the same cache.
+
+#### Step
+The cache is scoped to each custom step instance, which means that 2 instances of the same custom step in the same 
+workflow will access a separate cache, even though both supplied with the same cache name.
+
+### Create cache
+To create or obtain cache, you will need to build the `StepCacheConfiguration`.
+
+#### Cache configuration
+Use `StepCacheConfigurationBuilder` to build the `StepCacheConfiguration`. Here you may set the cache name, 
+time to live for update of the cache, cache scope and specify the type for cache key and cache value. 
+Cache key and cache value can be any type under Java.*.
+`StepCacheConfigurationBuilder` is supplied by `StepProcessorContext`.
+
+#### Get or create cache
+Caches are created or obtained by calling `getOrCreateCache` from the `StepCacheManager`. You will need to pass the 
+`StepCacheConfiguration` to create or retrieve the cache. `StepCacheManager` is supplied by `StepProcessorContext`. 
+
+Example below illustrate how to create a cache with the following configurations
+
+| Name             | Value        |
+| ---------------- | ------------ |
+| Cache name       | cache-name-1 |
+| Time-to-live     | 10 minutes   |
+| Cache scope      | STEP         |
+| Cache key type   | String       |
+| Cache value type | String       |
 
 ``` java
-setStepDefinitionType("PROCESS");
-```
-
-There is another step type: `PROCESS_ONLY`, which prevents the step from being connected to other steps' "data" outputs/inputs.
-
-### isInteractive flag
-This flag is set to true when the step is used as an interactive drilldown. When false, the step is invoked as part of a workflow execution step, or as an input to a view that requires all its data.
+ private static final String CACHE_NAME_1 = "cache-name-1";
  
+ ....
+
+@Override
+    public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+        return processorBuilder
+                .forOutputNode(OUTPUT_ID, (context, columnManager) -> {
+                    final StepCacheManager cacheManager = context.getCacheManager();
+                    final StepCacheConfiguration<String, String> cacheConfiguration = context.getCacheConfigurationBuilder()
+                            .withCacheName(CACHE_NAME_1)
+                            .withTtlForUpdate(10L, TimeUnit.MINUTES)
+                            .withScope(StepCacheScope.STEP)
+                            .build(String.class, String.class);
+                    final StepCache<String, String> cache1 = cacheManager.getOrCreateCache(cacheConfiguration1);
+``` 
+### Destroy cache
 ``` java
-boolean res = isInteractive();
+cacheManager.destroyCache(cacheConfiguration);
 ```
 
-This setting is best used during the execution and `getValueAt` stages of the step, as it can negate the need to process all the input data when being viewed interactively. Instead, you can just process values when required. 
+### Assigning value to cache
+``` java
+cache1.put(cacheKey, value);
+```
 
-### Caching 
+### Getting value from cache
+``` java
+cache1.get(cacheKey);
+```
 
-The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and referenced 
-by a particular name. The cache is _scoped to each custom step class_, which means that 2 instances of the same custom 
-step in 2 different workflows can use the same cache if both supplied the same cache name. It is useful for storing 
-responses from slow services between instances of custom steps. The backing key/value datastore is fast enough on reads 
-to be used for random access lookups, and it can handle reads/writes from multiple steps at once. The cache is managed 
-by Data Studio, but it is the responsibility of the custom step to delete or refresh the cache as necessary.
+## The HTTP Client library
 
-Caches are created or obtained by calling `StepOutput#getCache` method with the name of your cache, which can be any 
-string. `StepOutput#getCache` call is thread safe. Example below create or obtain (if it's already created) a cache with 
-default configuration:
+The HTTP client library provides an interface for accessing external endpoints through the HTTP protocol. 
+
+The HTTP requests are made using the SDK HTTP libraries/helper classes: 
+- `WebHttpClient` 
+- `WebHttpRequest` 
+- `WebHttpResponse` 
+
+First, an HTTP web client (`WebHttpClient`) is set up, and a request (`WebHttpRequest`) is sent through the client using the `sendAsync()` method with the request as an argument. This returns a `WebHttpResponse` which contains the response from the endpoint.
+
+#### Steps to use the HTTP client library: 
+1. [Create an HTTP client](#create-an-http-client)
+2. [Create an HTTP request (GET/POST/PUT/DELETE)](#create-an-http-request)
+3. [Send the HTTP request through WebHttpClient](#send-the-http-request-through-webhttpclient)
+4. [Retrieving the HTTP Response through WebHttpResponse](#retrieving-the-http-response-through-webhttpresponse)
+
+A [GET example](#example-of-sending-an-http-get-request-through-webhttpclient) and a [POST example](#example-of-sending-an-http-post-request-through-webhttpclient) is provided at the end of this section. 
+
+### Create an HTTP client
+``` java
+WebHttpClient.builder()
+        .withHttpVersion(..) // Http protocol version
+        .withProxy(..) // specifying any required proxy
+        .withConnectionTimeout(..) // maximum time to establish connection
+        .withSocketTimeout(..) // maximum time to retrieve data
+        .build()    
+```
+
+### Create an HTTP request
+The request supports the following http methods: 
+- [GET request](#get-request)
+- [POST request](#post-request)
+- [PUT request](#put-request)
+- [DELETE request](#delete-request)
+
+#### GET request
+``` java
+WebHttpRequest.builder()
+        .get(..) // passing in the url
+        .withQueryString(..) // specifying query string in key value pair, alternatively can use .addQueryString(..)
+        .withHeader(..) // specifying headers value, alternatively can use .addHeader(..)
+        .build()
+```
+
+#### POST request
+``` java
+WebHttpRequest.builder()
+        .post(..) // passing in the url
+        .withBody(..) // specifying the body
+        .withQueryString(..) // specifying query string in key value pair, alternatively can use .addQueryString(..)
+        .withHeader(..) // specifying headers value, alternatively can use .addHeader(..)
+        .build()
+```
+
+#### PUT request
+``` java
+WebHttpRequest.builder()
+        .put(..) // passing in the url
+        .withBody(..) // specifying the body
+        .withQueryString(..) // specifying query string in key value pair, alternatively can use .addQueryString(..)
+        .withHeader(..) // specifying headers value, alternatively can use .addHeader(..)
+        .build()
+```
+
+#### DELETE request
+``` java
+WebHttpRequest.builder()
+        .delete(..) // passing in the url
+        .withBody(..) // specifying the body
+        .withQueryString(..) // specifying query string in key value pair, alternatively can use .addQueryString(..)
+        .withHeader(..) // specifying headers value, alternatively can use .addHeader(..)
+        .build()
+```
+
+### Send the HTTP request through WebHttpClient
+``` java
+client.sendAsync(request);
+```
+
+Calling the `sendAsync()` method returns a `CompletableFuture<WebHttpResponse>` object. 
+
+### Retrieving the HTTP Response through WebHttpResponse 
+
+The methods provided to retrieve information from WebHttpResponse are: 
+- `getStatus()`
+- `getMessage()` 
+- `getBody()`
+- `getHeaders()`
+
+An example: 
 
 ``` java
-public class MyCustomStepOutput extend StepOutput {
-    // ... detail omitted
-    @Override
-    public void execute() {
-        final Cache myCache = getCache("MyCache");
-    }
-}
+CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
+
+webHttpResponse
+        .thenAccept(response -> {
+            String responseBody = response.getBody();
+        })
+        .exceptionally(e -> {
+            // error handling 
+        });
 ```
 
-Each record inside a cache is tied to _time-to-live_ value. _Time-to-live_ value is uniform across a single cache, 
-however, eviction event for each record is different as it's based on `creation time + _time-to-live_ value`. To 
-illustrate this:
+### Example of Sending an HTTP GET Request through WebHttpClient
 
-CacheA: Time-to-live 1 hour
-
-* Record A: 
-    * creation time 10:00 AM
-    * eviction time approximately 11:00 AM
-* Record B: 
-    * creation time 10:05 AM
-    * eviction time approximately 11:05 AM
-    
-Example below illustrate how to create a cache with custom time-to-live: 
-
-```java 
-public class MyCustomStepOutput extend StepOutput {
-    // ... detail omitted
-    @Override
-    public void execute() {
-        final Cache cache30s = getCache(CacheConfiguration.withName(SECOND_CACHE).withTtl(30, TimeUnit.SECONDS));
-    }
-}
-```
-
-Please take note that eviction time is not a _hard realtime_ and there is going to be a few second delay from the real 
-eviction time due to the asynchronous nature of the mechanism. 
-
-Cache default properties values: 
-
-* Time-to-live: 1 day. Configurable as `Sdk.cacheTTL` system property.
-* Eviction pool size: 2. Configurable as `Sdk.cacheEvictionPoolSize` system property.
-* Eviction interval: 10 seconds. Configurable as `Sdk.cacheEvictionInterval` system property.
-* Initial allocation file size: 5 MB. Configurable as `Sdk.cacheAllocateFileSize` system property.
-* File increment size: 5 MB. Configurable as `Sdk.cacheIncrementFileSize` system property.
-
-#### Cache interface
-
-The cache interface is defined by the functions presented below. They are called through the `Cache` object returned by the `getCache` function described above.
+This example step relies on [ip-api](https://ip-api.com/docs), an API endpoint that identifies the country of origin (and other location specific data) based on a provided IP address. In this example, the response is returned in JSON format. 
 
 ``` java
-String read(String key) throws Exception;
+WebHttpClient client = WebHttpClient.builder()
+        .withHttpVersion(HttpVersion.HTTP1_1)
+        .withProxy(Proxy.NO_PROXY)
+        .withConnectionTimeout(10L, TimeUnit.SECONDS) 
+        .withSocketTimeout(10L, TimeUnit.SECONDS)
+        .build();
+
+WebHttpRequest request = WebHttpRequest.builder()
+        .get("http://ip-api.com/json/205.174.40.1") 
+        .withQueryString("fields", "status,message,country") 
+        .build()
+
+CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
+
+webHttpResponse
+        .thenAccept(response -> {
+            String webHttpResponseBody = response.getBody();
+            JSONObject jsonObject = new JSONObject(webHttpResponseBody);
+            String countryName = (String) jsonObject.opt("country");
+        })
+        .exceptionally(e -> {
+            // error handling 
+        });
 ```
-Reads a string value from the cache according to the given key. If the key is not found in the cache, a null result is returned.
+
+### Example of Sending an HTTP POST Request through WebHttpClient
 
 ``` java
-void write(String key, String value) throws Exception;
-```
-Writes a value string to the cache keyed by the given key string. If the key is already present, the old value will be replaced with the new value.
+JSONObject json = new JSONObject(); 
+json.put("test", "value");
 
-``` java
-void close() throws Exception;
-```
-Closes the cache. Should be called when all read/writes are completed - typically in `StepOutput.close()`.
+WebHttpClient client = WebHttpClient.builder()
+        .withHttpVersion(HttpVersion.HTTP1_1)
+        .withProxy(Proxy.NO_PROXY)
+        .withConnectionTimeout(10L, TimeUnit.SECONDS) 
+        .withSocketTimeout(10L, TimeUnit.SECONDS)
+        .build();
 
-```java 
-String remove(String key)
-```
-Remove a single record from the cache. It will return the removed cache value if record exists.
+WebHttpRequest request = WebHttpRequest.builder()
+        .post(<URL>) 
+        .withBody(json.toString()) 
+        .build()
 
-```java 
-void clear()
-```
-Remove all records from a cache.
-
-``` java
-void delete() throws Exception;
-```
-Deletes the cache. Will throw an exception if in use.
-
-``` java
-long getCreateTime();
-```
-Gets the time when the cache was created.
-
-``` java
-long getModifiedTime();
-```
-Gets the time when the cache was last modified.
-
-### Progress
-When your step is being executed, it may take a long time to run. You can let Data Studio and its users know how far it has advanced, and approximatively how long it will take to finish, by sending progress updates to the server. The `sendProgess` call should be called with a double between 0 and 100 depending how far along your execution has progressed. For example:
-
-```java
-sendProgress(50.0);
+CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
 ```
 
-Note that when your step's execution function finishes, the progress will automatically be set to 100.
+## Generating a custom parser from a new or existing project
 
+1. You can either use Gradle or Maven: 
 
-## Testing a custom step
- 
-Apart from providing all the resources you need to develop custom steps, the SDK also contains a test framework that can help you test custom steps at component level. The test framework uses JUnit.
+  If using Gradle, point to the SDK repository in the `build.gradle`:
 
-The test framework helps mock the behavior of Data Studio where a custom step is installed and used in a workflow. 
-This ensures the custom step works as intended. The test framework is also useful for creating regression tests.
- 
-### Adding the test framework SDK dependency
- 
-If you are building the custom step from the sample project, the test framework has already been included as a test dependency.
- 
-1.	Download the [sdk-test-framework.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk-test-framework.jar).
-2.	Add it into the libs folder.
-3.	Add the test framework as a test dependency. 
- 
-### Writing custom step tests
- 
-We recommend you create tests based on `StepTemplate`. The test suite template allows you to start building regression tests, and ensures the custom step works as intended in Data Studio.
-
-There is also an example step with tests that shows you how to write tests for a custom step that consumes an external
- REST API service.
- 
-### Test framework API
- 
-The test framework RESTful service is separated into two parts:
-- The *configuration* API, which simulates the Data Studio UI configuration. 
-- The *execution/assertion* API, which executes the step in a workflow.
-   
-#### Configuration API
- 
-In order to be executed, a custom step must first be configured. This might involve:
-- Connecting the step to an input (e.g. a source step or a previous step’s output).
-- The user having to input some argument values defined in the custom step's properties.
-- The custom step depending on a certain constant, glossary or property during execution.
-
-The Configuration API helps set up all the above, so the custom step can be executed. 
- 
-The `StepTestBuilder` class allows you to configure both the target step to test, and the mock behavior of Data Studio.
- 
- ```java
-// Use the option to target the custom step directly by instantiating the step class yourself. This is useful if the
-// step contains a constructor overload with mock-able external dependencies.
-StepTestBuilder
-    .fromCustomStep(new MyCustomStepConfiguration())
- ```
- 
-or 
- 
- ```java
- // Use this option to load the custom step bundled in a jar.
- StepTestBuilder
-    .fromJar("path/to/MyCustomStep.jar")
-    .useCustomStep("MyCustomStep")
-    
- ```
- 
-You need to specify the input to your test. The sample below simulates a scenario where the custom step’s input is
- connected to the output of another step. Typically, the output of a step is in the form of a table. You can specify
- a CSV file as the input for the test.
- 
- ```java
- StepTestBuilder
-    .fromCustomStep(new MyCustomStepConfiguration())
-    .withCsvInput("path/to/input.csv")
- ```
- 
-To mock the Data Studio values so that the custom step can access them in the test, use the method provided.
- 
- ```java
- StepTestBuilder
-     .fromCustomStep(new MyCustomStepConfiguration())
-     .withServerProperty(propertyName, propertyValue) // Specify the required server properties
-     .withConstantValues(constantValues) // Specify a collection of server constant values, or
-     .withConstantValue(name, value) // Add a single server constant value 
- ```
- 
-Set `isInteractive` to true, to simulate the `Show data` event.
- 
- ```java
-  StepTestBuilder
-      .fromCustomStep(new MyCustomStepConfiguration())
-      .isInteractive(true) // This makes StepOutput.isInteractive() returns true
- ```
- 
-The test framework records the progress of calls throughout the step execution, so that they can be asserted later.
-
-Additionally, there is also a method that allows you to hook a custom progress callback if required.
- 
- ```java
- StepTestBuilder
-    .fromCustomStep(new MyCustomStepConfiguration())
-    .onProgressReport((message, progress) -> { 
-       // do something with the progress
-    })
- ``` 
- 
-Before the step can be executed, the step property values (or argument) will need to be specified. For example, specify
- the selected column from the output of the previous step.
- 
- ```java
- StepTestBuilder
-    .fromCustomStep(new MyCustomStepConfiguration())
-    .withCsvInput("path/to/input.csv") // input.csv contains a column named "Color id"
-    .withStepPropertyValue(0, "Color id") // Specify that for the first step property (argument), you want to choose the column "Color id"
- ```
- 
-After you are done configuring the test, call the `build()` method, which returns a `TestSession` object. This object represents the current test. It contains the methods to execute the custom step and to assert its result.
- 
-The build also validates the following:
-- That the target step is not null. This might happen when the step is loaded from a jar file.
-- That the step has a valid package name. Each custom step has to be in the package derived from a specific name,
- e.g. `com.experian.aperture.datastudio.sdk.step`
-- That `StepOutput` has been initialized. Each step configuration will need to call `setStepOutput()` to initialize the step output.
-- That the input node doesn’t have duplicate names.
-- That there is only one output node (the current SDK version doesn’t support multiple output nodes).
- 
- ```java
- StepTestBuilder
-     .fromCustomStep(new MyCustomStepConfiguration())
-     .withCsvInput("path/to/input.csv") // input.csv contains a column named "Color id"
-     .withStepPropertyValue(0, "Color id")
-     .build()
- ```
- 
-#### Execution and Assertion API
- 
-Before testing the execution of the step, you should assert the step has the expected properties (arguments),
- input nodes, and output node.
- 
- ```java
- StepTestBuilder
-      .fromCustomStep(new MyCustomStepConfiguration())
-      ... // Removed for brevity
-      .build()
-      .getArgumentCount() // Get the step properties or argument count defined in the StepConfiguration and then assert
-      // or
-      .getInputNodeCount() // Get the input node count and then assert
-      // or
-      .getOutputNodeCount() // Get the output node count and then assert
- ``` 
- 
-Call `execute()` to execute the custom step. A `SDKAssertion` object is returned, which contains the methods to assert the execution output. If the step is not complete, a `SDKTestException` will be thrown.
- 
- ```java
- final SDKAssertion assertion = StepTestBuilder
-       .fromCustomStep(new MyCustomStepConfiguration())
-       ... // Removed for brevity
-       .build()
-       .execute(); // Throws SDKTestException if the step is not complete (e.g. did not set an argument/property value)
-
- ```
- 
-Assert that the output columns are as expected after the execution.
- 
- ```java
- // Continuing from the assertion object returned by execute()
- assertion
-    .assertColumnName(3, "My custom column") // Assert the column added by the custom step.
-    .assertColumnSize(3) // Assert the number of columns is correct.
-    
- ```
- 
-Assert the rows from the input are executed or processed as expected.
- 
- ```java
- // Continuing from the assertion object returned by execute()
- assertion
-    .assertThatAllRowsIsExecuted() // Assert that the number of executed rows matches the number of input rows.
-    // or
-    .assertExecutedRowCount() // Assert the specific number of executed rows; for scenarios where StepOutput.execute() returns a different value than the number of input rows (e.g. filter step).
- ```
- 
-Assert the output column values from the step are as expected. The column assertion returns an `SDKAsyncAssertion`
- object, as it is an asynchronous operation. This helps simulate the behavior in Data Studio where the grid view
- column value is typically processed asynchronously. This way, you can also test that the `getValueAt()` from the
- `StepOutput` is thread-safe.
- 
- ```java
- assertion
-    .assertColumnValueAt(row1, column3, "Value") // Assert that at row 1, column 3, the value is as expected.
-    .assertColumnValueAt(row2, column3, "Value2")
-    .waitForAssertion() // Wait for the asynchronous assertion to finish.
- ```
- 
-Other than asserting the output rows and columns, there are also miscellaneous API calls you can use to assert various
- parts of the step execution.
- 
- ```java
- assertion
-    .assertServerProperty(key, value) // Assert the server property is as expected.
-    // or
-    .closeCustomStep()                          // Simulates the StepOutput's close event.
-    .assertCacheIsValid(myCacheName)            // Assert that the cache is still valid after closing the step.
-    .assertCacheValue(myCacheName, key, value)  // Assert the value stored in cache during or after execution is as expected.
-    // or
-    .assertArgumentValue(index, value) // Assert the argument value is as expected.
- ```
- 
-## Adding a custom step to Data Studio
-
-To make your custom step available in the Data Studio UI:
-
-1. Copy your new jar into the addons folder in your Data Studio installation directory. You should see the new step in the UI.
-2. Test your new step by dragging it into your workflow.
-
-## Generating a custom parser with the sample project
-
-The steps below show how to generate a compatible jar file using Gradle:
-
-1. Clone the repo.
-2. Open the project in your IDE of choice.
-3. Custom parser skeleton is available at [ParserTemplate.java](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/parser/addons/ParserTemplate.java). 
-   Please take note that the package structure `com.experian.aperture.datastudio.sdk.parser.addons` must be respected as 
-   it's where Aperture Data Studio scan for custom parser. 
-4. You may remove the example custom steps located at [example step package](ExampleSteps/src/main/java/com/experian/aperture/datastudio/sdk/step/examples) to reduce the build size.
-5. To build your parser, you can run `gradle build` either from IDE or command prompt. Refer to the [documentation](ExampleSteps/README.md) of 
-   ExampleStep module for more detail on the build step.
-6. Your new jar will be built and copied to `ExampleSteps/build/libs/ExampleSteps-all.jar`.
-
-## Generating a custom parser from a new or existing project 
-
-If you don't wish to use Gradle, you'll need to configure your own Java project to generate a compatible jar artifact:
-
-1. Create a new Java project or open an existing one.
-2. Download the [sdk.jar](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk.jar) file 
-   and optionally [sdk-test-framework](https://github.com/experiandataquality/aperture-data-studio-sdk/raw/master/libs/sdk-test-framework.jar). 
-   
-   Alternatively if you use Gradle, you can point to sdk repository in the `build.gradle`: 
-   
    ```gradle
    apply plugin: 'java'
-   
+
    repositories {
        mavenCentral()
        maven {
-            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
+            // TODO: to be updated to release repository
+            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
        }
    }
-   
+
    dependencies {
-       compileOnly("com.experian.aperture:sdk:1.6.2")
-       testCompile("com.experian.aperture:sdk-test-framework:1.6.2")
+       compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
    }
    ```
-   
-   If you're using Maven, modify `pom.xml` to add SDK github repository: 
-   
-   ```xml 
+
+  If you don't want to use Gradle, you'll have to configure your own Java project to generate a compatible JAR artifact:
+   - Create a new Java project or open an existing one.
+   - Download and install the [sdkapi.jar]([TO BE CHANGED]) file.
+
+  If using Maven, modify `pom.xml` to add the SDK GitHub repository:
+
+   ```xml
    <project xmlns="http://maven.apache.org/POM/4.0.0"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                                 http://maven.apache.org/maven-v4_0_0.xsd">
        <modelVersion>4.0.0</modelVersion>
-       <groupId>com.experian.aperture.datastudio.sdk.step.addons</groupId>
-       <!-- replace this accordingly with your custom step name -->
-       <artifactId>MyCustomStep</artifactId>
+       <groupId>com.experian.aperture.datastudio.sdk.custom.addons</groupId>
+       <!-- replace this accordingly with your custom parser name -->
+       <artifactId>MyCustomParser</artifactId>
        <!-- replace this accordingly with your custom step version -->
-       <version>1.0-SNAPSHOT</version>
+       <version>1.0</version>
        <packaging>jar</packaging>
        <!-- replace this accordingly with your custom step name -->
-       <name>MyCustomStep</name>
-   
+       <name>MyCustomParser</name>
+
        <repositories>
            <repository>
-               <id>aperture-data-studio-github-repo</id>
-               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/</url>
+               <!-- TODO: to be updated to release repository -->
+               <id>aperture-data-studio-github-repo-snapshot</id>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven/</url>
            </repository>
        </repositories>
-   
+
        <dependencies>
            <dependency>
-               <groupId>com.experian.aperture</groupId>
-               <artifactId>sdk</artifactId>
-               <version>1.6.2</version>
+               <groupId>com.experian.datastudio</groupId>
+               <artifactId>sdkapi</artifactId>
+               <version>2.0.0-SNAPSHOT</version>
                <scope>provided</scope>
-           </dependency>
-           <dependency>
-               <groupId>com.experian.aperture</groupId>
-               <artifactId>sdk-test-framework</artifactId>
-               <version>1.6.2</version>
-               <scope>test</scope>
            </dependency>
        </dependencies>
    </project>
    ```
+   
+3. (Skip this step if using Maven or Gradle). If you've downloaded the JAR manually, create a *libs* folder and add in the *sdkapi.jar* as a library.
+4. Create a new package and class.
+5. Configure your project to output a .jar file as an artifact. Note that this will be done differently depending on your IDE.
 
-3. If you downloaded the jar manually, create a libs folder and add in the sdk.jar as a library. You can skip this step 
-   if you're using Maven or Gradle.
-4. Create a new package called `com.experian.aperture.datastudio.sdk.parser.addons`.
-5. Create a new class in the package you just created.
-6. Configure your project to output a jar file as an artifact. Note that this will be done differently depending on your IDE.
+## Creating a custom parser
 
-## Creating a custom parser 
+Once your project is set up, you can create a new class and implement the `CustomParserDefinition` interface. The newly created class will be picked up by the Data Studio UI.
 
-The sample project in the repository has a pre-configured Gradle build, it includes the SDK, and has the correct package name configured. However, if you want to start your own project, then follow the [instructions above](#generating-a-custom-parser-from-a-new-or-existing-project).
-
-With your project set up, you can now create a new class. If you cloned the sample project you will have a `ExampleSteps` module. 
-Inside that module you'll find the `com.experian.aperture.datastudio.sdk.parser.addons` package. Create your new class 
-in this package so that it is correctly picked up by the Data Studio UI.
-
-You can bundle multiple parsers into a single jar as long as they're located under `com.experian.aperture.datastudio.sdk.parser.addons` 
+Note that it is recommended that you bundle *one* custom parser per JAR.
 
 ### Importing the parser SDK
 
-To use the classes and methods, you need to import the SDK into your class. Add an import statement below the package name to import all the SDK classes and methods.
-
+To use the interfaces, classes and methods, you have to import the SDK into your class. Add an import statement below the package name to import all the SDK classes and methods:
 ``` java
-import com.experian.aperture.datastudio.sdk.parser.*
+import com.experian.datastudio.sdk.api.*;
+import com.experian.datastudio.sdk.api.parser.*;
+import com.experian.datastudio.sdk.api.parser.configuration.*;
+import com.experian.datastudio.sdk.api.parser.processor.*;
 ```
-
 Your new class should look something like this:
 
 ``` java
-package com.experian.aperture.datastudio.sdk.parser.addons;
+package com.experian.datastudio.customparser;
 
-import com.experian.aperture.datastudio.sdk.parser.*;
+import com.experian.datastudio.sdk.api.*;
+import com.experian.datastudio.sdk.api.parser.*;
+import com.experian.datastudio.sdk.api.parser.configuration.*;
+import com.experian.datastudio.sdk.api.parser.processor.*;
 
-public class ParserTemplate extends CustomParser {
+public class DemoParser implements CustomParserDefinition{
 }
 ```
+All the SDK interfaces, classes and methods will now available.
 
-All the SDK classes and methods are now available to you.
-
-### Configuring the supported filetypes
-
-First of all, you have to determine the filetypes that your parser will support. You should override the `getSupportedFileExtensions` method for this purpose.
-
-``` java
-private static String[] allowableFileTypes = {
-    "yourextension"
-};
-
-@Override
-public final List<String> getSupportedFileExtensions() {
-    // Return all allowed file types.
-    return Arrays.asList(allowableFileTypes);
-}
-```
-
-### Instantiating your parser and creating any required parameters
-
-The template parser constructor looks like this: 
-
-``` java
-public ParserTemplate() {
-    super("Template", "Parser Template");
-}
-```
-
-You should replace the parameters in the call to the constructor base class with an appropriate brief name and description.
-
-Your parser may need to infer, or to be supplied, parameters that help it understand the file type. In the case of a CSV parser, for example, you could supply the field separator.
-
-If your parser requires parameters, they should be created in the constructor. Note that each parameter has an ID which is used to reference it.
-
-Parameters can be string or boolean as determined by the `ParserPropertyType` parameter. 
-
-Override the `getProperties` method to return all the parameters that your parser supports.
-
-``` java
-import com.experian.aperture.datastudio.sdk.parser.ParserProperty;
-
-private static final String ROW_COUNT_ID = "RowCount";
-private List<ParserProperty> properties;
-
-public ParserTemplate() {
-    super("Template", "Parser Template");
-
-    properties = new ArrayList<>();
-
-    ParserProperty rows = new ParserProperty(ParserPropertyType.STRING, "Row count", "The number of rows in each table", ROW_COUNT_ID);
-
-    properties.add(rows);
-}
-
-@Override
-public final List<ParserProperty> getProperties() {
-    return properties;
-}
-```
-
-This creates a single property, which stores the number of rows to be returned. Override the `getProperties` method to return the stored properties. You will set default values for these properties at a later stage.
-
-### Providing a method that attempts to parse the data file
-
-Override the `attemptParse` method. This method receives a stream supplier (so that multiple passes can be made if necessary),
- a filename, and the parameter list.
-
-The method must determine whether the file can be parsed (or may be parsable with additional user help in configuration) and return that status to the caller. It must also set up any required configuration parameters that are to be presented to the user. If the file can be parsed, this method must also describe the tabular structure of the data as it will appear in Data Studio. 
-
-Below, we take a look at this method in detail.
-``` java
-@Override
-public final ParseResult attemptParse(final Supplier<InputStream> streamSupplier, final String filename, final List<ParserParameter> parameterConfiguration) throws CustomParseException {
-    String started = String.format("Template parsing attempted for %s", filename);
-    log(started);
-```
-
-You can use `log()` to write an informational message to the server log file, or `logError()` for more serious problems.
- Use `getLoggingLevel()` to read the value of the custom parser server logging level. Typically, zero means no logging,
- 1 is used for minimal logging of major events and general information, and 2 is used to provide logging at the record
- level. However, it is your decision how you want to interpret the values.
-
-Next, take a copy of the parameters provided or create any new ones that are required to parse the file. The parameters are referred to by their ID. Data Studio will not supply parameters when initially attempting to parse the file, but the user can update any that your parser provides. If you do not wish the user to have control over a parser value, it should not be stored as a parameter. 
-
-In the example below, for demonstration purposes, we set the number of records to be returned by the parser. The file can be configured within the Data Explorer to return a different number of rows. In a normal situation, the row count would be determined by the file contents.
-
-``` java
-List<ParserParameter> localParameters = new ArrayList<>();
-
-if (parameterConfiguration == null) {
-    ParserParameter.updateParameters(localParameters, ROW_COUNT_ID, String.valueOf(DEFAULT_ROWS));
-} else {
-    localParameters.addAll(parameterConfiguration);
-}
-```
-
-The code below creates two output files, each with a fixed number of columns. These output files are both attached to the result, as is the set of parameters that the parser is using.
-
-These parameters will be passed back into the parser in the future and will be applied the next time that it is parsed (any user configuration will also be applied). 
-
-Note that this template parser does not actually look at the file provided. It simply creates dummy data based on a trivial algorithm. 
-
-``` java
-    List<ParseOutput> outputs = new ArrayList<>();
-
-    int tableCount = 2;
-
-    for (int table = 0; table < tableCount; table++) {
-        List<Column> columns = new ArrayList<>();
-
-        for (int i = 0; i < COLUMN_COUNT; i++) {
-            String name = String.format("T%d H%d", table + 1, i + 1);
-            Column column = new Column(null, i, name, name);
-            columns.add(column);
-        }
-
-        ParseOutput output = new ParseOutput(String.format("Table %d", table + 1), String.format("This is table number %d", table + 1));
-        output.setColumns(columns);
-
-        outputs.add(output);
-    }
-
-    ParseResult result = new ParseResult();
-
-    result.setStatus(ParseStatus.PARSED);
-
-    result.setOutputs(outputs);
-
-    result.setParameters(localParameters);
-
-    return result;
-}
-```
-#### Result status
-
-A result status must be set to indicate the level of success.
-
-If the file cannot be parsed, return `NOT_PARSABLE`. If parsing is not currently possible but user configuration may help,
- return `POSSIBLY_PARSABLE` so that the user can adjust the values as appropriate.
-
-Note that by returning `NOT_PARSABLE`, the file will not appear in the Data Explorer (unless another parser is able to understand it)
- and this may prove confusing for the user. By setting the status to `POSSIBLY_PARSABLE`, the file will appear with
- an 'Error' label against it.
-
-### Performing the actual parse
-
-Once the file is satisfactorily accepted and configured by Data Studio, it will call out to the parse method to retrieve the rows. This method must be overridden by your parser and must return an iterator which returns an array of objects containing the cell data for each row.
-
-We will now cover the template parser implementation, which, for simplicity, does not refer to the supplied file when supplying the row data.
-
-This method accepts:
- - The input stream. 
- - The filename.
- - The index of the file that is being retrieved (your parser may only return one file).
- - A list of parameters.
- - A maximum row count which can be used to optimize loading.
-
-The wrapping code parses the supplied parameter in a defensive manner and sets the current row to zero.
-
-``` java
-@Override
-public final Iterator<Object[]> parse(final InputStream input, final String filename, final int outputIndex, final List<ParserParameter> parameterConfiguration, final int maxRows) throws CustomParseException {
-    int rowTotal;
-
-    try {
-        String rows = ParserParameter.getStringParameter(parameterConfiguration, ROW_COUNT_ID);
-
-        rowTotal = Integer.valueOf(rows);
-    } catch (Exception ex) {
-        rowTotal = DEFAULT_ROWS;
-    }
-
-    final int rowCount = rowTotal;
-
-    return new Iterator<Object[]>() {
-        ...
-    }
-}
- ```
+### Creating your metadata
+[Same as creating metadata for custom step](#creating-your-metadata)
  
-The iterator contains two methods: an indicator of whether more rows exist, and a method to get the next row. The implementation of the template parser iterator is shown below, but in a real-world use case, it would obviously need to examine the contents of the input file.
+### Configuring your parser
 
-Furthermore, the implementation may vary significantly depending on the output index, as this would most likely require the examination of a different part of the file.
- 
-``` java
-@Override
-public final Iterator<Object[]> parse(final InputStream input, final String filename, final int outputIndex, final List<ParserParameter> parameterConfiguration, final int maxRows) throws CustomParseException {
-    ...
-    
-    return new Iterator<Object[]>() {
-        private int currentRow = 0;
+Use `ParserConfigurationBuilder` in `createConfiguration` method to configure your custom parser.
 
-        @Override
-        public boolean hasNext() {
-            return currentRow < rowCount;
-        }
-
-        @Override
-        public Object[] next() {
-            if (hasNext()) {
-                Object[] result = new Object[COLUMN_COUNT];
-                if (currentRow < rowCount) {
-                    ++currentRow;
-
-                    for (int c = 0; c < COLUMN_COUNT; c++) {
-                        result[c] = String.format("T%d R%d C%d", outputIndex + 1, currentRow, c + 1);
-                    }
-                }
-
-                return result;
-            }
-
-            throw new NoSuchElementException();
-        }
-    };
-}
- ```
- 
-### Exceptions
- 
-When the custom parser is faced with an unexpected situation, the `CustomParseException` class can be used to throw an exception. Whilst the `attemptParse` method should be made fairly resilient to unexpected content (and use the result status where possible), the actual parse method should throw exceptions of this class when it encounters a situation it cannot handle. 
- 
-## Adding a custom parser to Data Studio
-
-To make your custom parser available in the Data Studio UI:
-
-1. Copy your new jar into the addons folder in your Data Studio installation directory.
-2. Test your new parser by dragging in a file type which it supports to the Data Explorer.
-
-## Working with datastores
-
-The SDK allows you to get access to Data Studio's datastores and the tables within them, obtain information about them, and even create new tables or append to existing ones.
-
-### Get datastores
-
-To get a list of all datastores available to you, call the `getDatastores` function. This returns a list of `Datastore` objects that can be further queried.
-
-### Datastore interface
-
-This interface allows you to find out more about a particular data source: its name, its type, if it’s the current user’s private import datastore. The interface also enables you to retrieve and even set properties for the datastore and to retrieve a list of tables (`TableSDK` objects) within the datastore which you are allowed to see.
-  
-See the `Datastore` object in the Javadoc for more details. 
-
-### TableSDK interface
-
-Objects implementing this interface allow you to interact with individual tables in a datastore. You can: 
-
-- Query the status of cached data.
-- Remove or refresh the cache.
-- Read the file or delete it (where applicable).
-
-See the `TableSDK` interface in the Javadoc for more details.
-
-## Reading Data Studio properties
- 
-Various Data Studio properties are accessible through the SDK:
- 
-### Constants
-
-This function obtains the value of a constant value stored in Data Studio (the Glossary area under the Constants tab). 
-The name to pass to the function is typically the constant name, written in uppercase and with underscores replacing 
-spaces. For example, to obtain the regular expression for validating emails:
+#### Supported file extension
+Define the file extension that the custom parser is able to parse.
 
 ``` java
-final Optional<String> constantValue = ServerValueUtil.getGlossaryConstant("EMAIL_ADDRESS");
+.withSupportedFileExtensions(supportedFileExtensionsBuilder ->
+                        supportedFileExtensionsBuilder
+                                .add(supportedFileExtensionBuilder ->
+                                        supportedFileExtensionBuilder
+                                                .withSupportedFileExtension(".testFile")
+                                                .withFileExtensionName("Test extension")
+                                                .withFileExtensionDescription("Test extension")
+                                                .build())
+                                .build())
 ```
 
-Since 1.5, `StepOutput#getConstantByName(String)` has been marked as deprecated in favor of 
-`ServerValueUtil.getGlossaryConstant(String)`. `ServerValueUtil` provide more flexibility such as retrieving constant 
-inside a constructor of `StepConfiguration`.  
- 
-### Glossary values
-This function obtains groups of values defined under one glossary item in Data Studio. 
+#### Parameter definition
+Each parser can be configured in the UI. It will determine the behaviour of the custom parser.
+You can have multiple parameter defined using the `parameterDefinitionsBuilder` in the `withParserParameterDefinition`.
 
-This is only used to get a list of the DNS servers.
+Example:
+For delimited parser, user can choose either comma, tab, etc as a delimiter. 
 
 ``` java
-List<Object> values = getGlossaryValues("DNS_SERVERS");
+.withParserParameterDefinition(parameterDefinitionsBuilder ->
+                        parameterDefinitionsBuilder
+                                .add(parameterDefinitionBuilder ->
+                                        parameterDefinitionBuilder
+                                                .withId("delimiter")
+                                                .withName("Delimiter")
+                                                .withDescription("Character that separates columns in plain text")
+                                                .setAsRequired(true)
+                                                .setTypeAs(ParserParameterValueType.STRING)
+                                                .setDisplayTypeAs(ParserParameterDisplayType.TEXTFIELD)
+                                                .withDefaultValueAsString(",")
+                                                .affectsTableStructure(true)
+                                                .build())
+                                .build())
 ```
- 
-### Server properties
 
-To obtain a server property as defined in Data Studio, or set in the server's `server.properties` file:
 
-```java 
-final Optional<Object> serverPropertyValue = ServerValueUtil.getServerProperty("System.locale");
-```
+| Method                    | Description                                                                                         |
+| ------------------------- | --------------------------------------------------------------------------------------------------- |
+| withId                    | Set Id for the parameter. Id can be used to retrieve the parameter value in the parser processor    |
+| withName                  | Set parameter name                                                                                  |
+| withDescription           | Set parameter description                                                                           |
+| setTypeAs                 | Set data type of the parameter value. The available type are boolean, string, integer and character |
+| setDisplayTypeAs          | Set display format of the parameter                                                                 |
+| withDefaultValueAsString  | Set a default value in the field                                                                    |
+| withDefaultValueAsBoolean | Set a default value in the field                                                                    |
+| withDefaultValueAsString  | Set a default value in the field                                                                    |
+| affectsTableStructure     | Set this flag to true if the parameter value influence the table structure of the parser output     |
 
-Alternatively, you can obtain a list of values under a particular Data Studio property by using (note that this method 
-only accessible inside child class of `StepOutput`):
+
+#### Display type
+
+| ParserParameterDisplayType | Description                                                                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| TEXTFIELD                  | Display a textfield                                                                                                                        |
+| CHECKBOX                   | Display a checkbox                                                                                                                         |
+| CHARSET                    | Display a dropdown where user able to select one of the character set. Example: UTF-8, UTF-16, US-ASCII                                    |
+| DELIMITER                  | Display a dropdown where user able to select one of the delimiter. Example: Comma (,),  Tab(\t), Pipe (                                    | ) |
+| LOCALE                     | Display a dropdown where user able to select one of the locale. Example: English (United States), English (United Kingdom, French (France) |
+| ENDOFLINE                  | Display a dropdown where user able to select one of the end of line flag. Example: eg: \r\n, \n, \r                                        |
+| QUOTE                      | Display a dropdown where user able to select one of the quote. Example: Double ("), Single ('), Grave (`)                                  |
+
+#### Set default value 
+You can set default value based on the content of the file. Use `ParameterContext` to in set default value method, to retrieve the file input stream.
+
+
+### Set processor
+
+Set your parser processor class.
 
 ``` java
-List<String> dnsServers = getServerObjectProperties("DNSServers", "CONTENT");
+.withProcessor(new SampleParserProcessor())
 ```
 
-Since 1.5, `StepOutput#getServerProperty(String)` has been marked as deprecated in favor of 
-`ServerValueUtil.getServerProperty(String)`. `ServerValueUtil` provide more flexibility such as retrieving constant 
-inside a constructor of `StepConfiguration`.  
+## Parser Processor
+
+Parser processor contains the processor to take the file source and convert it to `ParserTableDefintion` and `ClosableIterator`
+To build a parser processor, create a new class that implements `ParserProcessor`. There are 2 methods in the interface, `getTableDefinition` and `ClosableIterator`
+
+### Get table definition
+
+In Aperture Data Studio, data in the files are present in form of table with rows and columns. `ParserTableDefinition` is the definition of the parsed table. You can have single or multiple table in a file source. For each table, you can have single or multiple columns. Use the `ParserTableDefinitionFactory` and `ParserColumnDefinitionFactory` in the `TableDefinitionContext` to create `ParserTableDefinition`. 
+
+#### TableDefinitionContext
+
+| Method                           | Description                                     |
+| -------------------------------- | ----------------------------------------------- |
+| getStreamSupplier                | Contains the stream of the file source          |
+| getFilename                      | Name of the file source                         |
+| getParameterConfiguration        | Get the parameter value selected by the user    |
+| getParserTableDefinitionFactory  | Factory that generated `ParserTableDefinition`  |
+| getParserColumnDefinitionFactory | Factory that generated `ParserColumnDefinition` |
+
+
+## Get row iterator
+
+Return a closable iterator over a collection of table row. Use the `ClosableIteratorBuilder` in the `RowIteratorContext` to build the `ClosableIterator`
+
+#### TableDefinitionContext
+
+| Method                     | Description                                  |
+| -------------------------- | -------------------------------------------- |
+| getTableId                 | Returns the id of `ParserTableDefinition`    |
+| getStreamSupplier          | Contains the stream of the file source       |
+| getParameterConfiguration  | Get the parameter value selected by the user |
+| getTableDefinition         | Returns the `ParserTableDefinition`          |
+| getClosableIteratorBuilder | Returns the builder for a closable iterator. |
+
+
+#### ClosableIteratorBuilder
+| Method      | Description                                                                    |
+| ----------- | ------------------------------------------------------------------------------ |
+| withHasNext | Returns true if iterations has more rows                                       |
+| withNext    | Returns the next row in the iteration                                          |
+| withClose   | Closes any streams and releases system resources associated with the iterator. |
 
 ## Debugging
 To enable Java's standard remote debugging feature:
 1. Install Data Studio. Please [contact us](https://www.edq.com/data-quality-management/aperture-data-quality-management-platform/) to get the latest version.
 2. Go to the installation directory of Data Studio.
-3. Edit `Aperture Data Studio Service 64bit.ini`.
+3. Find and edit `Aperture Data Studio Service 64bit.ini`. You might need *Administrator* permission to edit this file if the installation is in "Program Files" folder.
 4. Alter the **`Virtual Machine Parameters`** property.
     ```properties
     Virtual Machine Parameters=-Xms66:1000:16000P -Xmx66:1000:16000P -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
     ```
-5. Open IntelliJ IDEA, and click __Edit Configurations...__
+5. Open IntelliJ IDEA project containing the source code of your custom addon code.
+6. Click the toolbar __Edit Configurations...__. This could also be found by going to the menu __Run__ > __Edit Configurations__
 
-    ![Edit Configurations](images/edit_configurations.png)
+    ![Edit Configurations](images/edit-configurations.PNG)
 
-6. Click the `+` button and add new remote debugging:
+7. Click the `+` button and add new __Remote__ debugging:
 
-    ![Add Remote Debugging](images/remote.png)
+    ![Add Remote Debugging](images/new-remote-debugging.PNG)
 
-7. Click __OK__.
-8. Place a debug point in your addons code.
-9. Restart Data Studio.
-10. Now you can debug your custom addons code.
+8. Fill in the __Name__ with *Aperture Data Studio Remote Debugging* or any other name that you can recognize later.
+
+    ![Editing Remote Debugging](images/editing-remote-debugging.PNG)
+9. Click __OK__. This will create a new *Debug* configuration.
+10. Place break points in your addons code where you want the debugger to stop.
+11. Start debugging by clicking the __Debug__ icon button, or menu __Run__ > __Debug...__ > *Select __Aperture Data Studio Remote Debugging__ configuration*.
+
+    ![Start debugging](images/debug-button.PNG)
+12. Restart Data Studio.
+13. Now you can debug your custom addons code. Create a workflow containing your custom step and interact with UI depending on where you want to debug, e.g: If you want to debug processor, click *Show step results*.
+
 **NOTE**: make sure `-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005` is removed in the production
 environment.

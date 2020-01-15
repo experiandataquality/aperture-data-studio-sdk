@@ -1,2 +1,4 @@
-rootProject.name = 'ApertureDataStudioSDK'
-include 'ExampleSteps'
+include ':ExampleSteps:AddVAT'
+include ':ExampleSteps:ConcatValues'
+include ':ExampleSteps:IPGeolocation'
+include ':SDKTestFramework'
