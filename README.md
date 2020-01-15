@@ -1,4 +1,4 @@
-![](https://github.com/experiandataquality/aperture-data-studio-sdk/workflows/Java%20CI/badge.svg?branch=2.0.0)
+![](https://github.com/experiandataquality/aperture-data-studio-sdk/workflows/Java%20CI/badge.svg)
 
 # Aperture Data Studio SDK
 
@@ -6,7 +6,7 @@ The SDK provides a simple Java library to create and test your own custom Workfl
 
 This repo contains the SDK JAR and a pre-configured Java project that uses Gradle, allowing you to easily build your own custom step. Alternatively, you can add the SDK as a dependency to your own project by downloading the SDK JAR from the `sdkapi` folder.
 
-[//]: # "TODO: [Javadoc reference](https://experiandataquality.github.io/aperture-data-studio-sdk/tree/2.0.0) for full reference documentation."
+[Javadoc reference](https://experiandataquality.github.io/aperture-data-studio-sdk/tree/2.0.0) for full reference documentation.
 
 ## Table of contents
 
