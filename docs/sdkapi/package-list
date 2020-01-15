@@ -1,0 +1,9 @@
+com.experian.datastudio.sdk.api
+com.experian.datastudio.sdk.api.parser
+com.experian.datastudio.sdk.api.parser.configuration
+com.experian.datastudio.sdk.api.parser.processor
+com.experian.datastudio.sdk.api.step
+com.experian.datastudio.sdk.api.step.configuration
+com.experian.datastudio.sdk.api.step.configuration.stepproperties
+com.experian.datastudio.sdk.api.step.processor
+com.experian.datastudio.sdk.api.step.processor.cache
