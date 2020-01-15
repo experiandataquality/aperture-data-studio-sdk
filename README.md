@@ -27,6 +27,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
     - [Processing your step](#processing-your-step)
         - [Execute step](#execute-step)
         - [StepProcessorBuilder sample code](#stepprocessorbuilder-sample-code)
+- [Class-isolation](#class-isolation)
 - [The Logging library](#the-logging-library)
 - [The Cache configuration](#the-cache-configuration)
     - [Cache scope](#cache-scope)
@@ -465,6 +466,63 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
                 if (processorContext.isInteractive()) {
                     ...
 ```
+
+## Class-isolation
+
+By default each and every plugin's `JAR` files are isolated in their own class-loader. This class-loader will prioritize 
+libraries that are bundled inside the jar. This allow plugin to depends on specific version of libraries without 
+affecting other plugin.
+
+Some notes on jar packaging: 
+
+1. Always bundle dependencies into a single jar together with the plugin.
+1. If you plan to use sdklib, your plugin jar must not contains these packages:
+
+    * _org.apache.logging.log4j:log4j-api:2.12.0_
+    * _com.google.code.findbugs:jsr305:3.0.2_
+    
+    In addition to that, anything that falls under these Java packages: `com.experian.datastudio.sdk`, `sun`, 
+    `java`, and `javax` will always be loaded from parent class loader. 
+    
+    Please contact us if your plugin needs a newer version of any of the libraries above.  
+    
+1. It's not recommended to bundle native driver that involved JNI/JNA as it's not trivial to load native libraries from 
+   a jar in a distributed environment. Please contact us if your custom step needs a specific native drivers.
+    
+1. When using [Gradle shadow plugin](https://imperceptiblethoughts.com/shadow/) or [Maven shade plugin](https://maven.apache.org/plugins/maven-shade-plugin/),
+   **Do not** `minimize` the uber jar as it may remove dependencies that are loaded through reflection and _service-provider-interface_. 
+   
+   Basically, **don't do any of this**:
+   
+   Gradle:
+   
+   ```groovy
+   shadowJar {
+       minimize() // don't 
+   }
+   ```
+   
+   Maven: 
+   
+   ```xml 
+    <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-shade-plugin</artifactId>
+       <version>3.2.1</version>
+       <executions>
+         <execution>
+           <phase>package</phase>
+           <goals>
+             <goal>shade</goal>
+           </goals>
+           <configuration>
+             <!-- don't -->
+             <minimizeJar>true</minimizeJar>
+           </configuration>
+         </execution>
+       </executions>
+    </plugin>
+   ```
 
 ## The Logging library
 ``` java
