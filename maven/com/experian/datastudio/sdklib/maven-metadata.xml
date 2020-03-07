@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.experian.datastudio</groupId>
+  <artifactId>sdklib</artifactId>
+  <versioning>
+    <latest>2.0.0</latest>
+    <release>2.0.0</release>
+    <versions>
+      <version>2.0.0</version>
+    </versions>
+    <lastUpdated>20200306124546</lastUpdated>
+  </versioning>
+</metadata>
