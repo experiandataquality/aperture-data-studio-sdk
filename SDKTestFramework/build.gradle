@@ -20,10 +20,10 @@ dependencies {
     )
 }
 
-// Snapshot of SDK Test Framework module
+// SDK Test Framework module
 dependencies {
-    testCompile("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
-    testCompile("com.experian.datastudio:sdklib:2.0.0-SNAPSHOT")
-    testCompile("com.experian.datastudio:sdktestframework:2.0.0-SNAPSHOT")
+    testCompile("com.experian.datastudio:sdkapi:2.0.0")
+    testCompile("com.experian.datastudio:sdklib:2.0.0")
+    testCompile("com.experian.datastudio:sdktestframework:2.0.0")
 }
 

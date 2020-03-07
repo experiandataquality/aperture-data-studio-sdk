@@ -5,16 +5,16 @@ subprojects {
         mavenCentral()
         jcenter()
         maven {
-            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
+            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
         }
     }
 
     dependencies {
         implementation(
-                "com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT",
-                "com.experian.datastudio:sdklib:2.0.0-SNAPSHOT"
+                "com.experian.datastudio:sdkapi:2.0.0",
+                "com.experian.datastudio:sdklib:2.0.0"
         )
-        testImplementation("com.experian.datastudio:sdktestframework:2.0.0-SNAPSHOT")
+        testImplementation("com.experian.datastudio:sdktestframework:2.0.0")
     }
 }
 
