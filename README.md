@@ -34,7 +34,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
         - [Execute step](#execute-step)
         - [StepProcessorBuilder sample code](#stepprocessorbuilder-sample-code)
         - [Cell value style](#cell-value-style)
-        - [isInteractive() flag](#isinteractive-flag)
+        - [isInteractive flag](#isinteractive-flag)
+		- [Progress bar handling](#progress-bar-handling)        
     - [The Cache configuration](#the-cache-configuration)
         - [Cache scope](#cache-scope)
             - [Workflow](#workflow)
@@ -491,7 +492,7 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
 }
 ```
 
-#### isInteractive() flag
+#### isInteractive flag
 Interactive is a flag that set to `true` when the user views the output of a step on the Data Studio Grid (UI).
 In interactive mode, the evaluator of `OutputColumnManager.onValue(String, LongFunction)}` will only be executed when the cell is visible.
 
@@ -507,6 +508,43 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
                 if (processorContext.isInteractive()) {
                     ...
 ```
+
+#### Progress bar handling
+Progress bar is used to indicate the progress of the custom step execution. It can be set using `progressChanged()` and the code snippet is as shown below:
+``` java
+public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+    return processorBuilder
+            .forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
+                doSlowTask();
+                processorContext.progressChanged("Do slow task", 0.1);
+                doHeavyTask();
+                processorContext.progressChanged("Do heavy task", 0.2);
+                final ProcessorInputContext inputContext = processorContext.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new);
+                final long rowCount = inputContext.getRowCount();
+                List<InputColumn> inputColumns = processorContext.getColumnFromChooserValues(COLUMN_CHOOSER_ID);
+                AtomicLong result = new AtomicLong();
+                if (!inputColumns.isEmpty()) {
+                    for (long row = 0; row < rowCount; row++) {
+                        processEachRow(result, row, inputColumns.get(0));
+                        if (row % 1000 == 999) { // reduce calling progressChanged to avoid performance impact
+                            final double progressBeforeProcessRows = 0.2;
+                            final double progress = (row / (double) rowCount * (1 - progressBeforeProcessRows))
+                                    + progressBeforeProcessRows;
+                            processorContext.progressChanged(progress);
+                        }
+                    }
+                }
+                outputColumnManager.onValue(OUTPUT_COLUMN_HEADER, rowIndex -> {
+                    // DO NOT call progressChanged() here
+                    return result.get();
+                });
+                // progressChanged(1.0) will be called automatically
+                return 1;
+            })
+            .build();
+}
+```
+Please take note that `progressChanged()` must not be called inside `outputColumnManager.onValue()`.
 
 ### The Cache configuration
 The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and 

@@ -170,12 +170,16 @@ var activeTableTab = "activeTableTab";
 </tr>
 <tr id="i8" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/experian/datastudio/sdk/api/step/processor/StepProcessorContext.html#progressChanged-double-">progressChanged</a></span>(double&nbsp;progressPercent)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/experian/datastudio/sdk/api/step/processor/StepProcessorContext.html#progressChanged-double-">progressChanged</a></span>(double&nbsp;progressPercent)</code>
+<div class="block">Update the step execution's progress bar percentage.</div>
+</td>
 </tr>
 <tr id="i9" class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../../../com/experian/datastudio/sdk/api/step/processor/StepProcessorContext.html#progressChanged-java.lang.String-double-">progressChanged</a></span>(java.lang.String&nbsp;message,
-               double&nbsp;progressPercent)</code>&nbsp;</td>
+               double&nbsp;progressPercent)</code>
+<div class="block">Update the step execution's progress bar percentage with additional message.</div>
+</td>
 </tr>
 </table>
 </li>
@@ -216,9 +220,12 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <h4>progressChanged</h4>
 <pre>void&nbsp;progressChanged(double&nbsp;progressPercent)</pre>
+<div class="block">Update the step execution's progress bar percentage.
+
+ This method must not used inside <a href="../../../../../../../com/experian/datastudio/sdk/api/step/processor/OutputColumnManager.html#onValue-java.lang.String-java.util.function.LongFunction-"><code>OutputColumnManager.onValue(String, LongFunction)</code></a> and <a href="../../../../../../../com/experian/datastudio/sdk/api/step/processor/OutputColumnManager.html#onValue-java.lang.String-java.util.function.BiFunction-"><code>OutputColumnManager.onValue(String, BiFunction)</code></a></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>progressPercent</code> - progress percentage. Valid value is between 0.0 to 1.0.</dd>
+<dd><code>progressPercent</code> - progress percentage. Valid value is between 0.0 to 1.0, e.g. 0.1 is 10%, 0.5 is 50%.</dd>
 </dl>
 </li>
 </ul>
@@ -230,10 +237,13 @@ var activeTableTab = "activeTableTab";
 <h4>progressChanged</h4>
 <pre>void&nbsp;progressChanged(java.lang.String&nbsp;message,
                      double&nbsp;progressPercent)</pre>
+<div class="block">Update the step execution's progress bar percentage with additional message.
+
+ This method must not used inside <a href="../../../../../../../com/experian/datastudio/sdk/api/step/processor/OutputColumnManager.html#onValue-java.lang.String-java.util.function.LongFunction-"><code>OutputColumnManager.onValue(String, LongFunction)</code></a> and <a href="../../../../../../../com/experian/datastudio/sdk/api/step/processor/OutputColumnManager.html#onValue-java.lang.String-java.util.function.BiFunction-"><code>OutputColumnManager.onValue(String, BiFunction)</code></a></div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>message</code> - progress message.</dd>
-<dd><code>progressPercent</code> - progress percentage in double. Valid value is between 0.0 to 1.0.</dd>
+<dd><code>progressPercent</code> - progress percentage. Valid value is between 0.0 to 1.0, e.g. 0.1 is 10%, 0.5 is 50%.</dd>
 </dl>
 </li>
 </ul>
