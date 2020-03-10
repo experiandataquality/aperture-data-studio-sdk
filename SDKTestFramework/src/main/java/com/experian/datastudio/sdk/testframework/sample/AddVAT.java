@@ -1,4 +1,4 @@
-package com.experian.datastudio.sdk.testframework.step;
+package com.experian.datastudio.sdk.testframework.sample;
 
 import com.experian.datastudio.sdk.api.CustomTypeMetadata;
 import com.experian.datastudio.sdk.api.CustomTypeMetadataBuilder;
