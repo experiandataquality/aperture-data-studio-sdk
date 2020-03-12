@@ -62,6 +62,7 @@ public class IPGeolocation implements CustomStepDefinition {
                                 .withId(SETTING_ID)
                                 .withName("Lang Localization Setting (e.g. en, de, zh-CN)")
                                 .withIsRequired(true)
+                                .withFieldType(StepSettingType.TEXT)
                                 .build())
                         .build())
                 .build();
