@@ -1,3 +1,4 @@
+
 ![](https://github.com/experiandataquality/aperture-data-studio-sdk/workflows/Java%20CI/badge.svg)
 
 # Aperture Data Studio SDK
@@ -46,7 +47,6 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
         - [Destroy cache](#destroy-cache)
         - [Assigning value to cache](#assigning-value-to-cache)
         - [Getting value from cache](#getting-value-from-cache)
-    - [Custom step exception](#custom-step-exception)
     - [Step setting](#step-setting)
         - [Creating step setting](#creating-step-setting)
         - [Accessing step setting](#accessing-step-setting)
@@ -74,20 +74,15 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 ## Compatibility matrix between SDK and Data Studio version
 
-| Data Studio version       | Compatible SDK version            | 
-|:-------------------------:|:---------------------------------:|
-| 2.0.0                     |    [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk)                                     |
-| 1.6.2                     |    [1.^6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2)                                     |
-| 1.6.1                     |    [1.^6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1)                         |
-| 1.6.0                     |    [1.^6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0)                         |
-| 1.5.1                     |    [1.^5.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.1)                         |
-| 1.5.0                     |    [1.^5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0)                         |
+| Data Studio version | Compatible SDK version                                                                                                                                                      | 
+|:-------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| 2.0.0               | [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk)                                                                                                    |
+| 1.6.2               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2) |
+| 1.6.1               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1) |
+| 1.6.0               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0) |
+| 1.5.1               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.5.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.1) |
+| 1.5.0               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0)                                                                                        |
 
-### Legends
-
-- Prefix `^` in the version number indicates that SDK is compatible with any version **up to**  the specified number in the category. For example, *1.6.^2* indicates that the SDK is compatible with Data Studio version 1.6.0 up to the 1.6.2.
-- Suffix `^` in the version number indicates that SDK is compatible with any version **starting from**  the specified number (inclusive) up to latest available in the category. For example, *1.4^.0* indicates that the SDK is compatible with Data Studio version starting from 1.4.0 to the 1.6.2, assuming the latest available minor version for 1.x.x is 1.6.2.
-- Combining the prefix and suffix together will form a range of compatible version. For example, *1.4^6.0* indicates that the SDK is compatible with Data Studio from version 1.4.0 to 1.6.2, assuming the latest available minor version for 1.x.x is 1.6.2.
 
 ### Notes
 
@@ -628,12 +623,6 @@ If the cache contains no value for that key, `null` is returned.
 cache1.get(cacheKey);
 ```
 
-### Custom step exception
-You can raise custom step exception by throwing the following exception class.
-``` java
-throw new CustomStepException(401, "Authentication failed")
-```
-
 ### Step setting
 You may use step setting as a constant variable or as global setting across the Aperture Data Studio. The setting page will be appeared in *Step Setting* module.
 
@@ -644,7 +633,6 @@ Use `CustomStepSettingBuilder` in `createConfiguration` method to configure your
 | withId         | Set the Id for the field                            |
 | withName       | Set the name for the field                          |
 | withIsRequired | Set whether the field is mandatory                  |
-| withFieldType  | Set the field type (*PASSWORD*, *TEXT*, *TEXTAREA*) |
 
 ``` java
 .withStepSetting(builder -> builder
@@ -652,39 +640,12 @@ Use `CustomStepSettingBuilder` in `createConfiguration` method to configure your
 			.withId("stepsetting-1")
 			.withName("Step Setting 1")
 			.withIsRequired(true)
-			.withFieldType(StepSettingType.PASSWORD)
 			.build())
 	.build())
 ```
 
 #### Accessing step setting
-Step setting value can be accessed from both *createConfiguration* and *createProcessor* methods.
-``` java
-.withStepProperties(stepPropertiesBuilder -> stepPropertiesBuilder
-	.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
-			.asCustomChooser("property-1")
-			.withAllowValuesProvider(uiCallbackContext -> {
-				final Optional<String> fieldValue1 = uiCallbackContext.getStepSettingFieldValueAsString("stepsetting-1");
-				return fieldValue1.map(s -> Arrays.asList(s.split(","))).orElse(Collections.emptyList());
-			})
-			.withIsRequired(true)
-			.build())
-	.build())
-```
-
-``` java
-.withOutputLayouts(outputLayoutBuilder -> outputLayoutBuilder
-	.forOutputNode("output-1", outputColumnBuilder -> outputColumnBuilder
-			.addColumns(context -> {
-				final Optional<String> fieldValue1 = context.getStepSettingFieldValueAsString("stepsetting-1");
-				List<Column> columnList = context.getInputContext(INPUT_ID).getColumns();
-				fieldValue1.ifPresent(s -> columnList.add(context.createNewColumn(s)));
-				return columnList;
-			})
-			.addColumn(COLUMN_HEADER)
-			.build())
-	.build())
-```
+Step setting value can be accessed from *createProcessor* methods.
 
 ``` java
 public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
