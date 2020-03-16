@@ -75,22 +75,27 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 ## Compatibility matrix between SDK and Data Studio version
 
-| Data Studio version | Compatible SDK version                                                                                                                                                      | 
-|:-------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| 2.0.6               | [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.0.0) — [2.1.0](https://github.com/experiandataquality/aperture-data-studio-sdk)             |
-| 2.0.0               | [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.0.0)                                                                                        |
-| 1.6.2               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2) |
-| 1.6.1               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1) |
-| 1.6.0               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0) |
-| 1.5.1               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.5.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.1) |
-| 1.5.0               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0)                                                                                        |
+| SDK version                                                                          | Compatible Data Studio version | New features released |
+|--------------------------------------------------------------------------------------|--------------------------------|-----------------------|
+|  2.1.0                                                                               | 2.0.6 (or newer)               |<ul><li>Accessing Step Settings at the Step Configuration stage, so that API calls can be made using the credentials in the Step Settings to populate the Step Properties.</li><li>Password type field in Step Settings to ensure masking and encryption of sensitive information.</li><li>Custom Step Exception. Custom step developer can define error IDs and descriptions.</li></ul>|
+| [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.0.0) | 2.0.0 (or newer)               ||
+| [1.6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2) | 1.6.2                          |
+| [1.6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1) | 1.6.1 (up to 1.6.2)            |
+| [1.6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0) | 1.6.0 (up to 1.6.2)            |
+| [1.5.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.1) | 1.5.1 (up to 1.6.2)            |
+| [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) | 1.5.0 (up to 1.6.2)            |
 
 
 ### Notes
 
-- Both the Data Studio and SDK version follows [semantic version](https://semver.org/) notation where for version *a.b.c*; *a*, *b*, *c* indicate the major, minor and patch version respectively.
-- Although an older SDK version is compatible with the newer Data Studio version, e.g SDK 1.4.0 is compatible up to Data Studio 1.6.2, the SDK might not support the new features released in the new Data Studio version. As such, SDK user is always encouraged to upgrade to the latest SDK version supported by their current version of Data Studio.
-- For newer SDK version, the existing features will always be backward compatible to older Data Studio version, e.g: For SDK version 1.6.2, feature that was release in previous 1.4.0 will still be compatible with Data Studio 1.4.0. Even with this backward compatibility support, you are not encouraged to upgrade the SDK version for older Data Studio version, using SDK 1.6.2 for Data Studio 1.4.0, as you might be using new SDK features that isn't supported by that Data Studio.
+- Both the Data Studio and SDK version follows [semantic version](https://semver.org/) notation where for version *a.b.c*; *a*, *b*, *c* indicate the major, minor and patch version respectively. Each SDK version released will be exclusively tied to a compatible Data Studio version.
+
+- Any custom steps built on an SDK version, will work on the Data Studio version that it is tied to, as well as any newer version onwards. 
+    - Example 1: Custom steps built on SDK v2.0.0 will work on Data Studio v2.0.0, v2.0.6 and onwards.
+    - Example 2: Custom steps built on SDK v2.1.0 will work on Data Studio v2.0.6 and onwards.
+
+- Any features provided by a newer version of the SDK will not be supported on an older version of Data Studio.
+    - Example 1: Custom steps using new features from SDK v2.1.0 will not work on a Data Studio version that is earlier than v2.0.6.
 
 ## Generating a custom step from a new or existing project
 
@@ -280,7 +285,7 @@ For example, to add a column chooser to the step:
                 .asColumnChooser(ARG_ID_COLUMN_CHOOSER)
                 .forInputNode(INPUT_ID)
                 .build())
-        .build()))
+        .build())
 ```
 
 |StepPropertyType|Description                   |
