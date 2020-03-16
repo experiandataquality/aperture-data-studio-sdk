@@ -94,7 +94,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
     - Example 1: Custom steps built on SDK v2.0.0 will work on Data Studio v2.0.0, v2.0.6 and onwards.
     - Example 2: Custom steps built on SDK v2.1.0 will work on Data Studio v2.0.6 and onwards.
 
-- Any feature provided by a newer version of the SDK will not supported on an older version of Data Studio.
+- Any features provided by a newer version of the SDK will not be supported on an older version of Data Studio.
     - Example 1: Custom steps using new features from SDK v2.1.0 will not work on a Data Studio version that is earlier than v2.0.6.
 
 ## Generating a custom step from a new or existing project
