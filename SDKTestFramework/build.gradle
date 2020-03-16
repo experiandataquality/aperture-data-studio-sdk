@@ -1,29 +1,24 @@
 plugins {
-    id 'java'
+    id 'java-library'
 }
-
-version 'unspecified'
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
+    }
 }
 
-// Dependencies for SDK Test Framework
 dependencies {
-    compile (
-            "com.google.guava:guava:28.0-jre",
-            "org.junit.platform:junit-platform-runner:1.5.1",
-            "org.junit.platform:junit-platform-launcher:1.5.1",
-            "org.junit.jupiter:junit-jupiter-api:5.5.1",
-            "org.junit.jupiter:junit-jupiter-params:5.5.1",
-            "org.junit.jupiter:junit-jupiter-engine:5.5.1"
+    compileOnly(
+            "com.experian.datastudio:sdkapi:2.0.0",
+            "com.experian.datastudio:sdklib:2.0.0"
     )
+    testImplementation "com.experian.datastudio:sdktestframework:2.0.0"
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 }
 
-// Snapshot of SDK Test Framework module
-dependencies {
-    testCompile("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
-    testCompile("com.experian.datastudio:sdklib:2.0.0-SNAPSHOT")
-    testCompile("com.experian.datastudio:sdktestframework:2.0.0-SNAPSHOT")
+test {
+    useJUnitPlatform()
 }
-

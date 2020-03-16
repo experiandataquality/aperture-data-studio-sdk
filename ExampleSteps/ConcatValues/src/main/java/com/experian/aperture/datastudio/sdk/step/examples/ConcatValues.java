@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * This is a custom step definition that concatenates two
@@ -118,10 +117,14 @@ public class ConcatValues implements CustomStepDefinition {
                     LOGGER.info("1st column={}, 2nd column={}, delimiter={}", firstColumn == null ? "NULL" : firstColumn.getName(), secondColumn == null ? "NULL" : secondColumn.getName(), delimiter);
 
                     if (firstColumn != null && secondColumn != null) {
-                        outputColumnManager.onValue(OUTPUT_COLUMN_HEADER, rowIndex -> {
+                        outputColumnManager.onValue(OUTPUT_COLUMN_HEADER, (rowIndex,outputCellBuilder) -> {
                             final CellValue cellValue1 = firstColumn.getValueAt(rowIndex);
                             final CellValue cellValue2 = secondColumn.getValueAt(rowIndex);
-                            return cellValue1.toString() + delimiter + cellValue2.toString();
+                            final String value = cellValue1.toString() + delimiter + cellValue2.toString();
+                            return outputCellBuilder
+                                    .withValue(value)
+                                    .withStyle(CustomValueStyle.SUCCESS)
+                                    .build();
                         });
                     }
                     final ProcessorInputContext inputContext = processorContext.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new);

@@ -1,3 +1,4 @@
+
 ![](https://github.com/experiandataquality/aperture-data-studio-sdk/workflows/Java%20CI/badge.svg)
 
 # Aperture Data Studio SDK
@@ -12,7 +13,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 - [Compatibility matrix between SDK and Data Studio version](#compatibility-matrix-between-sdk-and-data-studio-version)
 - [Generating a custom step from a new or existing project](#generating-a-custom-step-from-a-new-or-existing-project)
-- [Comparison of SDK v1.0 and v2.0](#comparison-of-sdk-v1.0-and-v2.0)
+- [Comparison of SDK v1.0 and v2.0](#comparison-of-sdk-v10-and-v20)
 - [Creating a custom step](#creating-a-custom-step)
     - [Importing the step SDK](#importing-the-step-sdk)
     - [Creating your metadata](#creating-your-metadata)
@@ -20,25 +21,37 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
         - [Metadata sample code](#metadata-sample-code)
     - [Configuring your step](#configuring-your-step)
         - [Adding nodes](#adding-nodes)
+            - [Process node](#process-node)
         - [Adding step properties](#adding-step-properties)
-        - [Configure IsCompleteHandler](#configure-iscompletehandler)
+            - [asBoolean](#asboolean)
+            - [asString](#asstring)
+            - [asNumber](#asnumber)
+            - [asColumnChooser](#ascolumnchooser)
+            - [asCustomChooser](#ascustomchooser)
+        - [Configure isCompleteHandler](#configure-iscompletehandler)
         - [Configure column layouts](#configure-column-layouts)
         - [StepConfigurationBuilder sample code](#stepconfigurationbuilder-sample-code)
     - [Processing your step](#processing-your-step)
         - [Execute step](#execute-step)
         - [StepProcessorBuilder sample code](#stepprocessorbuilder-sample-code)
+        - [Cell value style](#cell-value-style)
+        - [isInteractive flag](#isinteractive-flag)
+		- [Progress bar handling](#progress-bar-handling)        
+    - [The Cache configuration](#the-cache-configuration)
+        - [Cache scope](#cache-scope)
+            - [Workflow](#workflow)
+            - [Step](#step)
+        - [Create cache](#create-cache)
+        - [Cache configuration](#cache-configuration)
+        - [Get or create cache](#get-or-create-cache)
+        - [Destroy cache](#destroy-cache)
+        - [Assigning value to cache](#assigning-value-to-cache)
+        - [Getting value from cache](#getting-value-from-cache)
+    - [Step setting](#step-setting)
+        - [Creating step setting](#creating-step-setting)
+        - [Accessing step setting](#accessing-step-setting)
 - [Class-isolation](#class-isolation)
 - [The Logging library](#the-logging-library)
-- [The Cache configuration](#the-cache-configuration)
-    - [Cache scope](#cache-scope)
-      - [Workflow](#workflow)
-      - [Step](#step)
-    - [Create cache](#create-cache)
-      - [Cache configuration](#cache-configuration)
-      - [Get or create cache](#get-or-create-cache)
-    - [Destroy cache](#destroy-cache)
-    - [Assigning value to cache](#assigning-value-to-cache)
-    - [Getting value from cache](#getting-value-from-cache)
 - [The HTTP Client library](#the-http-client-library)
 - [Generating a custom parser from a new or existing project](#generating-a-custom-parser-from-a-new-or-existing-project)
 - [Creating a custom parser](#creating-a-custom-parser)
@@ -61,20 +74,15 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 ## Compatibility matrix between SDK and Data Studio version
 
-| Data Studio version       | Compatible SDK version            | 
-|:-------------------------:|:---------------------------------:|
-| 2.0.0                     |    [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk)                                     |
-| 1.6.2                     |    [1.^6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2)                                     |
-| 1.6.1                     |    [1.^6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1)                         |
-| 1.6.0                     |    [1.^6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0)                         |
-| 1.5.1                     |    [1.^5.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.1)                         |
-| 1.5.0                     |    [1.^5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0)                         |
+| Data Studio version | Compatible SDK version                                                                                                                                                      | 
+|:-------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| 2.0.0               | [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk)                                                                                                    |
+| 1.6.2               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2) |
+| 1.6.1               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1) |
+| 1.6.0               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0) |
+| 1.5.1               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.5.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.1) |
+| 1.5.0               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0)                                                                                        |
 
-### Legends
-
-- Prefix `^` in the version number indicates that SDK is compatible with any version **up to**  the specified number in the category. For example, *1.6.^2* indicates that the SDK is compatible with Data Studio version 1.6.0 up to the 1.6.2.
-- Suffix `^` in the version number indicates that SDK is compatible with any version **starting from**  the specified number (inclusive) up to latest available in the category. For example, *1.4^.0* indicates that the SDK is compatible with Data Studio version starting from 1.4.0 to the 1.6.2, assuming the latest available minor version for 1.x.x is 1.6.2.
-- Combining the prefix and suffix together will form a range of compatible version. For example, *1.4^6.0* indicates that the SDK is compatible with Data Studio from version 1.4.0 to 1.6.2, assuming the latest available minor version for 1.x.x is 1.6.2.
 
 ### Notes
 
@@ -94,20 +102,19 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
    repositories {
        mavenCentral()
        maven {
-            // TODO: to be updated to release repository
-           url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
+           url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
        }
    }
 
    dependencies {
-       compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
-       compileOnly("com.experian.datastudio:sdklib:2.0.0-SNAPSHOT")
+       compileOnly("com.experian.datastudio:sdkapi:2.0.0")
+       compileOnly("com.experian.datastudio:sdklib:2.0.0")
    }
    ```
 
   If you don't want to use Gradle, you'll have to configure your own Java project to generate a compatible JAR artifact:
    - Create a new Java project or open an existing one.
-   - Download and install the [sdkapi.jar]([TO BE CHANGED]) file.
+   - Download and install the [sdkapi.jar](https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/com/experian/datastudio/sdkapi/2.0.0/sdkapi-2.0.0.jar) file.
 
   If using Maven, modify `pom.xml` to add the SDK GitHub repository:
 
@@ -133,9 +140,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
        <repositories>
            <repository>
-               <!-- TODO: to be updated to release repository -->           
-               <id>aperture-data-studio-github-repo-snapshot</id>
-               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven/</url>
+               <id>aperture-data-studio-github-repo</id>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/</url>
            </repository>
        </repositories>
 
@@ -143,13 +149,13 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
            <dependency>
                <groupId>com.experian.datastudio</groupId>
                <artifactId>sdkapi</artifactId>
-               <version>2.0.0-SNAPSHOT</version>
+               <version>2.0.0</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                 <groupId>com.experian.datastudio</groupId>
                 <artifactId>sdklib</artifactId>
-                <version>2.0.0-SNAPSHOT</version>
+                <version>2.0.0</version>
            </dependency>
        </dependencies>
    </project>
@@ -162,16 +168,16 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 Here are the main differences between the v1.0 and v2.0 of the SDK:
 
-| Features                          |            SDK v1.0           |                                       SDK v2.0                                    |
-|-----------------------------------|-------------------------------|-----------------------------------------------------------------------------------|
-| Design                            | Extending Abstract class                                                  | Implementing interface                                                                |
-| Register step details             | Using `setStepDefinition` methods in `StepConfiguration` class            | Using  `CustomTypeMetadataBuilder`  [Sample code](#metadata-sample-code)              |
-| Configure step property           | Using `setStepProperties()` in `StepConfiguration` class                  | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) |
-| Configure *isComplete* handling   | Override `isComplete()` in `StepConfiguration` class                      | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) |
-| Configure column step             | Override `initialise()` in `StepOutput` class                             | Using `StepConfigurationBuilder` [Sample code](#stepprocessorbuilder-sample-code)     |  
-| Execute and retrieve value from step    | Override `execute()` and `getValueAt()` in `StepOutput` class       | Using `StepProcessorBuilder` [Sample code](#stepprocessorbuilder-sample-code)         |
-| Logging in step                   | Using `logError()` from base class                                        | Using `SdkLogManager` library [Sample Code](#the-logging-library)                     |
-
+| Features                             |            SDK v1.0                                                       |                                       SDK v2.0                                           |
+|--------------------------------------|---------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| Design                               | Extending Abstract class                                                  | Implementing interface                                                                   |
+| Register step details                | Using `setStepDefinition` methods in `StepConfiguration` class            | Using  `CustomTypeMetadataBuilder`  [Sample code](#metadata-sample-code)                 |
+| Configure step property              | Using `setStepProperties()` in `StepConfiguration` class                  | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code)    |
+| Configure *isComplete* handling      | Override `isComplete()` in `StepConfiguration` class                      | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code)    |
+| Configure column step                | Override `initialise()` in `StepOutput` class                             | Using `StepConfigurationBuilder` [Sample code](#stepprocessorbuilder-sample-code)        |  
+| Execute and retrieve value from step | Override `execute()` and `getValueAt()` in `StepOutput` class             | Using `StepProcessorBuilder` [Sample code](#stepprocessorbuilder-sample-code)            |
+| Logging in step                      | Using `logError()` from base class                                        | Using `SdkLogManager` library [Sample Code](#the-logging-library)                        |
+| Global constant                      | Predefined server property                                                | Using `CustomStepSettingBuilder` [Sample Code](#creating-step-setting)                   |
  
 ## Creating a custom step
 
@@ -241,7 +247,7 @@ Nodes represent the input and output nodes in the step. You can define how many 
         .build())
 ``` 
 
-##### Process Node
+##### Process node
 
 By default, the input and output nodes are DATA node, which receive data or produce data.
 You can create a custom step that doesn't change the data in the workflow.
@@ -336,10 +342,13 @@ For example, to add a column chooser to the step:
 
 #### Configure isCompleteHandler
 
-The *CompleteHandler* determines the completeness based on the condition of the step prior to execution or data exploration. For example, you can set the step to always be in a complete state:
+The *CompleteHandler* determines the completeness based on the condition of the step prior to execution or data exploration. For example, you can set the step to be in a complete state if either one of the input is connected:
 
 ``` java
-.withIsCompleteHandler(context -> true)
+.withIsCompleteHandler(context ->
+        context.isInputNodeConnected(INPUT1_ID) ||
+                context.isInputNodeConnected(INPUT2_ID) ||
+                context.isInputNodeConnected(INPUT3_ID))
 ```
 
 #### Configure column layouts
@@ -452,11 +461,39 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
             .build();
 }
 ```
-#### isInteractive() flag
-Interactive is a flag that set to `true` when the step is used as an interactive drilldown. 
-It is set to `false` when the step is invoked as part of a workflow execution step, 
-or as an input to a view that requires all its data. This flag can be used to negate the need to 
-process all the input data when being viewed interactively. Instead, you can just process values when required.
+
+#### Cell value style
+
+On Data Studio Grid, the default cell value style is black text with white background. Data Studio SDK provides 4 predefined styles that can be chosen to differentiate from other cells.
+
+![Cell value style](images/style.PNG)
+
+``` java
+@Override
+public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+    return processorBuilder
+            .forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
+                final ProcessorInputContext inputContext = processorContext.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new);
+                outputColumnManager.onValue(MY_OUTPUT_COLUMN, (rowIndex, outputCellBuilder) -> {
+                    final String generatedValue = "Row " + (rowIndex + 1);
+                    return outputCellBuilder
+                            .withValue(generatedValue)
+                            .withStyle(CustomValueStyle.INFO) // only 4 enums: INFO,SUCCESS,WARNING,ERROR
+                            .build();
+                });
+                return inputContext.getRowCount();
+            })
+            .build();
+}
+```
+
+#### isInteractive flag
+Interactive is a flag that set to `true` when the user views the output of a step on the Data Studio Grid (UI).
+In interactive mode, the evaluator of `OutputColumnManager.onValue(String, LongFunction)}` will only be executed when the cell is visible.
+
+It is set to `false` when running the whole workflow as a Job in the background. In non-interactive mode, all the cells' value will be generated.
+
+This flag is used for delaying the cell's value generation until it is needed. So that, the step can display data in Data Studio Grid faster. However, this is only applicable to those steps that do not depend on all the input rows to generate value.
 
 ``` java
 @Override
@@ -465,6 +502,162 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
             .forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
                 if (processorContext.isInteractive()) {
                     ...
+```
+
+#### Progress bar handling
+Progress bar is used to indicate the progress of the custom step execution. It can be set using `progressChanged()` and the code snippet is as shown below:
+``` java
+public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+    return processorBuilder
+            .forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
+                doSlowTask();
+                processorContext.progressChanged("Do slow task", 0.1);
+                doHeavyTask();
+                processorContext.progressChanged("Do heavy task", 0.2);
+                final ProcessorInputContext inputContext = processorContext.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new);
+                final long rowCount = inputContext.getRowCount();
+                List<InputColumn> inputColumns = processorContext.getColumnFromChooserValues(COLUMN_CHOOSER_ID);
+                AtomicLong result = new AtomicLong();
+                if (!inputColumns.isEmpty()) {
+                    for (long row = 0; row < rowCount; row++) {
+                        processEachRow(result, row, inputColumns.get(0));
+                        if (row % 1000 == 999) { // reduce calling progressChanged to avoid performance impact
+                            final double progressBeforeProcessRows = 0.2;
+                            final double progress = (row / (double) rowCount * (1 - progressBeforeProcessRows))
+                                    + progressBeforeProcessRows;
+                            processorContext.progressChanged(progress);
+                        }
+                    }
+                }
+                outputColumnManager.onValue(OUTPUT_COLUMN_HEADER, rowIndex -> {
+                    // DO NOT call progressChanged() here
+                    return result.get();
+                });
+                // progressChanged(1.0) will be called automatically
+                return 1;
+            })
+            .build();
+}
+```
+Please take note that `progressChanged()` must not be called inside `outputColumnManager.onValue()`.
+
+### The Cache configuration
+The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and 
+referenced by a particular name. It is useful for storing responses from slow services between instances of custom steps. 
+The backing key/value datastore is fast enough on reads to be used for random access lookups, and 
+it can handle reads/writes from multiple steps at once. The cache is managed by Data Studio, but 
+it is the responsibility of the custom step to delete or refresh the cache as necessary.
+
+
+It is encouraged to use the key that decides the output of the result as cache name or the cache key. 
+For example, country in the step property will determine the address returned, and United Kingdom is selected, 
+you may set the cache name as `address-GB` instead of `address`. So that when the step property is changed, the new 
+cache will be created instead of reusing the old cache. 
+
+
+#### Cache scope
+There 2 types of caching scope: `Workflow` and `Step`
+
+##### Workflow
+The cache is scoped to each custom step class within a workflow, which means that 2 instances of the same custom step in the same 
+workflow can use the same cache if both supplied the same cache name. Same custom step in a different workflow will not able
+to access the same cache.
+
+##### Step
+The cache is scoped to each custom step instance, which means that 2 instances of the same custom step in the same 
+workflow will access a separate cache, even though both supplied with the same cache name.
+
+#### Create cache
+To create or obtain cache, you will need to build the `StepCacheConfiguration`.
+
+##### Cache configuration
+Use `StepCacheConfigurationBuilder` to build the `StepCacheConfiguration`. Here you may set the cache name, 
+time to live for update of the cache, cache scope and specify the type for cache key and cache value. 
+Cache key and cache value can be any type under Java.*.
+`StepCacheConfigurationBuilder` is supplied by `StepProcessorContext`.
+
+##### Get or create cache
+Caches are created or obtained by calling `getOrCreateCache` from the `StepCacheManager`. You will need to pass the 
+`StepCacheConfiguration` to create or retrieve the cache. `StepCacheManager` is supplied by `StepProcessorContext`. 
+
+Example below illustrate how to create a cache with the following configurations
+
+| Name             | Value        |
+| ---------------- | ------------ |
+| Cache name       | cache-name-1 |
+| Time-to-live     | 10 minutes   |
+| Cache scope      | STEP         |
+| Cache key type   | String       |
+| Cache value type | String       |
+
+``` java
+ private static final String CACHE_NAME_1 = "cache-name-1";
+ 
+ ....
+
+@Override
+    public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+        return processorBuilder
+                .forOutputNode(OUTPUT_ID, (context, columnManager) -> {
+                    final StepCacheManager cacheManager = context.getCacheManager();
+                    final StepCacheConfiguration<String, String> cacheConfiguration = context.getCacheConfigurationBuilder()
+                            .withCacheName(CACHE_NAME_1)
+                            .withTtlForUpdate(10L, TimeUnit.MINUTES)
+                            .withScope(StepCacheScope.STEP)
+                            .build(String.class, String.class);
+                    final StepCache<String, String> cache1 = cacheManager.getOrCreateCache(cacheConfiguration1);
+``` 
+#### Destroy cache
+``` java
+cacheManager.destroyCache(cacheConfiguration);
+```
+
+#### Assigning value to cache
+``` java
+cache1.put(cacheKey, value);
+```
+
+#### Getting value from cache
+If the cache contains no value for that key, `null` is returned.
+``` java
+cache1.get(cacheKey);
+```
+
+### Step setting
+You may use step setting as a constant variable or as global setting across the Aperture Data Studio. The setting page will be appeared in *Step Setting* module.
+
+#### Creating step setting
+Use `CustomStepSettingBuilder` in `createConfiguration` method to configure your step setting, which consist the following method for each *field*.
+| Method         | Description                                         |
+| -------------- | ----------------------------------------------------|
+| withId         | Set the Id for the field                            |
+| withName       | Set the name for the field                          |
+| withIsRequired | Set whether the field is mandatory                  |
+
+``` java
+.withStepSetting(builder -> builder
+	.addField(fieldBuilder -> fieldBuilder
+			.withId("stepsetting-1")
+			.withName("Step Setting 1")
+			.withIsRequired(true)
+			.build())
+	.build())
+```
+
+#### Accessing step setting
+Step setting value can be accessed from *createProcessor* methods.
+
+``` java
+public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+	return processorBuilder
+			.forOutputNode(OUTPUT_ID, ((processorContext, outputColumnManager) -> {
+				final ProcessorInputContext inputContext = processorContext.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new);
+				final Optional<String> fieldValue1 = processorContext.getStepSettingFieldValueAsString("stepsetting-1");
+				
+				return inputContext.getRowCount();
+			}))
+			.build();
+}
 ```
 
 ## Class-isolation
@@ -533,87 +726,6 @@ public class StepsTemplate implements CustomStepDefinition {
      public StepConfiguration createConfiguration(StepConfigurationBuilder stepConfigurationBuilder) {
         LOGGER.info("Create configuration");
         ...
-```
-
-## The Cache configuration
-The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and 
-referenced by a particular name. It is useful for storing responses from slow services between instances of custom steps. 
-The backing key/value datastore is fast enough on reads to be used for random access lookups, and 
-it can handle reads/writes from multiple steps at once. The cache is managed by Data Studio, but 
-it is the responsibility of the custom step to delete or refresh the cache as necessary.
-
-
-It is encouraged to use the key that decides the output of the result as cache name or the cache key. 
-For example, country in the step property will determine the address returned, and United Kingdom is selected, 
-you may set the cache name as `address-GB` instead of `address`. So that when the step property is changed, the new 
-cache will be created instead of reusing the old cache. 
-
-
-### Cache scope
-There 2 types of caching scope: `Workflow` and `Step`
-
-#### Workflow
-The cache is scoped to each custom step class within a workflow, which means that 2 instances of the same custom step in the same 
-workflow can use the same cache if both supplied the same cache name. Same custom step in a different workflow will not able
-to access the same cache.
-
-#### Step
-The cache is scoped to each custom step instance, which means that 2 instances of the same custom step in the same 
-workflow will access a separate cache, even though both supplied with the same cache name.
-
-### Create cache
-To create or obtain cache, you will need to build the `StepCacheConfiguration`.
-
-#### Cache configuration
-Use `StepCacheConfigurationBuilder` to build the `StepCacheConfiguration`. Here you may set the cache name, 
-time to live for update of the cache, cache scope and specify the type for cache key and cache value. 
-Cache key and cache value can be any type under Java.*.
-`StepCacheConfigurationBuilder` is supplied by `StepProcessorContext`.
-
-#### Get or create cache
-Caches are created or obtained by calling `getOrCreateCache` from the `StepCacheManager`. You will need to pass the 
-`StepCacheConfiguration` to create or retrieve the cache. `StepCacheManager` is supplied by `StepProcessorContext`. 
-
-Example below illustrate how to create a cache with the following configurations
-
-| Name             | Value        |
-| ---------------- | ------------ |
-| Cache name       | cache-name-1 |
-| Time-to-live     | 10 minutes   |
-| Cache scope      | STEP         |
-| Cache key type   | String       |
-| Cache value type | String       |
-
-``` java
- private static final String CACHE_NAME_1 = "cache-name-1";
- 
- ....
-
-@Override
-    public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
-        return processorBuilder
-                .forOutputNode(OUTPUT_ID, (context, columnManager) -> {
-                    final StepCacheManager cacheManager = context.getCacheManager();
-                    final StepCacheConfiguration<String, String> cacheConfiguration = context.getCacheConfigurationBuilder()
-                            .withCacheName(CACHE_NAME_1)
-                            .withTtlForUpdate(10L, TimeUnit.MINUTES)
-                            .withScope(StepCacheScope.STEP)
-                            .build(String.class, String.class);
-                    final StepCache<String, String> cache1 = cacheManager.getOrCreateCache(cacheConfiguration1);
-``` 
-### Destroy cache
-``` java
-cacheManager.destroyCache(cacheConfiguration);
-```
-
-### Assigning value to cache
-``` java
-cache1.put(cacheKey, value);
-```
-
-### Getting value from cache
-``` java
-cache1.get(cacheKey);
 ```
 
 ## The HTTP Client library
@@ -783,19 +895,18 @@ CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
    repositories {
        mavenCentral()
        maven {
-            // TODO: to be updated to release repository
-            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven'
+            url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
        }
    }
 
    dependencies {
-       compileOnly("com.experian.datastudio:sdkapi:2.0.0-SNAPSHOT")
+       compileOnly("com.experian.datastudio:sdkapi:2.0.0")
    }
    ```
 
   If you don't want to use Gradle, you'll have to configure your own Java project to generate a compatible JAR artifact:
    - Create a new Java project or open an existing one.
-   - Download and install the [sdkapi.jar]([TO BE CHANGED]) file.
+   - Download and install the [sdkapi.jar](https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/com/experian/datastudio/sdkapi/2.0.0/sdkapi-2.0.0.jar) file.
 
   If using Maven, modify `pom.xml` to add the SDK GitHub repository:
 
@@ -816,9 +927,8 @@ CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
 
        <repositories>
            <repository>
-               <!-- TODO: to be updated to release repository -->
-               <id>aperture-data-studio-github-repo-snapshot</id>
-               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-snapshot-repository/maven/</url>
+               <id>aperture-data-studio-github-repo</id>
+               <url>https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/</url>
            </repository>
        </repositories>
 
@@ -826,7 +936,7 @@ CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
            <dependency>
                <groupId>com.experian.datastudio</groupId>
                <artifactId>sdkapi</artifactId>
-               <version>2.0.0-SNAPSHOT</version>
+               <version>2.0.0</version>
                <scope>provided</scope>
            </dependency>
        </dependencies>

@@ -6,14 +6,10 @@ import com.experian.datastudio.sdk.testframework.datasource.DataSource;
 import com.experian.datastudio.sdk.testframework.datasource.DataSourcesBuilder;
 import com.experian.datastudio.sdk.testframework.setting.TestSetting;
 import com.experian.datastudio.sdk.testframework.setting.TestSettingBuilder;
-import com.experian.datastudio.sdk.testframework.step.AddVAT;
-import com.experian.datastudio.sdk.testframework.testdefinition.TestStep;
-import com.experian.datastudio.sdk.testframework.testdefinition.TestStepBuilder;
-import com.experian.datastudio.sdk.testframework.testdefinition.TestSuite;
-import org.junit.Assert;
+import com.experian.datastudio.sdk.testframework.testdefinition.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -35,9 +31,11 @@ class AddVATTest {
                 .build();
 
         TestResult result = testSuite.executeTest(OUTPUT_ID);
-        Assert.assertEquals(3, result.getRowCount());
-        Assert.assertEquals(1.175, result.getValueAt(0,0).getValue());
-        Assert.assertEquals(BigDecimal.valueOf(11), result.getValueAt("Column2", 0).getValue());
+        Assertions.assertEquals(3, result.getRowCount());
+        Assertions.assertEquals(1.175, result.getValueAt(0,0).getValue());
+        Assertions.assertEquals(2.35, result.getValueAt(0,1).getValue());
+        Assertions.assertEquals(3.525, result.getValueAt(0,2).getValue());
+        Assertions.assertEquals(11, ((Number) result.getValueAt("Column2", 0).getValue()).intValue());
     }
 
     private static Function<TestSettingBuilder, TestSetting> testSettingCreator(){

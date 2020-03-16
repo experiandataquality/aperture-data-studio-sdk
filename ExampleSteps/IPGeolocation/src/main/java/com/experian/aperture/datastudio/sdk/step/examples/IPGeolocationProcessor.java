@@ -15,9 +15,7 @@ import org.json.JSONObject;
 
 import java.net.Proxy;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.regex.Pattern;
 
 class IPGeolocationProcessor implements StepProcessorFunction {
@@ -35,9 +33,8 @@ class IPGeolocationProcessor implements StepProcessorFunction {
     private static final String API_RETRY_TTL = "X-Ttl";
     private static final String DEFAULT_API_RETRY_DURATION = "60";
     private static final String API_FIELDS_QUERY = "status,message,country";
-    private static final int FIRST_ELEMENT = 0;
     private static final int MAX_CONCURRENT_REQUESTS = 5;
-    private static final int MAX_TOTAL_RETRIES = 2*MAX_CONCURRENT_REQUESTS;
+    private static final int MAX_TOTAL_RETRIES = 2 * MAX_CONCURRENT_REQUESTS;
     private static final long ADD_DELAY_API_RETRY_DURATION = 5;
     private static final long CACHE_TTL = 60;
     private static final long SEMAPHORE_ACQUIRE_TIMEOUT = 60;
@@ -77,29 +74,20 @@ class IPGeolocationProcessor implements StepProcessorFunction {
         // Get or create cache
         final StepCacheManager cacheManager = processorContext.getCacheManager();
         final StepCache<String, String> cache = cacheManager.getOrCreateCache(cacheConfiguration);
-        LOGGER.info("Get or create cache={}", CACHE_NAME + langStepSetting);
+        LOGGER.info("Get or create cache={}", cacheConfiguration.getCacheName());
 
         // Processor for input column
-        final Optional<ProcessorInputContext> optionalInputContext = processorContext.getInputContext(INPUT_ID);
-        long rowCount = 0;
-        if (optionalInputContext.isPresent()) {
-            final ProcessorInputContext inputContext = optionalInputContext.get();
-            rowCount = inputContext.getRowCount();
-            final long finalRowCount = rowCount;
+        final ProcessorInputContext inputContext = processorContext.getInputContext(INPUT_ID).orElseThrow(IllegalStateException::new);
+        final long rowCount = inputContext.getRowCount();
 
-            // Retrieve input column for processing based on COLUMN_CHOOSER_ID
-            Optional<List<String>> columnChooserValues = processorContext.getStepPropertyValue(COLUMN_CHOOSER_ID);
-            String columnId = columnChooserValues
-                    .orElse(new ArrayList<>(Collections.singletonList("")))
-                    .get(FIRST_ELEMENT);
-            final Optional<InputColumn> column = inputContext.getColumnById(columnId);
-            column.ifPresent(inputColumn -> {
-                geolocateIp(inputColumn, cache, finalRowCount);
-                outputColumnManager.onValue(COLUMN_HEADER_COUNTRY_NAME, rowIndex -> {
-                    // Retrieve IP address from input column and return cached value
-                    final String ipAddress = inputColumn.getStringValueAt(rowIndex);
-                    return cache.get(ipAddress);
-                });
+        final List<InputColumn> columnChooserValues = processorContext.getColumnFromChooserValues(COLUMN_CHOOSER_ID);
+        if (!columnChooserValues.isEmpty()) {
+            final InputColumn inputColumn = columnChooserValues.get(0);
+            geolocateIp(inputColumn, cache, rowCount);
+            outputColumnManager.onValue(COLUMN_HEADER_COUNTRY_NAME, rowIndex -> {
+                // Retrieve IP address from input column and return cached value
+                final String ipAddress = inputColumn.getStringValueAt(rowIndex);
+                return cache.get(ipAddress);
             });
         }
         return rowCount;

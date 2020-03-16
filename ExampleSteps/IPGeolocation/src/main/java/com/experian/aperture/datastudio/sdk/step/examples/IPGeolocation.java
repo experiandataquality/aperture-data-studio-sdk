@@ -3,9 +3,7 @@ package com.experian.aperture.datastudio.sdk.step.examples;
 import com.experian.datastudio.sdk.api.CustomTypeMetadata;
 import com.experian.datastudio.sdk.api.CustomTypeMetadataBuilder;
 import com.experian.datastudio.sdk.api.step.CustomStepDefinition;
-import com.experian.datastudio.sdk.api.step.configuration.StepConfiguration;
-import com.experian.datastudio.sdk.api.step.configuration.StepConfigurationBuilder;
-import com.experian.datastudio.sdk.api.step.configuration.StepIcon;
+import com.experian.datastudio.sdk.api.step.configuration.*;
 import com.experian.datastudio.sdk.api.step.processor.StepProcessor;
 import com.experian.datastudio.sdk.api.step.processor.StepProcessorBuilder;
 
@@ -34,7 +32,10 @@ public class IPGeolocation implements CustomStepDefinition {
     public StepConfiguration createConfiguration(StepConfigurationBuilder configurationBuilder) {
         return configurationBuilder
                 .withNodes(stepNodeBuilder -> stepNodeBuilder
-                        .addInputNode(INPUT_ID)
+                        .addInputNode(inputNodeBuilder ->inputNodeBuilder
+                                .withId(INPUT_ID)
+                                .withIsRequired(true)
+                                .build())
                         .addOutputNode(OUTPUT_ID)
                         .build())
                 .withStepProperties(stepPropertiesBuilder -> stepPropertiesBuilder
@@ -47,7 +48,6 @@ public class IPGeolocation implements CustomStepDefinition {
                                 .withAllowSearch(true)
                                 .build())
                         .build())
-                .withIsCompleteHandler(uiCallbackContext -> true)
                 .withOutputLayouts(outputLayoutBuilder -> outputLayoutBuilder
                         .forOutputNode(OUTPUT_ID, outputColumnBuilder -> outputColumnBuilder
                                 .addColumns(outputColumnBuilderContext -> outputColumnBuilderContext
