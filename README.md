@@ -75,15 +75,15 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 ## Compatibility matrix between SDK and Data Studio version
 
-| Data Studio version | Compatible SDK version                                                                                                                                                      | 
-|:-------------------:|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| 2.0.6               | [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.0.0) — [2.1.0](https://github.com/experiandataquality/aperture-data-studio-sdk)             |
-| 2.0.0               | [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.0.0)                                                                                        |
-| 1.6.2               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2) |
-| 1.6.1               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1) |
-| 1.6.0               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0) |
-| 1.5.1               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) — [1.5.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.1) |
-| 1.5.0               | [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0)                                                                                        |
+| SDK version                                                                          | Compatible Data Studio version | New features released |
+|--------------------------------------------------------------------------------------|--------------------------------|-----------------------|
+|  2.1.0                                                                               | 2.0.6 (or newer)               | * Accessing Step Settings at the Step Configuration stage, so that API calls can be made using the credentials in the Step Settings to populate the Step Properties. <br/>* Password type field in Step Settings to ensure masking and encryption of sensitive information.<br/>* Custom Step Exception. Custom step developer can define error IDs and descriptions.|
+| [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.0.0) | 2.0.0 (or newer)               ||
+| [1.6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2) | 1.6.2                          |
+| [1.6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1) | 1.6.1 (up to 1.6.2)            |
+| [1.6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0) | 1.6.0 (up to 1.6.2)            |
+| [1.5.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.1) | 1.5.1 (up to 1.6.2)            |
+| [1.5.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.5.0) | 1.5.0 (up to 1.6.2)            |
 
 
 ### Notes
@@ -280,7 +280,7 @@ For example, to add a column chooser to the step:
                 .asColumnChooser(ARG_ID_COLUMN_CHOOSER)
                 .forInputNode(INPUT_ID)
                 .build())
-        .build()))
+        .build())
 ```
 
 |StepPropertyType|Description                   |
