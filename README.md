@@ -88,9 +88,14 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 ### Notes
 
-- Both the Data Studio and SDK version follows [semantic version](https://semver.org/) notation where for version *a.b.c*; *a*, *b*, *c* indicate the major, minor and patch version respectively.
-- Although an older SDK version is compatible with the newer Data Studio version, e.g SDK 1.4.0 is compatible up to Data Studio 1.6.2, the SDK might not support the new features released in the new Data Studio version. As such, SDK user is always encouraged to upgrade to the latest SDK version supported by their current version of Data Studio.
-- For newer SDK version, the existing features will always be backward compatible to older Data Studio version, e.g: For SDK version 1.6.2, feature that was release in previous 1.4.0 will still be compatible with Data Studio 1.4.0. Even with this backward compatibility support, you are not encouraged to upgrade the SDK version for older Data Studio version, using SDK 1.6.2 for Data Studio 1.4.0, as you might be using new SDK features that isn't supported by that Data Studio.
+- Both the Data Studio and SDK version follows [semantic version](https://semver.org/) notation where for version *a.b.c*; *a*, *b*, *c* indicate the major, minor and patch version respectively. Each SDK version released will be exclusively tied to a compatible Data Studio version.
+
+- Any custom steps built on an SDK version, will work on the Data Studio version that it is tied to, as well as any newer version onwards. 
+    - Example 1: Custom steps built on SDK v2.0.0 will work on Data Studio v2.0.0, v2.0.6 and onwards.
+    - Example 2: Custom steps built on SDK v2.1.0 will work on Data Studio v2.0.6 and onwards.
+
+- Any feature provided by a newer version of the SDK will not supported on an older version of Data Studio.
+    - Example 1: Custom steps using new features from SDK v2.1.0 will not work on a Data Studio version that is earlier than v2.0.6.
 
 ## Generating a custom step from a new or existing project
 
