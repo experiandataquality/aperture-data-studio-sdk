@@ -118,9 +118,6 @@ private static Function<TestStepBuilder, TestStep> testStepCreator(){
 }
 ```
 
-The custom step Java class can be placed in:
-`/aperture-data-studio-sdk/SDKTestFramework/src/test/java/com/experian/datastudio/sdk/testframework/step/`
-
 This essentially replicates the AddVAT step to be tested in Data Studio as below (the first column is selected for the Column Chooser): 
 
 ![test step](readme-images/test-step.png)
@@ -178,9 +175,11 @@ TestResult result = testSuite.executeTest(OUTPUT_ID);
 Assert the expected results uses the Assert class methods from [JUnit](https://junit.org/). The actual results after executing the code can be retrieved from the TestResult object produced by the execution of the Test Suite as shown above.  
 
 ```
-Assert.assertEquals(3, result.getRowCount());
-Assert.assertEquals(1.175, result.getValueAt(0,0).getValue());
-Assert.assertEquals(BigDecimal.valueOf(11), result.getValueAt("Column2", 0).getValue());
+Assertions.assertEquals(3, result.getRowCount());
+Assertions.assertEquals(1.175, result.getValueAt(0,0).getValue());
+Assertions.assertEquals(2.35, result.getValueAt(0,1).getValue());
+Assertions.assertEquals(3.525, result.getValueAt(0,2).getValue());
+Assertions.assertEquals(11, ((Number) result.getValueAt("Column2", 0).getValue()).intValue());
 ```
 
 ## Running the Test
