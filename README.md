@@ -77,7 +77,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 | SDK version                                                                          | Compatible Data Studio version | New features released |
 |--------------------------------------------------------------------------------------|--------------------------------|-----------------------|
-|  2.1.1                                                                               | 2.0.9 (or newer)               |New custom icon<ul><li>Australia Post</li><li>Collibra</li><li>Dynamics365</li><li>Salesforce</li><li>Collibra</li>Tableau</ul>|
+|  2.1.1                                                                               | 2.0.9 (or newer)               |New custom icon<ul><li>Australia Post</li><li>Collibra</li><li>Dynamics365</li><li>Salesforce</li><li>Tableau</li></ul>|
 | [2.1.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.1.0) | 2.0.6 (or newer)               |
 | [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.0.0) | 2.0.0 (or newer)               |
 | [1.6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2) | 1.6.2                          |
