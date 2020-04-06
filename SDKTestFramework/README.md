@@ -1,19 +1,22 @@
 # SDK Test Framework
 
-Apart from providing all the resources you need to develop custom steps, the SDK also contains a test framework that can help you test custom steps at component level. The test framework uses JUnit.
+Apart from providing all the resources you need to develop custom steps and parsers, the SDK also contains a test framework that can help you test custom steps and parsers at component level. The test framework uses JUnit.
 
-The test framework helps mock the behavior of Data Studio where a custom step is installed and used in a workflow. This ensures the custom step works as intended. The test framework is also useful for creating regression tests.
+The test framework helps mock the behavior of Data Studio where a custom step and parser are installed. This ensures both custom step and parser works as intended. The test framework is also useful for creating regression tests.
 
-**Purpose:** The SDK test framework is a standalone environment that mimics Aperture Data Studio to test the custom steps built by developers to ensure they work as designed. 
+**Purpose:** The SDK test framework is a standalone environment that mimics Aperture Data Studio to test the custom steps and parsers built by developers to ensure they work as designed. 
 
-The SDK test framework is not a complete duplicate of the Aperture Data Studio environment but only a limited simulation without the full features of Data Studio. However it provides sufficient resources to ensure a custom step is compatible with an actual Data Studio environment and should run as intended. 
+The SDK test framework is not a complete duplicate of the Aperture Data Studio environment but only a limited simulation without the full features of Data Studio. However it provides sufficient resources to ensure a custom step and parser are compatible with an actual Data Studio environment and should run as intended. 
 
-This project provides instructions on how to test an *individual* custom step jar. 
+This project provides instructions on how to test an *individual* custom step and parser jar. 
 
-Example custom steps tested are: 
-- AddVAT
+Example custom step tested is: 
+- [AddVAT](custom-step-test-framework-configuration)
 
-# Test Framework Configuration
+Example custom parser tested is:
+- [JsonParser](custom-parser-test-framework-configuration)
+
+# Custom Step Test Framework Configuration
 
 The SDK Test Framework tests are run using [JUnit](https://junit.org/) (a user interface is not provided). For more details about JUnit, refer to the [user documentation](https://junit.org/).
 
