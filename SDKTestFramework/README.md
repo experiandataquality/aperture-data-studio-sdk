@@ -34,10 +34,10 @@ A test consists of the following:
 
 1. Defining the test parameters (through the methods prescribed in SDKTestFramework.java): 
     - [Test Setting](#test-setting) - [Test Setting Example](#test-setting-example)
-    - [Test Step](#test-step)  - [Test Step Example](#test-step-example)
-    - [Test Data Source](#test-data-source)  - [Test Data Source Example](#test-data-source-example)
+    - [Test Step](#test-step) - [Test Step Example](#test-step-example)
+    - [Test Data Source](#test-data-source) - [Test Data Source Example](#test-data-source-example)
 
-2. [Building the Test Suite](#building-the-test-suite) with the parameters above (producing a TestSuite.java object)
+2. [Building the test suite](#building-the-test-suite) with the parameters above (producing a TestSuite.java object)
 
 3. [Executing the test suite](#executing-the-test-suite) to produce a TestResult.java object. 
 
