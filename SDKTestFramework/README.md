@@ -11,10 +11,10 @@ The SDK test framework is not a complete duplicate of the Aperture Data Studio e
 This project provides instructions on how to test an *individual* custom step and parser jar. 
 
 Example custom step tested is: 
-- [AddVAT](custom-step-test-framework-configuration)
+- [AddVAT](#custom-step-test-framework-configuration)
 
 Example custom parser tested is:
-- [JsonParser](custom-parser-test-framework-configuration)
+- [JsonParser](#custom-parser-test-framework-configuration)
 
 # Custom Step Test Framework Configuration
 
