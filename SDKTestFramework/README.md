@@ -85,7 +85,7 @@ To reiterate, the SDK Test Framework is designed to replicate the above function
 
 #### Test Setting Example: 
 
-```
+``` java
 TestSetting setting = SDKTestFramework.createTestSetting(testSettingCreator());
 
 ...
@@ -104,7 +104,7 @@ This essentially replicates the Step Settings for the AddVAT step in Data Studio
 
 #### Test Step Example: 
 
-```
+``` java
 TestStep step = SDKTestFramework.createTestStep(testStepCreator());
 
 ...
@@ -127,7 +127,7 @@ This essentially replicates the AddVAT step to be tested in Data Studio as below
 
 #### Test Data Source Example: 
 
-```
+``` java
 List<DataSource> sources = SDKTestFramework.createTestDataSource(dataSourceCreator());
 
 ...
@@ -156,7 +156,7 @@ This essentially replicates the data source to the test step in Data Studio as b
 
 With [test settings](#test-setting-example), [test step](#test-step-example), and [test data source](#test-data-source-example) defined as above, build the Test Suite using the builder as follows: 
 
-```
+``` java
 TestSuite testSuite = TestSuite
                 .builder()
                 .withTestSetting(setting)
@@ -169,7 +169,7 @@ TestSuite testSuite = TestSuite
 
 Executing the test suite is relatively simple using the `executeTest()` method of the TestSuite class. This returns a TestResult object on which assertions can be made. 
 
-```
+``` java
 TestResult result = testSuite.executeTest(OUTPUT_ID);
 ```
 
@@ -177,7 +177,7 @@ TestResult result = testSuite.executeTest(OUTPUT_ID);
 
 Assert the expected results uses the Assert class methods from [JUnit](https://junit.org/). The actual results after executing the code can be retrieved from the TestResult object produced by the execution of the Test Suite as shown above.  
 
-```
+``` java
 Assertions.assertEquals(3, result.getRowCount());
 Assertions.assertEquals(1.175, result.getValueAt(0,0).getValue());
 Assertions.assertEquals(2.35, result.getValueAt(0,1).getValue());
@@ -223,7 +223,7 @@ In this example, we will use the Json parser for the demonstration. For further 
 A test consists of the following: 
 
 1. Defining the test parameters (through the methods prescribed in SDKTestFramework.java): 
-	- [Pasrser Loader](#parser-loader) - [Parser Test Loader Example](#parser-test-loader-example)
+	- [Parser Loader](#parser-loader) - [Parser Test Loader Example](#parser-test-loader-example)
     - [Parser Test Setting](#parser-test-setting) - [Parser Test Setting Example](#parser-test-setting-example)
     - [Parser Test Data Source](#parser-test-data-source) - [Parser Test Data Source Example](#parser-test-data-source-example)
 
@@ -272,7 +272,7 @@ To reiterate, the SDK Test Framework is designed to replicate the above function
 
 #### Parser Test Loader Example:
 
-```
+``` java
 final TestParser parser = SDKTestFramework.createTestParser(
                 parserBuilder -> parserBuilder
                         .loadCustomParser(customParserLoader ->
@@ -288,7 +288,7 @@ This essentially replicates the loading of json file into Data Studio as below:
 
 #### Parser Test Setting Example: 
 
-```
+``` java
 final TestParserSetting setting = SDKTestFramework.createTestParserSetting(
                 parserSettingBuilder -> parserSettingBuilder
                         .assignDataTypeToColumn(ParserDataType.NUMERIC, "Data Studio Link")
@@ -305,7 +305,7 @@ This essentially replicates the column annotation for the Json parser in Data St
 
 #### Parser Test Data Source Example: 
 
-```
+``` java
 final TestParserSource source = SDKTestFramework.createTestParserSource(
                 parserSourceBuilder -> parserSourceBuilder
                         .loadFile("/json/example.json")
@@ -320,11 +320,11 @@ This essentially replicates the data source uploaded into Data Studio as below:
 
 With [parser test loader](#parser-test-loader-example), [parser test setting](#parser-test-setting-example), and [parser test data source](#parser-test-data-source-example) defined as above, build the Test Suite using the builder as follows: 
 
-```
+``` java
 final ParserTestSuite testSuite = ParserTestSuiteBuilderFactory.newBuilder()
                 .withParser(parser)
                 .withSource(source)
-				.withSetting(setting)
+                .withSetting(setting)
                 .build();
 ```
 
@@ -332,21 +332,30 @@ final ParserTestSuite testSuite = ParserTestSuiteBuilderFactory.newBuilder()
 
 Executing the parser test suite is relatively simple using the `execute()` method of the ParserTestSuite class. This returns a ParserTestResult object on which assertions can be made. 
 
-```
+``` java
 final ParserTestResult result = testSuite.execute();
 ```
 
 ### Asserting the parser expected results
 
-Assert the expected results uses the Assert class methods from [JUnit](https://junit.org/). The actual results after executing the code can be retrieved from the ParserTestResult object produced by the execution of the Test Suite as shown above.  
+The actual results after executing the code can be retrieved from the ParserTestResult object produced by the execution of the Test Suite as shown above.  
 
-```
+``` java
 assertThat(result.getTableDefinitions().size()).isEqualTo(1);
 assertThat(result.getTableDefinitionById("Customers")).isNotNull();
 ```
 
 Alternatively, you can use TableResultAssert which bundled together with SDK TestFramework.
 
-```
+``` java
 TableResultAssert.assertThat(result.getTableResult("Customers")).compareOutputWithCsv("/json/example-customer-result.csv");
 ```
+
+**Note:** Do take note that TableResultAssert read the result using stream method. Therefore, the reading of records have to be from top to bottom. The following code snippet will throw `IllegalArgumentExcepttion`
+
+``` java
+TableResultAssert.assertThat(result.getTableResult("tbl1")).hasValuesAtRow(10L , Arrays.asList("a", "1", "true"));
+TableResultAssert.assertThat(result.getTableResult("tbl1")).hasValuesAtRow(8L , Arrays.asList("b", "2", "true"));
+``` 
+
+Hence, you need to re-execute the test suite in order to read the backtrack record.
