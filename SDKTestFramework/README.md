@@ -218,7 +218,7 @@ The steps to test a custom parser using the SDK Test Framework can be roughly si
 
 ## Writing a Test using the SDK Test Framework
 
-In this example, we will use the Json parser for the demonstration. For further details about the Metro2 parser, refer to the source code. 
+In this example, we will use the Json parser for the demonstration. For further details about the Json parser, refer to the source code. 
 
 A test consists of the following: 
 
