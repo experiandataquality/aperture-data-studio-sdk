@@ -240,12 +240,12 @@ In detail, the defining of test parameters use the following methods of the SDKT
 - `createTestParserSource()`
 
 #### Parser Loader
-The `createTestParser()` method of SDKTestFramework.java class takes a TestParserBuilder (which returns a list of TestParser.java objects) as an argument. 
+The `createTestParser()` method of SDKTestFramework.java class takes a TestParserBuilder (which returns a TestParser.java objects) as an argument. 
 
-The TestParserBuilder allows you to configure the parser for the test using the following methods: 
+The TestParserBuilder allows you to create and configure the parser for the test using the following methods: 
 - `loadCustomParser()` 
 - `addParserParameter()`
-- `build()` - returns a list of TestParser.java object
+- `build()` - returns a TestParser.java object
 
 #### Parser Test Setting
 The `createTestParserSetting()` method of SDKTestFramework.java class takes a ParserSettingBuilder (which returns a TestParserSetting.java object) as an argument. 
@@ -255,12 +255,12 @@ The ParserSettingBuilder allows you to configure the settings for the test using
 - `build()` - returns a TestParserSetting.java object
 
 #### Parser Test Data Source
-The `createTestParserSource()` method of SDKTestFramework.java class takes a TestParserSourceBuilder (which returns a list of TestParserSource.java objects) as an argument. 
+The `createTestParserSource()` method of SDKTestFramework.java class takes a TestParserSourceBuilder (which returns a TestParserSource.java objects) as an argument. 
 
 The TestParserSourceBuilder allows you to configure the data sources for the test using the following methods: 
 - `loadFile()` - optional
 - `loadStream()` - optional
-- `build()` - returns a list of TestParserSource.java objects
+- `build()` - returns a TestParserSource.java object
 
 ### Demo: Json Parser Test 
 
@@ -276,7 +276,7 @@ To reiterate, the SDK Test Framework is designed to replicate the above function
 final TestParser parser = SDKTestFramework.createTestParser(
                 parserBuilder -> parserBuilder
                         .loadCustomParser(customParserLoader ->
-                                customParserLoader.fromParserDefinition(new JsonParser()))
+                        .customParserLoader.fromParserDefinition(new JsonParser()))
                         .addParserParameter("&header_processing_iteration", 3L)
                         .addParserParameter("&id_field", "Id")
                         .build());
@@ -292,8 +292,8 @@ This essentially replicates the loading of json file into Data Studio as below:
 final TestParserSetting setting = SDKTestFramework.createTestParserSetting(
                 parserSettingBuilder -> parserSettingBuilder
                         .assignDataTypeToColumn(ParserDataType.NUMERIC, "Data Studio Link")
-						.assignDataTypeToColumn(ParserDataType.NUMERIC, "Id")
-						.assignDataTypeToColumn(ParserDataType.ALPHANUMERIC, "Name")
+			.assignDataTypeToColumn(ParserDataType.NUMERIC, "Id")
+			.assignDataTypeToColumn(ParserDataType.ALPHANUMERIC, "Name")
                         .build()
         );
 }
