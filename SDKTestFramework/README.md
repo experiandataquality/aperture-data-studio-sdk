@@ -212,13 +212,13 @@ With the test written (following the [Writing a Test using the SDK Test Framewor
 
 # Custom Parser Test Framework Configuration
 
-The steps to test a custom step using the SDK Test Framework can be roughly simplified over the following steps: 
+The steps to test a custom parser using the SDK Test Framework can be roughly simplified over the following steps: 
 1. [Writing a Test using the SDK Test Framework](#writing-a-test-using-the-sdk-test-framework)
 2. [Running the Test](#running-the-test)
 
 ## Writing a Test using the SDK Test Framework
 
-In this example, we will use the Metro2 parser for the demonstration. For further details about the Metro2 parser, refer to the source code. 
+In this example, we will use the Json parser for the demonstration. For further details about the Metro2 parser, refer to the source code. 
 
 A test consists of the following: 
 
