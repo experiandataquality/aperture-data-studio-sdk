@@ -218,7 +218,7 @@ The steps to test a custom parser using the SDK Test Framework can be roughly si
 
 ## Writing a Test using the SDK Test Framework
 
-In this example, we will use the Json parser for the demonstration. For further details about the Json parser, refer to the source code. 
+In this example, we will use the Sample parser for the demonstration. For further details about the Sample parser, refer to the source code. 
 
 A test consists of the following: 
 
@@ -262,13 +262,13 @@ The TestParserSourceBuilder allows you to configure the data sources for the tes
 - `loadStream()` - optional
 - `build()` - returns a TestParserSource.java object
 
-### Demo: Json Parser Test 
+### Demo: Sample Parser Test 
 
-An example of uploading json file using Json Parser in Data Studio would look similar to the following: 
+An example of uploading sample file using Sample Parser in Data Studio would look similar to the following: 
 
 ![example dataset](readme-images/example-dataset.png)
 
-To reiterate, the SDK Test Framework is designed to replicate the above functionality of Data Studio (with only limited features) to test a custom parser. Using JsonParserTfwTest.java as an example, the Java class can be found at: `/aperture-data-studio-sdk/SDKTestFramework/src/test/java/com/experian/datastudio/sdk/parser/json/`
+To reiterate, the SDK Test Framework is designed to replicate the above functionality of Data Studio (with only limited features) to test a custom parser. Using SampleParserTest.java as an example, the Java class can be found at: `/aperture-data-studio-sdk/SDKTestFramework/src/test/java/com/experian/datastudio/sdk/parser/sample/`
 
 #### Parser Test Loader Example:
 
@@ -276,13 +276,13 @@ To reiterate, the SDK Test Framework is designed to replicate the above function
 final TestParser parser = SDKTestFramework.createTestParser(
                 parserBuilder -> parserBuilder
                         .loadCustomParser(customParserLoader ->
-                        .customParserLoader.fromParserDefinition(new JsonParser()))
+                        .customParserLoader.fromParserDefinition(new SampleParser()))
                         .addParserParameter("&encoding", "UTF-8")
                         .addParserParameter("&max_row", 10)
                         .build());
 ```
 						
-This essentially replicates the loading of json file into Data Studio as below:
+This essentially replicates the loading of .sample file into Data Studio as below:
 
 ![parser test loader](readme-images/parser-test-loader.png)
 
@@ -299,7 +299,7 @@ final TestParserSetting setting = SDKTestFramework.createTestParserSetting(
 }
 ```
 
-This essentially replicates the column annotation for the Json parser in Data Studio as below: 
+This essentially replicates the column annotation for the Sample parser in Data Studio as below: 
 
 ![parser test setting](readme-images/parser-test-setting.png)
 
@@ -308,7 +308,7 @@ This essentially replicates the column annotation for the Json parser in Data St
 ``` java
 final TestParserSource source = SDKTestFramework.createTestParserSource(
                 parserSourceBuilder -> parserSourceBuilder
-                        .loadFile("/json/example.json")
+                        .loadFile("/file/dcsample.sample")
                         .build());
 ```
 
@@ -348,7 +348,7 @@ assertThat(result.getTableDefinitionById("Customers")).isNotNull();
 Alternatively, you can use TableResultAssert which bundled together with SDK TestFramework.
 
 ``` java
-TableResultAssert.assertThat(result.getTableResult("Customers")).compareOutputWithCsv("/json/example-customer-result.csv");
+TableResultAssert.assertThat(result.getTableResult("Customers")).compareOutputWithCsv("/file/example-customer-result.csv");
 ```
 
 **Note:** Do take note that TableResultAssert read the result using stream method. Therefore, the reading of records have to be from top to bottom. The following code snippet will throw `IllegalArgumentExcepttion`
