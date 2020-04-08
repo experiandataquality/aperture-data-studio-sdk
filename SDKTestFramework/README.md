@@ -14,7 +14,7 @@ Example custom step tested is:
 - [AddVAT](#custom-step-test-framework-configuration)
 
 Example custom parser tested is:
-- [JsonParser](#custom-parser-test-framework-configuration)
+- [SampleParser](#custom-parser-test-framework-configuration)
 
 # Custom Step Test Framework Configuration
 
@@ -223,7 +223,7 @@ In this example, we will use the Json parser for the demonstration. For further 
 A test consists of the following: 
 
 1. Defining the test parameters (through the methods prescribed in SDKTestFramework.java): 
-	- [Parser Loader](#parser-loader) - [Parser Test Loader Example](#parser-test-loader-example)
+    - [Parser Loader](#parser-loader) - [Parser Test Loader Example](#parser-test-loader-example)
     - [Parser Test Setting](#parser-test-setting) - [Parser Test Setting Example](#parser-test-setting-example)
     - [Parser Test Data Source](#parser-test-data-source) - [Parser Test Data Source Example](#parser-test-data-source-example)
 
@@ -277,8 +277,8 @@ final TestParser parser = SDKTestFramework.createTestParser(
                 parserBuilder -> parserBuilder
                         .loadCustomParser(customParserLoader ->
                         .customParserLoader.fromParserDefinition(new JsonParser()))
-                        .addParserParameter("&header_processing_iteration", 3L)
-                        .addParserParameter("&id_field", "Id")
+                        .addParserParameter("&encoding", "UTF-8")
+                        .addParserParameter("&max_row", 10)
                         .build());
 ```
 						
