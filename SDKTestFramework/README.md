@@ -21,10 +21,10 @@ Example custom parser tested is:
 The SDK Test Framework tests are run using [JUnit](https://junit.org/) (a user interface is not provided). For more details about JUnit, refer to the [user documentation](https://junit.org/).
 
 The steps to test a custom step using the SDK Test Framework can be roughly simplified over the following steps: 
-1. [Writing a Test using the SDK Test Framework](#writing-a-test-using-the-sdk-test-framework)
+1. [Writing a Step Test using the SDK Test Framework](#writing-a-step-test-using-the-sdk-test-framework)
 2. [Running the Test](#running-the-test)
 
-## Writing a Test using the SDK Test Framework
+## Writing a Step Test using the SDK Test Framework
 
 **Assumption:** The developer has already written a custom step to be tested using this framework.  
 
@@ -187,7 +187,7 @@ Assertions.assertEquals(11, ((Number) result.getValueAt("Column2", 0).getValue()
 
 ## Running the Test
 
-With the test written (following the [Writing a Test using the SDK Test Framework](#writing-a-test-using-the-sdk-test-framework) section), the Test needs to be built and run using Gradle. 
+With the test written (following the [Writing a Step Test using the SDK Test Framework](#writing-a-step-test-using-the-sdk-test-framework) section), the Test needs to be built and run using Gradle. 
 
 1. Run `gradle build` either from the command line or from IntelliJ IDEA:
 
@@ -213,10 +213,10 @@ With the test written (following the [Writing a Test using the SDK Test Framewor
 # Custom Parser Test Framework Configuration
 
 The steps to test a custom parser using the SDK Test Framework can be roughly simplified over the following steps: 
-1. [Writing a Test using the SDK Test Framework](#writing-a-test-using-the-sdk-test-framework)
-2. [Running the Test](#running-the-test)
+1. [Writing a Parser Test using the SDK Test Framework](#writing-a-parser-test-using-the-sdk-test-framework)
+2. [Running the Test](#running-the-test) (Identical to custom step test)
 
-## Writing a Test using the SDK Test Framework
+## Writing a Parser Test using the SDK Test Framework
 
 In this example, we will use the Sample parser for the demonstration. For further details about the Sample parser, refer to the source code. 
 
@@ -351,7 +351,7 @@ Alternatively, you can use TableResultAssert which bundled together with SDK Tes
 TableResultAssert.assertThat(result.getTableResult("Customers")).compareOutputWithCsv("/file/example-customer-result.csv");
 ```
 
-**Note:** Do take note that TableResultAssert read the result using stream method. Therefore, the reading of records have to be from top to bottom. The following code snippet will throw `IllegalArgumentExcepttion`
+**Note:** Do take note that TableResultAssert reads the result using the stream method. Therefore, the reading of records has to be from top to bottom. The following code snippet will throw an `IllegalArgumentException`.
 
 ``` java
 TableResultAssert.assertThat(result.getTableResult("tbl1")).hasValuesAtRow(10L , Arrays.asList("a", "1", "true"));
