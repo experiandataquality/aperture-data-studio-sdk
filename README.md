@@ -28,6 +28,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
             - [asNumber](#asnumber)
             - [asColumnChooser](#ascolumnchooser)
             - [asCustomChooser](#ascustomchooser)
+        - [Configure withOnValueChanged](#configure-withonvaluechanged)
         - [Configure isCompleteHandler](#configure-iscompletehandler)
         - [Configure column layouts](#configure-column-layouts)
         - [StepConfigurationBuilder sample code](#stepconfigurationbuilder-sample-code)
@@ -77,7 +78,9 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 | SDK version                                                                          | Compatible Data Studio version | New features released |
 |--------------------------------------------------------------------------------------|--------------------------------|-----------------------|
-|  2.1.0                                                                               | 2.0.6 (or newer)               |<ul><li>Accessing Step Settings at the Step Configuration stage, so that API calls can be made using the credentials in the Step Settings to populate the Step Properties.</li><li>Password type field in Step Settings to ensure masking and encryption of sensitive information.</li><li>Custom Step Exception. Custom step developer can define error IDs and descriptions.</li></ul>|
+|  2.2.0                                                                               |                                | <ul><li>Step property On-value-change hander</li><li>Locale parameter</li></ul> |
+| [2.1.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.1.1) | 2.0.9 (or newer)               | New custom icons added:<ul><li>Australia Post</li><li>Collibra</li><li>Dynamics365</li><li>Salesforce</li><li>Tableau</li></ul> |
+| [2.1.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.1.0) | 2.0.6 (or newer)               |<ul><li>Accessing Step Settings at the Step Configuration stage, so that API calls can be made using the credentials in the Step Settings to populate the Step Properties.</li><li>Password type field in Step Settings to ensure masking and encryption of sensitive information.</li><li>Custom Step Exception. Custom step developer can define error IDs and descriptions.</li></ul>| 
 | [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.0.0) | 2.0.0 (or newer)               ||
 | [1.6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2) | 1.6.2                          |
 | [1.6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1) | 1.6.1 (up to 1.6.2)            |
@@ -346,6 +349,74 @@ For example, to add a column chooser to the step:
 | withMultipleSelect()    | Set whether multiple fields can be selected         |
 | build                   | Build the step property                             |
 
+#### Configure withOnValueChanged
+Since version 2.2.0, on-value-changed handler is added to all the step property types. The on-value-changed handler allows a step property to update the other step properties' value, when its value is been updated. 
+
+This is necessary for scenario below. The step property `CUSTOM_2`'s allow values are depends on the step property `CUSTOM_1`'s value. First, the user selects "1" for `CUSTOM_1`, AND "1b" for `CUSTOM_2`. Then, the user edit `CUSTOM_1`'s value to "2". The step property `CUSTOM_2`'s value will become invalid as the "1b" is not found in the new allow values ("2a", "2b"). By configuring the on-value-changed on the `CUSTOM_1`, the invalid value of `CUSTOM_2` can be cleared. 
+
+``` java
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+		.asCustomChooser(CUSTOM_1)
+		.withAllowValuesProvider(context -> Arrays.asList("1", "2"))
+		.withOnValueChanged(context -> {
+			context.clearStepPropertyValue(CUSTOM_2);
+		})
+		.build())
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+		.asCustomChooser(CUSTOM_2)
+		.withAllowValuesProvider(context -> {
+			List<String> list = (List<String>) context.getStepPropertyValue(CUSTOM_1).orElse(Collections.emptyList());
+			if (!list.isEmpty()) {
+				switch (list.get(0)) {
+					case "1":
+						return Arrays.asList("1a", "1b");
+					case "2":
+						return Arrays.asList("2a", "2b");
+				}
+			}
+			return Collections.emptyList();
+		})
+```
+
+Below are the actions that can be performed in on-value-changed handler.
+| Method                     | Description                                                                             |
+|----------------------------|-----------------------------------------------------------------------------------------|
+| clearStepPropertyValue     | Removes the value of a step property.                                                   |
+| getChangedByStepPropertyId | Gets the step property ID that change this value. For chaining on-value-changed events. |
+| getStepPropertyValue       | Gets the value of a step property.                                                      |
+| setStepPropertyValue       | Sets the value of a step property. Please take note, column chooser is not supported.   |
+
+Chaining on-value-changed event is supported. For example, when `STRING_3` is edited, it will update `NUMBER_4`'s value via on-value-changed handler. Then, `NUMBER_4` will fire it's on-value-changed event to update `BOOLEAN_5`. However, the same on-value-changed handler will not be triggered twice. 
+
+``` java
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+		.asString(STRING_3)
+		.withOnValueChanged(context -> {
+			final String value = (String) context.getStepPropertyValue(STRING_3).orElse("");
+			context.setStepPropertyValue(NUMBER_4, value.length());
+		})
+		.build())
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+		.asNumber(NUMBER_4)
+		.withOnValueChanged(context -> {
+			final Number value = (Number) context.getStepPropertyValue(NUMBER_4).orElse(0);
+			context.setStepPropertyValue(BOOLEAN_5, value.intValue() % 2 == 0);
+		})
+		.build())
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+		.asBoolean(BOOLEAN_5)
+		.withOnValueChanged(context -> {
+			final Boolean value = (Boolean) context.getStepPropertyValue(BOOLEAN_5).orElse(false);
+			if (Boolean.FALSE.equals(value)) {
+				context.clearStepPropertyValue(COLUMN_6);
+			}
+		})
+		.build())
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+		.asColumnChooser(COLUMN_6)
+		.forInputNode(INPUT_ID)
+		.build())
+```
 
 #### Configure isCompleteHandler
 
