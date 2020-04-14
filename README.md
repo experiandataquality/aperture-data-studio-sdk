@@ -356,26 +356,26 @@ This is necessary for scenario below. The step property `CUSTOM_2`'s allow value
 
 ``` java
 .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
-		.asCustomChooser(CUSTOM_1)
-		.withAllowValuesProvider(context -> Arrays.asList("1", "2"))
-		.withOnValueChanged(context -> {
-			context.clearStepPropertyValue(CUSTOM_2);
-		})
-		.build())
+        .asCustomChooser(CUSTOM_1)
+        .withAllowValuesProvider(context -> Arrays.asList("1", "2"))
+        .withOnValueChanged(context -> {
+            context.clearStepPropertyValue(CUSTOM_2);
+        })
+        .build())
 .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
-		.asCustomChooser(CUSTOM_2)
-		.withAllowValuesProvider(context -> {
-			List<String> list = (List<String>) context.getStepPropertyValue(CUSTOM_1).orElse(Collections.emptyList());
-			if (!list.isEmpty()) {
-				switch (list.get(0)) {
-					case "1":
-						return Arrays.asList("1a", "1b");
-					case "2":
-						return Arrays.asList("2a", "2b");
-				}
-			}
-			return Collections.emptyList();
-		})
+        .asCustomChooser(CUSTOM_2)
+        .withAllowValuesProvider(context -> {
+            List<String> list = (List<String>) context.getStepPropertyValue(CUSTOM_1).orElse(Collections.emptyList());
+            if (!list.isEmpty()) {
+                switch (list.get(0)) {
+                    case "1":
+                        return Arrays.asList("1a", "1b");
+                    case "2":
+                        return Arrays.asList("2a", "2b");
+                }
+            }
+            return Collections.emptyList();
+        })
 ```
 
 Below are the actions that can be performed in on-value-changed handler.
@@ -390,32 +390,46 @@ Chaining on-value-changed event is supported. For example, when `STRING_3` is ed
 
 ``` java
 .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
-		.asString(STRING_3)
-		.withOnValueChanged(context -> {
-			final String value = (String) context.getStepPropertyValue(STRING_3).orElse("");
-			context.setStepPropertyValue(NUMBER_4, value.length());
-		})
-		.build())
+        .asString(STRING_3)
+        .withOnValueChanged(context -> {
+            final String value = (String) context.getStepPropertyValue(STRING_3).orElse("");
+            context.setStepPropertyValue(NUMBER_4, value.length());
+        })
+        .build())
 .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
-		.asNumber(NUMBER_4)
-		.withOnValueChanged(context -> {
-			final Number value = (Number) context.getStepPropertyValue(NUMBER_4).orElse(0);
-			context.setStepPropertyValue(BOOLEAN_5, value.intValue() % 2 == 0);
-		})
-		.build())
+        .asNumber(NUMBER_4)
+        .withOnValueChanged(context -> {
+            final Number value = (Number) context.getStepPropertyValue(NUMBER_4).orElse(0);
+            context.setStepPropertyValue(BOOLEAN_5, value.intValue() % 2 == 0);
+        })
+        .build())
 .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
-		.asBoolean(BOOLEAN_5)
-		.withOnValueChanged(context -> {
-			final Boolean value = (Boolean) context.getStepPropertyValue(BOOLEAN_5).orElse(false);
-			if (Boolean.FALSE.equals(value)) {
-				context.clearStepPropertyValue(COLUMN_6);
-			}
-		})
-		.build())
+        .asBoolean(BOOLEAN_5)
+        .withOnValueChanged(context -> {
+            final Boolean value = (Boolean) context.getStepPropertyValue(BOOLEAN_5).orElse(false);
+            if (Boolean.FALSE.equals(value)) {
+                context.clearStepPropertyValue(COLUMN_6);
+            }
+        })
+        .build())
 .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
-		.asColumnChooser(COLUMN_6)
-		.forInputNode(INPUT_ID)
-		.build())
+        .asColumnChooser(COLUMN_6)
+        .forInputNode(INPUT_ID)
+        .build())
+```
+
+Sometimes, chaining on-value-changed events can be confusing, especially if a step property's value can be updated by multiple step properties. It might be hard to trace how a step property's value been set. On-value-changed event chaining cannot be turn off. However, there is a workaround using the `getChangedByStepPropertyId()` method.
+
+``` java
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+        .asString(STRING_3)
+        .withOnValueChanged(context -> {
+            if (!context.getChangedByStepPropertyId().isPresent()) { // ChangedByStepPropertyId is empty if triggered by UI
+                final String value = (String) context.getStepPropertyValue(STRING_3).orElse("");
+                context.setStepPropertyValue(NUMBER_4, value.length());
+            }
+        })
+        .build())
 ```
 
 #### Configure isCompleteHandler
