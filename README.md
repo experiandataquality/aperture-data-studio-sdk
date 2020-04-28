@@ -350,9 +350,9 @@ For example, to add a column chooser to the step:
 | build                   | Build the step property                             |
 
 #### Configure withOnValueChanged
-Since version 2.2.0, on-value-changed handler is added to all the step property types. The on-value-changed handler allows a step property to update the other step properties' value, when its value is been updated. 
+Since version 2.2.0, on-value-changed handler is added to all the step property types. The on-value-changed handler allows a step property to update another step property's value, when its own value is updated. 
 
-This is necessary for scenario below. The step property `CUSTOM_2`'s allow values are depends on the step property `CUSTOM_1`'s value. First, the user selects "1" for `CUSTOM_1`, AND "1b" for `CUSTOM_2`. Then, the user edit `CUSTOM_1`'s value to "2". The step property `CUSTOM_2`'s value will become invalid as the "1b" is not found in the new allow values ("2a", "2b"). By configuring the on-value-changed on the `CUSTOM_1`, the invalid value of `CUSTOM_2` can be cleared. 
+This is necessary for the example scenario below. The step property `CUSTOM_2`'s allowed values depends on step property `CUSTOM_1`'s value. First, the user selects "1" for `CUSTOM_1`, AND "1b" for `CUSTOM_2`. Then, the user edits `CUSTOM_1`'s value to "2". Step property `CUSTOM_2`'s value will become invalid as "1b" is not found in the new allowed values ("2a", "2b"). By configuring the on-value-changed in `CUSTOM_1`, the invalid value of `CUSTOM_2` can be cleared. 
 
 ``` java
 .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
@@ -382,9 +382,9 @@ Below are the actions that can be performed in on-value-changed handler.
 | Method                     | Description                                                                             |
 |----------------------------|-----------------------------------------------------------------------------------------|
 | clearStepPropertyValue     | Removes the value of a step property.                                                   |
-| getChangedByStepPropertyId | Gets the step property ID that change this value. For chaining on-value-changed events. |
+| getChangedByStepPropertyId | Gets the step property ID that changes this value. For chaining on-value-changed events. |
 | getStepPropertyValue       | Gets the value of a step property.                                                      |
-| setStepPropertyValue       | Sets the value of a step property. Please take note, column chooser is not supported.   |
+| setStepPropertyValue       | Sets the value of a step property. Please note that the column chooser is not supported.   |
 
 Chaining on-value-changed event is supported. For example, when `STRING_3` is edited, it will update `NUMBER_4`'s value via on-value-changed handler. Then, `NUMBER_4` will fire it's on-value-changed event to update `BOOLEAN_5`. However, the same on-value-changed handler will not be triggered twice. 
 
@@ -418,7 +418,7 @@ Chaining on-value-changed event is supported. For example, when `STRING_3` is ed
         .build())
 ```
 
-Sometimes, chaining on-value-changed events can be confusing, especially if a step property's value can be updated by multiple step properties. It might be hard to trace how a step property's value been set. On-value-changed event chaining cannot be turn off. However, there is a workaround using the `getChangedByStepPropertyId()` method.
+Sometimes, chaining on-value-changed events can be confusing, especially if a step property's value can be updated by multiple step properties. It might be hard to trace how a step property's value has been set. On-value-changed event chaining cannot be turned off. However, there is a workaround using the `getChangedByStepPropertyId()` method.
 
 ``` java
 .addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
