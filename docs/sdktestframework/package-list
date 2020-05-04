@@ -1,0 +1,11 @@
+com.experian.datastudio.sdk.testframework
+com.experian.datastudio.sdk.testframework.assertion
+com.experian.datastudio.sdk.testframework.customloader
+com.experian.datastudio.sdk.testframework.customparser
+com.experian.datastudio.sdk.testframework.customstep
+com.experian.datastudio.sdk.testframework.customstep.processor
+com.experian.datastudio.sdk.testframework.datasource
+com.experian.datastudio.sdk.testframework.exception
+com.experian.datastudio.sdk.testframework.setting
+com.experian.datastudio.sdk.testframework.testdefinition
+com.experian.datastudio.sdk.testframework.web

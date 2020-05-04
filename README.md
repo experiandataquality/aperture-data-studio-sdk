@@ -28,6 +28,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
             - [asNumber](#asnumber)
             - [asColumnChooser](#ascolumnchooser)
             - [asCustomChooser](#ascustomchooser)
+        - [Configure withOnValueChanged](#configure-withonvaluechanged)
         - [Configure isCompleteHandler](#configure-iscompletehandler)
         - [Configure column layouts](#configure-column-layouts)
         - [StepConfigurationBuilder sample code](#stepconfigurationbuilder-sample-code)
@@ -77,9 +78,10 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 | SDK version                                                                          | Compatible Data Studio version | New features released |
 |--------------------------------------------------------------------------------------|--------------------------------|-----------------------|
-|  2.1.1                                                                               | 2.0.9 (or newer)               |New custom icons added:<ul><li>Australia Post</li><li>Collibra</li><li>Dynamics365</li><li>Salesforce</li><li>Tableau</li></ul> |
+|  2.2.0                                                                               | 2.0.11 (or newer)              | <ul><li>A new On value change handler for step properties. This will provide you with more control over the step properties in your custom step (e.g. you can reset the selection of subsequent step properties once the value in the preceding step property has changed).</li><li>A new Locale parameter. This will allow the users to select the "Language and region" settings when uploading a file with the custom parser. The parser will then be able to deserialize the file based on the selected setting.</li><li>SDK custom parser test framework. The SDK test framework has now been extended to cater for custom parser testing at component level as well.</li><li>New custom icons added:<ul><li>Dynamic Feed</li><li>Experian</li></ul></li></ul> |
+| [2.1.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.1.1) | 2.0.9 (or newer)               | New custom icons added:<ul><li>Australia Post</li><li>Collibra</li><li>Dynamics365</li><li>Salesforce</li><li>Tableau</li></ul> |
 | [2.1.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.1.0) | 2.0.6 (or newer)               |<ul><li>Accessing Step Settings at the Step Configuration stage, so that API calls can be made using the credentials in the Step Settings to populate the Step Properties.</li><li>Password type field in Step Settings to ensure masking and encryption of sensitive information.</li><li>Custom Step Exception. Custom step developer can define error IDs and descriptions.</li></ul>| 
-| [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.0.0) | 2.0.0 (or newer)               |
+| [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.0.0) | 2.0.0 (or newer)               ||
 | [1.6.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.2) | 1.6.2                          |
 | [1.6.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.1) | 1.6.1 (up to 1.6.2)            |
 | [1.6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v1.6.0) | 1.6.0 (up to 1.6.2)            |
@@ -115,14 +117,14 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
    }
 
    dependencies {
-       compileOnly("com.experian.datastudio:sdkapi:2.1.1")
-       compileOnly("com.experian.datastudio:sdklib:2.1.1")
+       compileOnly("com.experian.datastudio:sdkapi:2.2.0")
+       compileOnly("com.experian.datastudio:sdklib:2.2.0")
    }
    ```
 
   If you don't want to use Gradle, you'll have to configure your own Java project to generate a compatible JAR artifact:
    - Create a new Java project or open an existing one.
-   - Download and install the [sdkapi.jar](https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/com/experian/datastudio/sdkapi/2.1.1/sdkapi-2.1.1.jar) file.
+   - Download and install the [sdkapi.jar](https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/com/experian/datastudio/sdkapi/2.2.0/sdkapi-2.2.0.jar) file.
 
   If using Maven, modify `pom.xml` to add the SDK GitHub repository:
 
@@ -157,13 +159,13 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
            <dependency>
                <groupId>com.experian.datastudio</groupId>
                <artifactId>sdkapi</artifactId>
-               <version>2.1.1</version>
+               <version>2.2.0</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                 <groupId>com.experian.datastudio</groupId>
                 <artifactId>sdklib</artifactId>
-                <version>2.1.1</version>
+                <version>2.2.0</version>
            </dependency>
        </dependencies>
    </project>
@@ -347,6 +349,88 @@ For example, to add a column chooser to the step:
 | withMultipleSelect()    | Set whether multiple fields can be selected         |
 | build                   | Build the step property                             |
 
+#### Configure withOnValueChanged
+Since version 2.2.0, on-value-changed handler is added to all the step property types. The on-value-changed handler allows a step property to update another step property's value, when its own value is updated. 
+
+This is necessary for the example scenario below. The step property `CUSTOM_2`'s allowed values depends on step property `CUSTOM_1`'s value. First, the user selects "1" for `CUSTOM_1`, AND "1b" for `CUSTOM_2`. Then, the user edits `CUSTOM_1`'s value to "2". Step property `CUSTOM_2`'s value will become invalid as "1b" is not found in the new allowed values ("2a", "2b"). By configuring the on-value-changed in `CUSTOM_1`, the invalid value of `CUSTOM_2` can be cleared. 
+
+``` java
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+        .asCustomChooser(CUSTOM_1)
+        .withAllowValuesProvider(context -> Arrays.asList("1", "2"))
+        .withOnValueChanged(context -> {
+            context.clearStepPropertyValue(CUSTOM_2);
+        })
+        .build())
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+        .asCustomChooser(CUSTOM_2)
+        .withAllowValuesProvider(context -> {
+            List<String> list = (List<String>) context.getStepPropertyValue(CUSTOM_1).orElse(Collections.emptyList());
+            if (!list.isEmpty()) {
+                switch (list.get(0)) {
+                    case "1":
+                        return Arrays.asList("1a", "1b");
+                    case "2":
+                        return Arrays.asList("2a", "2b");
+                }
+            }
+            return Collections.emptyList();
+        })
+```
+
+Below are the actions that can be performed in on-value-changed handler.
+| Method                     | Description                                                                             |
+|----------------------------|-----------------------------------------------------------------------------------------|
+| clearStepPropertyValue     | Removes the value of a step property.                                                   |
+| getChangedByStepPropertyId | Gets the step property ID that changes this value. For chaining on-value-changed events. |
+| getStepPropertyValue       | Gets the value of a step property.                                                      |
+| setStepPropertyValue       | Sets the value of a step property. Please note that the column chooser is not supported.   |
+
+Chaining on-value-changed event is supported. For example, when `STRING_3` is edited, it will update `NUMBER_4`'s value via on-value-changed handler. Then, `NUMBER_4` will fire it's on-value-changed event to update `BOOLEAN_5`. However, the same on-value-changed handler will not be triggered twice. 
+
+``` java
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+        .asString(STRING_3)
+        .withOnValueChanged(context -> {
+            final String value = (String) context.getStepPropertyValue(STRING_3).orElse("");
+            context.setStepPropertyValue(NUMBER_4, value.length());
+        })
+        .build())
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+        .asNumber(NUMBER_4)
+        .withOnValueChanged(context -> {
+            final Number value = (Number) context.getStepPropertyValue(NUMBER_4).orElse(0);
+            context.setStepPropertyValue(BOOLEAN_5, value.intValue() % 2 == 0);
+        })
+        .build())
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+        .asBoolean(BOOLEAN_5)
+        .withOnValueChanged(context -> {
+            final Boolean value = (Boolean) context.getStepPropertyValue(BOOLEAN_5).orElse(false);
+            if (Boolean.FALSE.equals(value)) {
+                context.clearStepPropertyValue(COLUMN_6);
+            }
+        })
+        .build())
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+        .asColumnChooser(COLUMN_6)
+        .forInputNode(INPUT_ID)
+        .build())
+```
+
+Sometimes, chaining on-value-changed events can be confusing, especially if a step property's value can be updated by multiple step properties. It might be hard to trace how a step property's value has been set. On-value-changed event chaining cannot be turned off. However, there is a workaround using the `getChangedByStepPropertyId()` method.
+
+``` java
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+        .asString(STRING_3)
+        .withOnValueChanged(context -> {
+            if (!context.getChangedByStepPropertyId().isPresent()) { // ChangedByStepPropertyId is empty if triggered by UI
+                final String value = (String) context.getStepPropertyValue(STRING_3).orElse("");
+                context.setStepPropertyValue(NUMBER_4, value.length());
+            }
+        })
+        .build())
+```
 
 #### Configure isCompleteHandler
 
@@ -942,13 +1026,13 @@ CompletableFuture<WebHttpResponse> webHttpResponse = client.sendAsync(request);
    }
 
    dependencies {
-       compileOnly("com.experian.datastudio:sdkapi:2.1.1")
+       compileOnly("com.experian.datastudio:sdkapi:2.2.0")
    }
    ```
 
   If you don't want to use Gradle, you'll have to configure your own Java project to generate a compatible JAR artifact:
    - Create a new Java project or open an existing one.
-   - Download and install the [sdkapi.jar](https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/com/experian/datastudio/sdkapi/2.1.1/sdkapi-2.1.1.jar) file.
+   - Download and install the [sdkapi.jar](https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/com/experian/datastudio/sdkapi/2.2.0/sdkapi-2.2.0.jar) file.
 
   If using Maven, modify `pom.xml` to add the SDK GitHub repository:
 
