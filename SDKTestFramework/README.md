@@ -312,6 +312,7 @@ final TestParserSource source = SDKTestFramework.createTestParserSource(
                         .build());
 ```
 
+The dcsample.sample file should be located into the "resources" folder. For the sample above, the file is located under a "file" sub-directory in the "resources" folder. 
 This essentially replicates the data source uploaded into Data Studio as below: 
 
 ![parser test data source](readme-images/parser-test-data-source.png)
