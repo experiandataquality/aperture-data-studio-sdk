@@ -31,13 +31,15 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
         - [Configure withOnValueChanged](#configure-withonvaluechanged)
         - [Configure isCompleteHandler](#configure-iscompletehandler)
         - [Configure column layouts](#configure-column-layouts)
+        - [Configuration input context](#configuration-input-context) 
         - [StepConfigurationBuilder sample code](#stepconfigurationbuilder-sample-code)
     - [Processing your step](#processing-your-step)
         - [Execute step](#execute-step)
         - [StepProcessorBuilder sample code](#stepprocessorbuilder-sample-code)
         - [Cell value style](#cell-value-style)
         - [isInteractive flag](#isinteractive-flag)
-		- [Progress bar handling](#progress-bar-handling)        
+		- [Progress bar handling](#progress-bar-handling)    
+        - [Processor input context](#processor-input-context)     
     - [The Cache configuration](#the-cache-configuration)
         - [Cache scope](#cache-scope)
             - [Workflow](#workflow)
@@ -78,7 +80,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 | SDK version                                                                          | Compatible Data Studio version | New features released |
 |--------------------------------------------------------------------------------------|--------------------------------|-----------------------|
-|  2.2.0                                                                               | 2.0.11 (or newer)              | <ul><li>A new On value change handler for step properties. This will provide you with more control over the step properties in your custom step (e.g. you can reset the selection of subsequent step properties once the value in the preceding step property has changed).</li><li>A new Locale parameter. This will allow the users to select the "Language and region" settings when uploading a file with the custom parser. The parser will then be able to deserialize the file based on the selected setting.</li><li>SDK custom parser test framework. The SDK test framework has now been extended to cater for custom parser testing at component level as well.</li><li>New custom icons added:<ul><li>Dynamic Feed</li><li>Experian</li></ul></li></ul> |
+| 2.3.0                                                                                | 2.1.0 (or newer)               | <ul><li>Capability to rename input node label. You can now specify a text for the input node of your step instead of the default "Connect an input".</li><li>Data tags are now stored as part of column details.</li><li>A new getColumnsByTag method at Configuration and Processing. This will allow you to retrieve column details for a given data tag.</li><li>Custom Chooser now supports value and display name for each item defined. You can now set a friendly name to be displayed in the chooser while maintaining ids for backend processing.</li><li>Fixed SDK Test framework bug for failing to retrieve value from `getStepCell`.</li></ul>
+| [2.2.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.2.0) | 2.0.11 (or newer)              | <ul><li>A new On value change handler for step properties. This will provide you with more control over the step properties in your custom step (e.g. you can reset the selection of subsequent step properties once the value in the preceding step property has changed).</li><li>A new Locale parameter. This will allow the users to select the "Language and region" settings when uploading a file with the custom parser. The parser will then be able to deserialize the file based on the selected setting.</li><li>SDK custom parser test framework. The SDK test framework has now been extended to cater for custom parser testing at component level as well.</li><li>New custom icons added:<ul><li>Dynamic Feed</li><li>Experian</li></ul></li></ul> |
 | [2.1.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.1.1) | 2.0.9 (or newer)               | New custom icons added:<ul><li>Australia Post</li><li>Collibra</li><li>Dynamics365</li><li>Salesforce</li><li>Tableau</li></ul> |
 | [2.1.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.1.0) | 2.0.6 (or newer)               |<ul><li>Accessing Step Settings at the Step Configuration stage, so that API calls can be made using the credentials in the Step Settings to populate the Step Properties.</li><li>Password type field in Step Settings to ensure masking and encryption of sensitive information.</li><li>Custom Step Exception. Custom step developer can define error IDs and descriptions.</li></ul>| 
 | [2.0.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.0.0) | 2.0.0 (or newer)               ||
@@ -117,14 +120,14 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
    }
 
    dependencies {
-       compileOnly("com.experian.datastudio:sdkapi:2.2.0")
-       compileOnly("com.experian.datastudio:sdklib:2.2.0")
+       compileOnly("com.experian.datastudio:sdkapi:2.3.0")
+       compileOnly("com.experian.datastudio:sdklib:2.3.0")
    }
    ```
 
   If you don't want to use Gradle, you'll have to configure your own Java project to generate a compatible JAR artifact:
    - Create a new Java project or open an existing one.
-   - Download and install the [sdkapi.jar](https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/com/experian/datastudio/sdkapi/2.2.0/sdkapi-2.2.0.jar) file.
+   - Download and install the [sdkapi.jar](https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven/com/experian/datastudio/sdkapi/2.3.0/sdkapi-2.3.0.jar) file.
 
   If using Maven, modify `pom.xml` to add the SDK GitHub repository:
 
@@ -159,13 +162,13 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
            <dependency>
                <groupId>com.experian.datastudio</groupId>
                <artifactId>sdkapi</artifactId>
-               <version>2.2.0</version>
+               <version>2.3.0</version>
                <scope>provided</scope>
            </dependency>
            <dependency>
                 <groupId>com.experian.datastudio</groupId>
                 <artifactId>sdklib</artifactId>
-                <version>2.2.0</version>
+                <version>2.3.0</version>
            </dependency>
        </dependencies>
    </project>
@@ -267,6 +270,7 @@ Please take note that PROCESS output node cannot connect to DATA input node.
 .withNodes(stepNodeBuilder -> stepNodeBuilder
         .addInputNode(inputNodeBuilder -> inputNodeBuilder
                 .withId(INPUT_ID)
+                .withLabel("Name (required)")
                 .withType(NodeType.PROCESS)
                 .build())
         .addOutputNode(outputNodeBuilder -> outputNodeBuilder
@@ -339,15 +343,16 @@ For example, to add a column chooser to the step:
 
 ##### asCustomChooser
 
-| Method                  | Description                                         |
-|-------------------------|-----------------------------------------------------|
-| asCustomChooser         | Set an input column from a custom drop-down list    |
-| withAllowValuesProvider | Set the custom list for selection                   |
-| withAllowSearch         | Set whether there's a field search                  |
-| withAllowSelectAll()    | Set whether you can select all fields               |
-| withIsRequired()        | Set whether the field is mandatory                  |
-| withMultipleSelect()    | Set whether multiple fields can be selected         |
-| build                   | Build the step property                             |
+| Method                        | Description                                                   |
+|-------------------------------|---------------------------------------------------------------|
+| asCustomChooser               | Set an input column from a custom drop-down list              |
+| withAllowValuesProvider       | Set the custom list for selection                             |
+| withAllowChooserItemsProvider | Set the custom list with display name and value for selection |
+| withAllowSearch               | Set whether there's a field search                            |
+| withAllowSelectAll()          | Set whether you can select all fields                         |
+| withIsRequired()              | Set whether the field is mandatory                            |
+| withMultipleSelect()          | Set whether multiple fields can be selected                   |
+| build                         | Build the step property                                       |
 
 #### Configure withOnValueChanged
 Since version 2.2.0, on-value-changed handler is added to all the step property types. The on-value-changed handler allows a step property to update another step property's value, when its own value is updated. 
@@ -468,7 +473,15 @@ Column layouts represent column(s) that will be displayed in the step. For examp
         .build())
 
 ```
-                        
+#### Configuration input context
+ConfigurationInputContext is an instance that used to return metadata input columns.
+
+| Method          | Description                                                   |
+|-----------------|-------------------------------|
+| getColumns      | Get all input node columns    |
+| getColumnById   | Get input node column by id   |
+| getColumnsByTag | Get input node columns by tag |
+
 #### StepConfigurationBuilder sample code
 
 ``` java
@@ -632,6 +645,16 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
 }
 ```
 Please take note that `progressChanged()` must not be called inside `outputColumnManager.onValue()`.
+
+#### Processor input context
+ProcessorInputContext is an instance that used to return metadata input columns.
+
+| Method          | Description                                                   |
+|-----------------|-------------------------------|
+| getColumns      | Get all input node columns    |
+| getColumnById   | Get input node column by id   |
+| getColumnsByTag | Get input node columns by tag |
+| getRowCount     | Get row count                 |
 
 ### The Cache configuration
 The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and 
