@@ -11,10 +11,10 @@ repositories {
 
 dependencies {
     compileOnly(
-            "com.experian.datastudio:sdkapi:2.1.0",
-            "com.experian.datastudio:sdklib:2.1.0"
+            "com.experian.datastudio:sdkapi:2.3.0",
+            "com.experian.datastudio:sdklib:2.3.0"
     )
-    testImplementation "com.experian.datastudio:sdktestframework:2.1.0"
+    testImplementation "com.experian.datastudio:sdktestframework:2.3.0"
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
 }
