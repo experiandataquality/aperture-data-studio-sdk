@@ -178,11 +178,24 @@ TestResult result = testSuite.executeTest(OUTPUT_ID);
 Assert the expected results uses the Assert class methods from [JUnit](https://junit.org/). The actual results after executing the code can be retrieved from the TestResult object produced by the execution of the Test Suite as shown above.  
 
 ``` java
+// Retrieve the row count defined in StepProcessorFunction
 Assertions.assertEquals(3, result.getRowCount());
+
+// Retrieve the value directly using result.getValue()
+Assertions.assertEquals(1.175, result.getValue(0, 0));
+Assertions.assertEquals(2.35, result.getValue(0, 1));
+Assertions.assertEquals(3.525, result.getValue(0, 2));
+Assertions.assertEquals(11, ((Number) result.getValue("Column2", 0)).intValue());
+
+// Retrieve the value from result.getStepCell().getValue()
 Assertions.assertEquals(1.175, result.getStepCell(0, 0).getValue());
 Assertions.assertEquals(2.35, result.getStepCell(0, 1).getValue());
 Assertions.assertEquals(3.525, result.getStepCell(0, 2).getValue());
 Assertions.assertEquals(11, ((Number) result.getStepCell("Column2", 0).getValue()).intValue());
+
+// Retrieve the cell style from result.getStepCell().getStyle()
+// result.getStepCell().getStyle() will return null if cell style is not defined.
+Assertions.assertEquals(CustomValueStyle.INFO, result.getStepCell(0, 2).getStyle());
 ```
 
 ##### Note:
@@ -217,7 +230,7 @@ int expectedTotalRow = 5;
 int lastRowIndex = expectedTotalRow - 1;
 
 // hit 'Row index out of bounds error' when retrieving the cell value of the last column 
-Assertions.assertEquals("abc -processed", result.getStepCell(0, lastRowIndex).getValue());
+Assertions.assertEquals("abc -processed", result.getValue(0, lastRowIndex).getValue());
 
 // assertion failed here too where getRowCount returns 1
 Assertions.assertEquals(expectedTotalRow, result.getRowCount());
