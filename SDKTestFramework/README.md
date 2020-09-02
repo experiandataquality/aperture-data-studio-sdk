@@ -179,10 +179,48 @@ Assert the expected results uses the Assert class methods from [JUnit](https://j
 
 ``` java
 Assertions.assertEquals(3, result.getRowCount());
-Assertions.assertEquals(1.175, result.getValueAt(0,0).getValue());
-Assertions.assertEquals(2.35, result.getValueAt(0,1).getValue());
-Assertions.assertEquals(3.525, result.getValueAt(0,2).getValue());
-Assertions.assertEquals(11, ((Number) result.getValueAt("Column2", 0).getValue()).intValue());
+Assertions.assertEquals(1.175, result.getStepCell(0, 0).getValue());
+Assertions.assertEquals(2.35, result.getStepCell(0, 1).getValue());
+Assertions.assertEquals(3.525, result.getStepCell(0, 2).getValue());
+Assertions.assertEquals(11, ((Number) result.getStepCell("Column2", 0).getValue()).intValue());
+```
+
+##### Note:
+
+Depends on how the custom step is defined, it is possible that `result.getStepCell(0, rowIndex)` throws *'Row index out of bounds'* error when it is expected to have more rows. This could be the row count returned by `StepProcessorFunction` is lesser than the actual number of rows. 
+
+``` java
+// Custom step
+@Override
+    public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+        return processorBuilder
+                .forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
+                        // simple processor that postfix a column with "-processed"
+                        final ProcessorInputContext inputManager = processorContext.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new);
+                        final Optional<InputColumn> column = inputManager.getColumns().stream().findFirst();
+                        column.ifPresent(inputColumn -> outputColumnManager.onValue(MY_OUTPUT_COLUMN, rowIndex -> {
+                        final CellValue cellValue = inputColumn.getValueAt(rowIndex);
+                        return cellValue.toString() + "-processed";
+                        }));
+                        // instead of returning the row count from input manager
+                        // return inputManager.getRowCount();
+                        // the row count is set to return 1
+                        return 1;
+                })
+                .build();
+    }
+```
+``` java
+// Test for custom step
+// In the test, it is expected the custom step to return the same number of rows provided by the test data source
+int expectedTotalRow = 5; 
+int lastRowIndex = expectedTotalRow - 1;
+
+// hit 'Row index out of bounds error' when retrieving the cell value of the last column 
+Assertions.assertEquals("abc -processed", result.getStepCell(0, lastRowIndex).getValue());
+
+// assertion failed here too where getRowCount returns 1
+Assertions.assertEquals(expectedTotalRow, result.getRowCount());
 ```
 
 ## Running the Test
