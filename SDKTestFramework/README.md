@@ -230,7 +230,7 @@ int expectedTotalRow = 5;
 int lastRowIndex = expectedTotalRow - 1;
 
 // hit 'Row index out of bounds error' when retrieving the cell value of the last column 
-Assertions.assertEquals("abc -processed", result.getValue(0, lastRowIndex).getValue());
+Assertions.assertEquals("abc -processed", result.getValue(0, lastRowIndex));
 
 // assertion failed here too where getRowCount returns 1
 Assertions.assertEquals(expectedTotalRow, result.getRowCount());
