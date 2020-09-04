@@ -281,6 +281,60 @@ Please take note that PROCESS output node cannot connect to DATA input node.
 
 ```
 
+###### Input node label
+Disconnected input node displays the label defined in "withLabel". When connected, the input node displays the name of the preceding step in the current step by default. 
+To hide the input node label, set “withLabelDisplayed” to false.
+
+**Disconnected input node without label**
+
+![disconnected input node without label](images/WithoutInputLabel.PNG)
+``` java
+.withNodes(stepNodeBuilder -> stepNodeBuilder
+        .addInputNode(inputNodeBuilder -> inputNodeBuilder
+            .withId(INPUT_ID)
+            .build())
+        .addOutputNode(OUTPUT_ID)
+        .build())
+```
+
+**Disconnected input node with label**
+
+``` java
+.withNodes(stepNodeBuilder -> stepNodeBuilder
+        .addInputNode(inputNodeBuilder -> inputNodeBuilder
+            .withId(INPUT_ID)
+            .withLabel("Sales input")
+            .build())
+        .addOutputNode(OUTPUT_ID)
+        .build())
+```
+![disconnected input node with label](images/WithInputLabel.PNG)
+
+**Connected input node without label**
+``` java
+.withNodes(stepNodeBuilder -> stepNodeBuilder
+        .addInputNode(inputNodeBuilder -> inputNodeBuilder
+            .withId(INPUT_ID)
+            .withLabelDisplayed(false)
+            .build())
+        .addOutputNode(OUTPUT_ID)
+        .build())
+```
+![connected input node with label](images/withLabelDisplayedFalse.PNG)
+
+**Connected input node with label**
+``` java
+.withNodes(stepNodeBuilder -> stepNodeBuilder
+        .addInputNode(inputNodeBuilder -> inputNodeBuilder
+            .withId(INPUT_ID)
+            // withLabelDisplayed is set to true by default
+            .withLabelDisplayed(true)
+            .build())
+        .addOutputNode(OUTPUT_ID)
+        .build())
+```
+![connected input node with label](images/withLabelDisplayedTrue.PNG)
+
 #### Adding step properties
 
 Step properties represent the UI elements of the step. These properties include displaying information about the step, allowing the user to input something or selecting a column to manipulate. 
