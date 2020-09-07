@@ -321,7 +321,7 @@ To hide the input node label, set “withLabelDisplayed” to false.
         .addOutputNode(OUTPUT_ID)
         .build())
 ```
-![connected input node with label](images/withLabelDisplayedFalse.png)
+![connected input node with label](images/WithLabelDisplayedFalse.png)
 
 **Connected input node with label**
 ``` java
@@ -334,7 +334,7 @@ To hide the input node label, set “withLabelDisplayed” to false.
         .addOutputNode(OUTPUT_ID)
         .build())
 ```
-![connected input node with label](images/withLabelDisplayedTrue.png)
+![connected input node with label](images/WithLabelDisplayedTrue.png)
 
 #### Adding step properties
 
