@@ -288,7 +288,6 @@ To hide the input node label, set “withLabelDisplayed” to false.
 
 **Disconnected input node without label**
 
-![disconnected input node without label](images/WithoutInputLabel.png)
 ``` java
 .withNodes(stepNodeBuilder -> stepNodeBuilder
         .addInputNode(inputNodeBuilder -> inputNodeBuilder
@@ -297,6 +296,8 @@ To hide the input node label, set “withLabelDisplayed” to false.
         .addOutputNode(OUTPUT_ID)
         .build())
 ```
+![disconnected input node without label](images/WithoutInputLabel.png)
+
 
 **Disconnected input node with label**
 
