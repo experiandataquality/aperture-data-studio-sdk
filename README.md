@@ -305,7 +305,7 @@ To hide the input node label, set “withLabelDisplayed” to false.
 .withNodes(stepNodeBuilder -> stepNodeBuilder
         .addInputNode(inputNodeBuilder -> inputNodeBuilder
             .withId(INPUT_ID)
-            .withLabel("Sales input")
+            .withLabel("Sales input required")
             .build())
         .addOutputNode(OUTPUT_ID)
         .build())
