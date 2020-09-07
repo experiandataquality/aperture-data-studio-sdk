@@ -541,13 +541,11 @@ public StepConfiguration createConfiguration(final StepConfigurationBuilder conf
 
 ### Processing your step
 
-Use `StepProcessorBuilder` in the `createProcessor` method to implement the logic of the output step. 
+Use `StepProcessorBuilder` in the `createProcessor` method to implement the logic of the custom step output. 
 
 #### Execute step
 
-You define how to generate the cell value of an output column here. The example below shows that appending "-processed" text to the value from first input column, and then displayed into `MY_OUTPUT_COLUMN`.
-
-Please take note that Data Studio executes the `onValue()` callback in parallel, and there is no guarantee of the execution sequences. When displaying the step result in the Grid UI, Data Studio only executes the `onValue()` callback of those cells that are visible to the user.
+You define how to generate the cell value of an output column here. The example below shows that appending "-processed" text to the value from the first input column, and then displayed into `MY_OUTPUT_COLUMN`.
 
 #### StepProcessorBuilder sample code
 
