@@ -38,6 +38,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
         - [StepProcessorBuilder sample code](#stepprocessorbuilder-sample-code)
         - [Cell value style](#cell-value-style)
         - [isInteractive flag](#isinteractive-flag)
+        - [Evaluator](#evaluator)
 		- [Progress bar handling](#progress-bar-handling)    
         - [Processor input context](#processor-input-context)     
     - [The Cache configuration](#the-cache-configuration)
@@ -280,6 +281,61 @@ Please take note that PROCESS output node cannot connect to DATA input node.
         .build())
 
 ```
+
+###### Input node label
+Disconnected input node displays the label defined in "withLabel". When connected, the input node displays the name of the preceding step in the current step by default. 
+To hide the input node label, set “withLabelDisplayed” to false.
+
+**Disconnected input node without label**
+
+``` java
+.withNodes(stepNodeBuilder -> stepNodeBuilder
+        .addInputNode(inputNodeBuilder -> inputNodeBuilder
+            .withId(INPUT_ID)
+            .build())
+        .addOutputNode(OUTPUT_ID)
+        .build())
+```
+![disconnected input node without label](images/WithoutInputLabel.png)
+
+
+**Disconnected input node with label**
+
+``` java
+.withNodes(stepNodeBuilder -> stepNodeBuilder
+        .addInputNode(inputNodeBuilder -> inputNodeBuilder
+            .withId(INPUT_ID)
+            .withLabel("Sales input required")
+            .build())
+        .addOutputNode(OUTPUT_ID)
+        .build())
+```
+![disconnected input node with label](images/WithInputLabel.png)
+
+**Connected input node without label**
+``` java
+.withNodes(stepNodeBuilder -> stepNodeBuilder
+        .addInputNode(inputNodeBuilder -> inputNodeBuilder
+            .withId(INPUT_ID)
+            .withLabelDisplayed(false)
+            .build())
+        .addOutputNode(OUTPUT_ID)
+        .build())
+```
+![connected input node with label](images/WithLabelDisplayedFalse.png)
+
+**Connected input node with label**
+``` java
+.withNodes(stepNodeBuilder -> stepNodeBuilder
+        .addInputNode(inputNodeBuilder -> inputNodeBuilder
+            .withId(INPUT_ID)
+            // withLabelDisplayed is set to true by default
+            .withLabelDisplayed(true)
+            .build())
+        .addOutputNode(OUTPUT_ID)
+        .build())
+```
+![connected input node with label](images/WithLabelDisplayedTrue.png)
 
 #### Adding step properties
 
@@ -594,7 +650,7 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
 
 #### isInteractive flag
 Interactive is a flag that set to `true` when the user views the output of a step on the Data Studio Grid (UI).
-In interactive mode, the evaluator of `OutputColumnManager.onValue(String, LongFunction)}` will only be executed when the cell is visible.
+In interactive mode, the evaluator of `OutputColumnManager.onValue(...)` will only be executed when the cell is visible.
 
 It is set to `false` when running the whole workflow as a Job in the background. In non-interactive mode, all the cells' value will be generated.
 
@@ -608,6 +664,18 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
                 if (processorContext.isInteractive()) {
                     ...
 ```
+
+#### Evaluator
+OutputColumnManager.onValue() accept 2 types of evaluators. 
+1. `OutputColumnManager.onValue(MY_OUTPUT_COLUMN, rowIndex -> CELL_OUTPUT)`
+   LongFunction evaluator accepts long-valued row index and return the computed value of the specified column.
+
+1. `OutputColumnManager.onValue(MY_OUTPUT_COLUMN, (rowIndex, outputCellBuilder)  -> outputCellBuilder.build)`
+BiFunction evaluator accepts long-valued row index along with the outputCellBuilder 
+so that cell style and computed value of the specified column can be defined.
+
+Do note that cells are evaluated in parallel. There is no guarantee the sequence of the evaluation. 
+When displaying step result in grid, the evaluator will only be executed when the cell is visible.
 
 #### Progress bar handling
 Progress bar is used to indicate the progress of the custom step execution. It can be set using `progressChanged()` and the code snippet is as shown below:
