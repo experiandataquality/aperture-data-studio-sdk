@@ -18,6 +18,46 @@ It is recommended to use the provided HTTP client library to access external end
 ### Use provided Logger
 It is also recommended to use the provided `Logger` to write custom step logs.  [See example.](README.md#The-Logging-library) Custom step logs can be retrieve from C:\ApertureDataStudio\data\log
 
+
+### Avoid temporary field
+Given the example below, `newColumns` acts as a temporary field to hold the new column names defined in the `createConfiguration()` method. The `createProcessor()` method also uses `newColumns` to provide the result for the newly add columns. As you can see `newColumns` field is only set if `createConfiguration()` is called. This will cause unexpected result if `createProcessor()` is called before `createConfiguration()`.
+
+```java
+private List<String> newColumns;
+
+@Override
+public StepConfiguration createConfiguration(final StepConfigurationBuilder configurationBuilder) {
+    return configurationBuilder
+            .withNodes(stepNodeBuilder -> stepNodeBuilder
+                    .addInputNode(INPUT_ID)
+                    .addOutputNode(OUTPUT_ID)
+                    .build())
+            .withStepProperties(stepPropertiesBuilder -> stepPropertiesBuilder.build())
+            .withOutputLayouts(outputLayoutBuilder -> outputLayoutBuilder
+                    .forOutputNode(OUTPUT_ID, outputColumnBuilder ->
+                            {
+                                this.newColumns = Arrays.asList("Column A", "Column B");
+                                this.newColumns.forEach(newColumn -> outputColumnBuilder.addColumn(newColumn));
+                                return outputColumnBuilder.build();
+                            })
+                    .build())
+            .build();
+}
+
+@Override
+public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder) {
+    return processorBuilder
+            .forOutputNode(OUTPUT_ID, (processorContext, outputColumnManager) -> {
+                // newColumns might be empty, as createConfiguration() might not 
+                // be called before createProcessor()
+                this.newColumns.forEach(newColumn -> outputColumnManager.onValue(newColumn, rowIndex -> "Value of " + newColumn));
+                final ProcessorInputContext inputContext = processorContext.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new);
+                return inputContext.getRowCount();
+            })
+            .build();
+}
+```
+
 ## Limitation
 ### Both custom chooser and column chooser cannot be reset
 Once the value for the custom chooser or column chooser is selected, it cannot be reset to its initial state anymore. For example, once hash tag is selected for the prefix custom chooser, prefix custom chooser cannot be reset to display "Select a value".
