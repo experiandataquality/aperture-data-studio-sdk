@@ -597,11 +597,11 @@ public StepConfiguration createConfiguration(final StepConfigurationBuilder conf
 
 ### Processing your step
 
-Use `StepProcessorBuilder` in the `createProcessor` method to implement the logic of the output step. 
+Use `StepProcessorBuilder` in the `createProcessor` method to implement the logic of the custom step output. 
 
 #### Execute step
 
-This method is used to apply logic to the input source and the computed value will become the output to a specified output column. The example below shows the logic of appending "-processed" to the value from `MY_INPUT_COLUMN` and displayed into `MY_OUTPUT_COLUMN`
+You define how to generate the cell value of an output column here. The example below shows that appending "-processed" text to the value from the first input column, and then displayed into `MY_OUTPUT_COLUMN`.
 
 #### StepProcessorBuilder sample code
 
@@ -727,7 +727,7 @@ ProcessorInputContext is an instance that used to return metadata input columns.
 ### The Cache configuration
 The cache object allows a custom step to cache its results, for later reuse. Each cache object is created and 
 referenced by a particular name. It is useful for storing responses from slow services between instances of custom steps. 
-The backing key/value datastore is fast enough on reads to be used for random access lookups, and 
+The backing key/value datastore is thread-safe and fast enough on reads to be used for random access lookups, and 
 it can handle reads/writes from multiple steps at once. The cache is managed by Data Studio, but 
 it is the responsibility of the custom step to delete or refresh the cache as necessary.
 
