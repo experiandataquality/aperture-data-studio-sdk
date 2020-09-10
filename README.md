@@ -58,6 +58,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 - [Class-isolation](#class-isolation)
 - [The Logging library](#the-logging-library)
 - [The HTTP Client library](#the-http-client-library)
+- [Best practices and limitation](best-practices.md)
 - [Generating a custom parser from a new or existing project](#generating-a-custom-parser-from-a-new-or-existing-project)
 - [Creating a custom parser](#creating-a-custom-parser)
   - [Importing the parser SDK](#importing-the-parser-sdk)
