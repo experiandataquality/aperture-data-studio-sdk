@@ -3,10 +3,11 @@
 ## Best practices
 
 ### One custom step per jar
-It is recommended that you bundle one custom step per JAR.
+It is recommended that you bundle one custom step per JAR. This will simplify the process of updating or removing a single custom step. And it will also promote security by isolation. A problematic custom step can be easily detected and isolated without affecting after custom step.
 
 ### Fat jar
-Bundle the custom step in a fat jar where all dependencies are bundled into a single jar. For more details, [read this](README.md#class-isolation).
+Bundle the custom step in a fat jar where all dependencies are bundled into a single jar. This allow custom step to use specific version of libraries without affecting other custom step. For more details, [read this](README.md#class-isolation).
+
 
 
 ### Progress bar handling
