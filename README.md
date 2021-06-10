@@ -51,6 +51,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
         - [Destroy cache](#destroy-cache)
         - [Assigning value to cache](#assigning-value-to-cache)
         - [Getting value from cache](#getting-value-from-cache)
+    - [Preprocessing (Index)](#preprocessing)    
+        - [Index type](#index-type)
     - [Custom step exception](#custom-step-exception)
     - [Step setting](#step-setting)
         - [Creating step setting](#creating-step-setting)
@@ -808,7 +810,7 @@ If the cache contains no value for that key, `null` is returned.
 cache1.get(cacheKey);
 ```
 
-#### Preprocessing (Index)
+### Preprocessing
 
 Preprocessing provide flexibility to manipulate custom Step input values through callback and made it available as an index for the 
 main processing to use.
@@ -854,7 +856,9 @@ public StepProcessor createProcessor(StepProcessorBuilder processorBuilder) {
 }
 ```
 
-##### Index Type
+**NOTE**: at the current moment there's no support for SDK preprocessing in the SDKTestFramework.
+
+#### Index Type
 
 As for the current moment, there's only one type of index which is `indexTypeRows`. 
 ```java
