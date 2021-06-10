@@ -808,6 +808,104 @@ If the cache contains no value for that key, `null` is returned.
 cache1.get(cacheKey);
 ```
 
+#### Preprocessing (Index)
+
+Preprocessing provide flexibility to manipulate custom Step input values through callback and made it available as an index for the 
+main processing to use.
+
+Advantages:
+* Reduced memory usage as the callbacks that manipulate each input value are evaluted lazily. This allow the step to process even larger 
+  data than before.
+* Potentially faster processing time since common operation can be written into the index and reuse by the main processing. 
+* Much faster read/write performance compare to SDK cache. 
+
+Disadvantages: 
+* Potential code duplication with the main processing (`forOutputNode`).
+* API flexibility vs. SDK Cache. The API to populate index is not as easy to use as SDK Cache. In addition to that, index is only **unique per
+  step** and changes to the structure of the Workflow or Step property values will trigger index rebuilding.
+
+Preprocessing can be done by registering one or more indexes through the `StepProcessorBuilder`.  
+```java
+@Override
+public StepProcessor createProcessor(StepProcessorBuilder processorBuilder) {
+    return processorBuilder
+            .registerIndex(INDEX_NAME, indexBuilder -> indexBuilder
+                    .indexTypeRows() // index type
+                    .provideIndexValues(ctx -> {
+                        final ProcessorInputContext inputContext = ctx.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new);
+                        final List<InputColumn> inputColumns = inputContext.getColumns();
+                        final InputColumn firstInputColumn = inputColumns.get(0);
+                        final InputColumn secondInputColumn = inputColumns.get(1);
+                        
+                        // Append first and second input columns values with -index
+                        for (long i = 0; i < inputContext.getRowCount(); i++) {
+                            final int rowIndex = (int) i;
+                            ctx.appendRow(() -> {
+                                // this callback will be executed lazily
+                                final CellValue indexColumn1 = firstInputColumn.getValueAt(rowIndex);
+                                final CellValue indexColumn2 = secondInputColumn.getValueAt(rowIndex);
+                                // write the index row
+                                return Arrays.asList(indexColumn1, indexColumn2);
+                            });
+                        }
+                    })
+                    .build())
+    // omitted for brevity...
+}
+```
+
+##### Index Type
+
+As for the current moment, there's only one type of index which is `indexTypeRows`. 
+```java
+return processorBuilder
+        .registerIndex(INDEX_NAME, indexBuilder -> indexBuilder
+                .indexTypeRows() 
+                // ...
+```
+
+`indexTypeRows` store values as a map of 32 bits `int` (as index rows) and `List` of `Object`s (as index columns). 
+* This index has a good read/write performance and minimal memory usage due to the use of `int` as a key.
+* The maximum number of row size is equivalent with `Integer.MAX_VALUE` or `2,147,483,647` rows. If you foresee that your index is going to be 
+  bigger than this, I would suggest to split into multiple smaller indexes.  
+* The maximum number of index columns depends on the kind of `List` being used. `ArrayList` would have limit of `Integer.MAX_VALUE`.
+
+To append new row into the index:
+```java 
+// ...
+.indexTypeRows() 
+.provideIndexValues(ctx -> {
+    ctx.appendRow(() -> {
+        // write the index row
+        return Arrays.asList("Value for index column1", "Value for index column2");
+    });
+})
+// ...
+```
+* this will increment the index row value internally. 
+
+To explicitly put the index row:
+```java
+// ...
+.indexTypeRows() 
+.provideIndexValues(ctx -> {
+    final int explicitRowIndex = 15;
+    ctx.putRow(explicitRowIndex, () -> {
+        return Arrays.asList("Value for index column1", "Value for index column2");
+    });
+})
+// ...
+```
+
+To fetch the written index value:
+```java 
+// Details omitted for brevity...
+.forOutputNode(OUTPUT_ID, (context, columnManager) -> {
+    final int rowIndex = 10; 
+    final List<CellValue> indexRowValues = context.getIndexRowValues(INDEX_NAME, rowIndex);
+})
+```
+
 ### Custom step exception
 You can raise custom step exception by throwing the following exception class.
 ``` java
