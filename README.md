@@ -901,7 +901,7 @@ To explicitly put the index row:
 // ...
 ```
 
-To fetch the written index value:
+To fetch the written index value (inside `forOutputNode`):
 ```java 
 // Details omitted for brevity...
 .forOutputNode(OUTPUT_ID, (context, columnManager) -> {
@@ -909,6 +909,21 @@ To fetch the written index value:
     final List<CellValue> indexRowValues = context.getIndexRowValues(INDEX_NAME, rowIndex);
 })
 ```
+
+Other methods available in the `provideIndexValues` context(`RowBasedIndex.ValueContext`):
+```java 
+// Details omitted for brevity...
+.indexTypeRows() 
+.provideIndexValues(ctx -> {
+    ctx.getInputContext(INPUT_1);
+    ctx.getStepPropertyValue(MY_STEP_PROPERTY);
+    ctx.getStepSettingFieldValueAsString(STEP_SETTINGS_1);
+})
+// ...
+```
+* `getInputContext`: Use this method to gain access to input columns values and input row count. 
+* `getStepPropertyValue`: Use this method to get the configured Step property value.
+* `getStepSettingFieldValueAsString`: Use this method to get the configured Step Settings value.
 
 ### Custom step exception
 You can raise custom step exception by throwing the following exception class.
