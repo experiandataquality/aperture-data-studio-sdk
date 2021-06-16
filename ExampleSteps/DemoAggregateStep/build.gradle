@@ -1,0 +1,41 @@
+buildscript {
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+    }
+}
+
+plugins {
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
+    }
+}
+
+dependencies {
+    compileOnly(
+            "com.experian.datastudio:sdkapi:2.4.0",
+    )
+    implementation(
+            "org.eclipse.collections:eclipse-collections:11.0.0.M2",
+            "org.eclipse.collections:eclipse-collections-api:11.0.0.M2",
+    )
+}
+
+/*
+Package the step into a jar together with its dependencies.
+Relocate the dependencies to ensure dependencies version doesn't conflict with data studio
+*/
+shadowJar {
+    //minimize() - DO NOT USE minimize() because classes initialized through reflections or service loader pattern will be excluded
+    zip64 = true
+    relocate 'org.eclipse.collections', 'example.org.eclipse.collections'
+}
+
+tasks.test.dependsOn tasks.shadowJar
+jar.enabled = false
+assemble.dependsOn(shadowJar)

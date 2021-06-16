@@ -80,6 +80,12 @@ The [IPGeolocation](IPGeolocation/src/main/java/com/experian/aperture/datastudio
 - Step Settings (retrieving lang settings from the UI for query)
 - Concurrent asynchronous requests (using Java CompletableFuture)
 
+## Demo Aggregate Example Step 
+
+The [DemoAggregateStep](DemoAggregateStep/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/DemoAggregateStep.java) perform various aggregates operation on a single group column. 
+
+This examples relies on the SDK 2.4.0 preprocessing API.
+
 #### HTTP Requests
 The HTTP requests are made using the SDK HTTP libraries/helper classes (i.e. `WebHttpClient`, `WebHttpRequest`, `WebHttpResponse`). First, an HTTP web client (`WebHttpClient`) is set up, and a request (`WebHttpRequest`) is sent through the client using the `sendAsync()` method. This returns a `WebHttpResponse` which contains the location data of the IP address in JSON format. 
 

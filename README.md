@@ -856,6 +856,9 @@ public StepProcessor createProcessor(StepProcessorBuilder processorBuilder) {
 }
 ```
 
+For full example step, please refer to the 
+[DemoAggregateStep](ExampleSteps/DemoAggregateStep/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/DemoAggregateStep.java)
+
 **NOTE**: at the current moment there's no support for SDK preprocessing in the SDKTestFramework.
 
 #### Index Type
@@ -917,12 +920,14 @@ Other methods available in the `provideIndexValues` context(`RowBasedIndex.Value
 .provideIndexValues(ctx -> {
     ctx.getInputContext(INPUT_1);
     ctx.getStepPropertyValue(MY_STEP_PROPERTY);
+    ctx.getColumnFromChooserValues(MY_INPUT_COLUMN_STEP_PROPERTY);
     ctx.getStepSettingFieldValueAsString(STEP_SETTINGS_1);
 })
 // ...
 ```
 * `getInputContext`: Use this method to gain access to input columns values and input row count. 
 * `getStepPropertyValue`: Use this method to get the configured Step property value.
+* `getColumnFromChooserValues`: Use this method to get the input column instance from column chooser value.
 * `getStepSettingFieldValueAsString`: Use this method to get the configured Step Settings value.
 
 ### Custom step exception
