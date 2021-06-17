@@ -28,7 +28,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
             - [asNumber](#asnumber)
             - [asColumnChooser](#ascolumnchooser)
             - [asCustomChooser](#ascustomchooser)
-        - [Configure withOnValueChanged](#configure-withonvaluechanged)
+        - [Configure withDefaultValue](#configure-withdefaultvalue)
+	- [Configure withOnValueChanged](#configure-withonvaluechanged)
         - [Configure isCompleteHandler](#configure-iscompletehandler)
         - [Configure column layouts](#configure-column-layouts)
         - [Configuration input context](#configuration-input-context) 
@@ -84,7 +85,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 | SDK version                                                                          | Compatible Data Studio version | New features released |
 |--------------------------------------------------------------------------------------|--------------------------------|-----------------------|
-| 2.4.0                                                                                | 2.4.0 (or newer)               | <ul><li>Capability to specify default value for column chooser and custom chooser. This would allow any existing workflow to continue to use without any breaking change while introducing new properties during a minor upgrade.</li><li>An overloaded withDefaultValue method at Configuration which provide you a reference context to other step properties, settings and column definitions (only applicable for column chooser)</li><li>Capability to write preprocessing (#preprocessing) mechanism prior to execution. This also introduces index(es) to the processed value as well.</li></ul>|                               
+| 2.4.0                                                                                | 2.4.0 (or newer)               | <ul><li>Capability to specify default value for column chooser and custom chooser. This would allow any existing workflow to continue to use without any breaking change while introducing new properties during a minor upgrade.</li><li>An overloaded withDefaultValue method at Configuration which provide you a reference context to other step properties, settings and column definitions (only applicable for column chooser)</li><li>Capability to write [preprocessing](#preprocessing) mechanism prior to execution. This also introduces index(es) to the processed value as well.</li></ul>|                               
 | 2.3.0                                                                                | 2.1.0 (or newer)               | <ul><li>Capability to rename input node label. You can now specify a text for the input node of your step instead of the default "Connect an input".</li><li>Data tags are now stored as part of column details.</li><li>A new getColumnsByTag method at Configuration and Processing. This will allow you to retrieve column details for a given data tag.</li><li>Custom Chooser now supports value and display name for each item defined. You can now set a friendly name to be displayed in the chooser while maintaining ids for backend processing.</li><li>Fixed SDK Test framework bug for failing to retrieve value from `getStepCell`.</li></ul>
 | [2.2.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.2.0) | 2.0.11 (or newer)              | <ul><li>A new On value change handler for step properties. This will provide you with more control over the step properties in your custom step (e.g. you can reset the selection of subsequent step properties once the value in the preceding step property has changed).</li><li>A new Locale parameter. This will allow the users to select the "Language and region" settings when uploading a file with the custom parser. The parser will then be able to deserialize the file based on the selected setting.</li><li>SDK custom parser test framework. The SDK test framework has now been extended to cater for custom parser testing at component level as well.</li><li>New custom icons added:<ul><li>Dynamic Feed</li><li>Experian</li></ul></li></ul> |
 | [2.1.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.1.1) | 2.0.9 (or newer)               | New custom icons added:<ul><li>Australia Post</li><li>Collibra</li><li>Dynamics365</li><li>Salesforce</li><li>Tableau</li></ul> |
@@ -413,6 +414,17 @@ For example, to add a column chooser to the step:
 | withIsRequired()              | Set whether the field is mandatory                            |
 | withMultipleSelect()          | Set whether multiple fields can be selected                   |
 | build                         | Build the step property                                       |
+
+#### Configure withDefaultValue
+There are 2 overloaded methods for withDefaultValue. You can either set it with a direct value or based on DefaultValueContext.
+DefaultValueContext is an instance that used to return step property and step setting values. It does also return metadata input columns however this is only applicable for ColumnChooser step proerty.
+
+| Method                           | Description                                                        |
+|----------------------------------|--------------------------------------------------------------------|
+| getStepPropertyValue             | Gets the value of a step property                                  |
+| getStepSettingFieldValueAsString | Gets the value of a step setting                                   |
+| getColumnsByTag                  | Gets the metadata input columns by tag (for column chooser only)   |
+| getColumnByIndex                 | Gets the metadata input columns by index (for column chooser only) |
 
 #### Configure withOnValueChanged
 Since version 2.2.0, on-value-changed handler is added to all the step property types. The on-value-changed handler allows a step property to update another step property's value, when its own value is updated. 
