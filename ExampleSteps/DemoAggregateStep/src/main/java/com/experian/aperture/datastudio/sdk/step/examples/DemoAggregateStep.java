@@ -6,13 +6,11 @@ import com.experian.datastudio.sdk.api.step.CustomStepDefinition;
 import com.experian.datastudio.sdk.api.step.configuration.StepConfiguration;
 import com.experian.datastudio.sdk.api.step.configuration.StepConfigurationBuilder;
 import com.experian.datastudio.sdk.api.step.configuration.StepIcon;
+import com.experian.datastudio.sdk.api.step.processor.*;
 import org.eclipse.collections.api.set.primitive.MutableIntSet;
 import org.eclipse.collections.impl.factory.primitive.IntSets;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -90,8 +88,6 @@ public class DemoAggregateStep implements CustomStepDefinition {
                         .indexTypeRows()
                         .provideIndexValues(ctx -> {
                             final InputColumn groupColumn = ctx.getColumnFromChooserValues(GROUP_COLUMN_PROP).get(0);
-                            final InputColumn aggregateColumn = ctx.getColumnFromChooserValues(AGGREGATE_COLUMN_PROP).get(0);
-
                             final long rowCount = ctx.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new)
                                     .getRowCount();
 
@@ -103,6 +99,7 @@ public class DemoAggregateStep implements CustomStepDefinition {
                             ctx.appendRow(() -> Collections.singletonList(outputRowCount.get()));
 
                             for (long i = 0; i < rowCount; i++) {
+                                final int currentGroupRow = (int) i;
                                 final CellValue currentGroup = groupColumn.getValueAt(i);
                                 final int currentGroupHash = currentGroup.hashCode();
                                 if (constructedGroup.contains(currentGroupHash)) {
@@ -113,13 +110,16 @@ public class DemoAggregateStep implements CustomStepDefinition {
                                 // index structure outputRowIndex + 1 -> [groupValue, aggregateColumnRow1Value, aggregateColumnRow2Value, ...]
                                 ctx.appendRow(() -> {
                                     // This callback is executed lazily as iterator exactly before the index row is written.
-                                    final List<Object> groupRow = new ArrayList<>();
-                                    groupRow.add(currentGroup);
+                                    final List<Integer> groupRow = new ArrayList<>();
+                                    // first index column is always the group values.
+                                    groupRow.add(currentGroupRow);
+
+                                    // safe to cast to int here since max rowcount for index type rows is Integer.MAX_VALUE
                                     for (int row = 0; row < rowCount; row++) {
                                         if (visitedRows.contains(row) || !groupColumn.getValueAt(row).equals(currentGroup)) {
                                             continue; // this row belong to another group, so skip...
                                         }
-                                        groupRow.add(aggregateColumn.getValueAt(row));
+                                        groupRow.add(row);
                                         visitedRows.add(row);
                                     }
                                     return groupRow;
@@ -135,35 +135,37 @@ public class DemoAggregateStep implements CustomStepDefinition {
 
                     columnManager.onValue(GROUP_COLUMN, row -> {
                         final List<CellValue> indexRow = ctx.getIndexRowValues(INDEX_NAME, (int) row + 1);
+                        final InputColumn groupColumn = ctx.getColumnFromChooserValues(GROUP_COLUMN_PROP).get(0);
                         if (indexRow.isEmpty()) {
                             throw new IllegalStateException("Index row " + row + " must not be empty.");
                         }
-                        return indexRow.get(0);
+                        return groupColumn.getValueAt(indexRow.get(0).toLong());
                     });
 
                     columnManager.onValue(AGGREGATE_COLUMN, row -> {
                         final List<CellValue> indexRow = ctx.getIndexRowValues(INDEX_NAME, (int) row + 1);
+                        final InputColumn aggregateColumn = ctx.getColumnFromChooserValues(AGGREGATE_COLUMN_PROP).get(0);
                         if (indexRow.size() <= 1) {
                             throw new IllegalStateException("Index row " + row + " has invalid structure: index columns size <= 1");
                         }
                         final List<CellValue> values = indexRow.subList(1, indexRow.size());
                         switch (aggregateType) {
                             case SUM:
-                                return values.stream().mapToDouble(v -> v.toDouble()).sum();
+                                return values.stream().map(v -> aggregateColumn.getValueAt(v.toLong())).mapToDouble(v -> v.toDouble()).sum();
                             case AVG:
-                                return values.stream().mapToDouble(v -> v.toDouble()).average().orElse(0.0);
+                                return values.stream().map(v -> aggregateColumn.getValueAt(v.toLong())).mapToDouble(v -> v.toDouble()).average().orElse(0.0);
                             case MAX:
-                                return values.stream().mapToDouble(v -> v.toDouble()).max().orElse(0.0);
+                                return values.stream().map(v -> aggregateColumn.getValueAt(v.toLong())).mapToDouble(v -> v.toDouble()).max().orElse(0.0);
                             case MIN:
-                                return values.stream().mapToDouble(v -> v.toDouble()).min().orElse(0.0);
+                                return values.stream().map(v -> aggregateColumn.getValueAt(v.toLong())).mapToDouble(v -> v.toDouble()).min().orElse(0.0);
                             case COUNT:
                                 return values.size();
                             case FIRST:
-                                return values.get(0);
+                                return aggregateColumn.getValueAt(values.get(0).toLong());
                             case LAST:
-                                return values.get(values.size() - 1);
+                                return aggregateColumn.getValueAt(values.get(values.size() - 1).toLong());
                             case PIPE:
-                                return values.stream().map(Object::toString).collect(Collectors.joining("|"));
+                                return values.stream().map(v -> aggregateColumn.getValueAt(v.toLong()).toString()).collect(Collectors.joining("|"));
                             default:
                                 throw new IllegalStateException("Unsupported aggregate operation: " + aggregateType);
                         }
