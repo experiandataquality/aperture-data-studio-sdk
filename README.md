@@ -1494,5 +1494,6 @@ environment.
 2. Importing a dmx which using an older custom step version will be 'auto-upgraded' to the latest minor version of custom step in Data Studio.
 3. Data Studio SDK is still not able to pre-select which custom step version to use in a specified environment, space or workflow since there is no "Plugin Admin UI" to manage on this. However, Data Studio SDK will honor same custom step with different major versions as display below
 
-![Capture](https://user-images.githubusercontent.com/53897209/122909179-80ce9500-d387-11eb-8e60-f2c561da44a5.JPG)
+![Capture](https://user-images.githubusercontent.com/53897209/122909412-be332280-d387-11eb-91ed-609cadac14ef.JPG)
+
 
