@@ -418,7 +418,7 @@ For example, to add a column chooser to the step:
 
 #### Configure withDefaultValue
 There are 2 overloaded methods for withDefaultValue. You can either set it with a direct value or based on DefaultValueContext.
-DefaultValueContext is an instance that used to return step property and step setting values. It does also return metadata input columns however this is only applicable for ColumnChooser step proerty.
+DefaultValueContext is an instance that used to return step property and step setting values. It does also return metadata input columns however this is only applicable for ColumnChooser step property.
 
 | Method                           | Description                                                        |
 |----------------------------------|--------------------------------------------------------------------|
