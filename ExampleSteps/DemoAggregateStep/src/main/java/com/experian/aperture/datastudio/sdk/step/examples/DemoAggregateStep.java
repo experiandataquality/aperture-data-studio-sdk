@@ -7,8 +7,6 @@ import com.experian.datastudio.sdk.api.step.configuration.StepConfiguration;
 import com.experian.datastudio.sdk.api.step.configuration.StepConfigurationBuilder;
 import com.experian.datastudio.sdk.api.step.configuration.StepIcon;
 import com.experian.datastudio.sdk.api.step.processor.*;
-import org.eclipse.collections.api.set.primitive.MutableIntSet;
-import org.eclipse.collections.impl.factory.primitive.IntSets;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -91,8 +89,8 @@ public class DemoAggregateStep implements CustomStepDefinition {
                             final long rowCount = ctx.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new)
                                     .getRowCount();
 
-                            final MutableIntSet constructedGroup = IntSets.mutable.empty();
-                            final MutableIntSet visitedRows = IntSets.mutable.empty();
+                            final Set<Integer> constructedGroup = new HashSet<>();
+                            final BitSet visitedRows = new BitSet((int) rowCount);
                             final AtomicInteger outputRowCount = new AtomicInteger();
 
                             // the first index's row is just the total aggregate row number
@@ -115,12 +113,12 @@ public class DemoAggregateStep implements CustomStepDefinition {
                                     groupRow.add(currentGroupRow);
 
                                     // safe to cast to int here since max rowcount for index type rows is Integer.MAX_VALUE
-                                    for (int row = 0; row < rowCount; row++) {
-                                        if (visitedRows.contains(row) || !groupColumn.getValueAt(row).equals(currentGroup)) {
+                                    for (int row = visitedRows.nextClearBit(0); row < rowCount; row++) {
+                                        if (visitedRows.get(row) || !groupColumn.getValueAt(row).equals(currentGroup)) {
                                             continue; // this row belong to another group, so skip...
                                         }
                                         groupRow.add(row);
-                                        visitedRows.add(row);
+                                        visitedRows.set(row);
                                     }
                                     return groupRow;
                                 });
