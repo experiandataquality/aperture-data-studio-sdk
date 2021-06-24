@@ -27,9 +27,10 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
             - [asString](#asstring)
             - [asNumber](#asnumber)
             - [asColumnChooser](#ascolumnchooser)
-            - [asCustomChooser](#ascustomchooser)
-        - [Configure withOnValueChanged](#configure-withonvaluechanged)
-        - [Configure isCompleteHandler](#configure-iscompletehandler)
+            - [asCustomChooser](#ascustomchooser)        
+	- [Configure withDefaultValue](#configure-withdefaultvalue)
+	- [Configure withOnValueChanged](#configure-withonvaluechanged)
+	- [Configure isCompleteHandler](#configure-iscompletehandler)
         - [Configure column layouts](#configure-column-layouts)
         - [Configuration input context](#configuration-input-context) 
         - [StepConfigurationBuilder sample code](#stepconfigurationbuilder-sample-code)
@@ -51,6 +52,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
         - [Destroy cache](#destroy-cache)
         - [Assigning value to cache](#assigning-value-to-cache)
         - [Getting value from cache](#getting-value-from-cache)
+    - [Preprocessing (Index)](#preprocessing)    
+        - [Index type](#index-type)
     - [Custom step exception](#custom-step-exception)
     - [Step setting](#step-setting)
         - [Creating step setting](#creating-step-setting)
@@ -76,12 +79,14 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
       - [TableDefinitionContext](#tabledefinitioncontext-1)
       - [ClosableIteratorBuilder](#closableiteratorbuilder)
 - [Debugging](#debugging)
+- [Limitation in supporting minor upgrade](#limitation-in-supporting-minor-upgrade)
 
 
 ## Compatibility matrix between SDK and Data Studio version
 
 | SDK version                                                                          | Compatible Data Studio version | New features released |
 |--------------------------------------------------------------------------------------|--------------------------------|-----------------------|
+| 2.4.0                                                                                | 2.4.0 (or newer)               | <ul><li>Data Studio SDK is able to support custom step with minor version upgrade without breaking existing workflow. Kindly take note of the [limitation in supporting minor upgrade](#limitation-in-supporting-minor-upgrade)</li><li>Capability to specify default value for column chooser and custom chooser. This would allow any existing workflow to continue to use without any breaking change while introducing new properties during a minor upgrade.</li><li>An overloaded withDefaultValue method at Configuration which provide you a reference context to other step properties, settings and column definitions (only applicable for column chooser)</li><li>Capability to write [preprocessing](#preprocessing) mechanism prior to execution. This also introduces index(es) to the processed value as well.</li></ul>|                               
 | 2.3.0                                                                                | 2.1.0 (or newer)               | <ul><li>Capability to rename input node label. You can now specify a text for the input node of your step instead of the default "Connect an input".</li><li>Data tags are now stored as part of column details.</li><li>A new getColumnsByTag method at Configuration and Processing. This will allow you to retrieve column details for a given data tag.</li><li>Custom Chooser now supports value and display name for each item defined. You can now set a friendly name to be displayed in the chooser while maintaining ids for backend processing.</li><li>Fixed SDK Test framework bug for failing to retrieve value from `getStepCell`.</li></ul>
 | [2.2.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.2.0) | 2.0.11 (or newer)              | <ul><li>A new On value change handler for step properties. This will provide you with more control over the step properties in your custom step (e.g. you can reset the selection of subsequent step properties once the value in the preceding step property has changed).</li><li>A new Locale parameter. This will allow the users to select the "Language and region" settings when uploading a file with the custom parser. The parser will then be able to deserialize the file based on the selected setting.</li><li>SDK custom parser test framework. The SDK test framework has now been extended to cater for custom parser testing at component level as well.</li><li>New custom icons added:<ul><li>Dynamic Feed</li><li>Experian</li></ul></li></ul> |
 | [2.1.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.1.1) | 2.0.9 (or newer)               | New custom icons added:<ul><li>Australia Post</li><li>Collibra</li><li>Dynamics365</li><li>Salesforce</li><li>Tableau</li></ul> |
@@ -410,6 +415,17 @@ For example, to add a column chooser to the step:
 | withIsRequired()              | Set whether the field is mandatory                            |
 | withMultipleSelect()          | Set whether multiple fields can be selected                   |
 | build                         | Build the step property                                       |
+
+#### Configure withDefaultValue
+There are 2 overloaded methods for withDefaultValue. You can either set it with a direct value or based on DefaultValueContext.
+DefaultValueContext is an instance that used to return step property and step setting values. It does also return metadata input columns however this is only applicable for ColumnChooser step property.
+
+| Method                           | Description                                                        |
+|----------------------------------|--------------------------------------------------------------------|
+| getStepPropertyValue             | Gets the value of a step property                                  |
+| getStepSettingFieldValueAsString | Gets the value of a step setting                                   |
+| getColumnsByTag                  | Gets the metadata input columns by tag (for column chooser only)   |
+| getColumnByIndex                 | Gets the metadata input columns by index (for column chooser only) |
 
 #### Configure withOnValueChanged
 Since version 2.2.0, on-value-changed handler is added to all the step property types. The on-value-changed handler allows a step property to update another step property's value, when its own value is updated. 
@@ -806,6 +822,126 @@ If the cache contains no value for that key, `null` is returned.
 ``` java
 cache1.get(cacheKey);
 ```
+
+### Preprocessing
+
+Preprocessing provide flexibility to manipulate custom Step input values through callback and made it available as an index for the 
+main processing to use.
+
+Advantages:
+* Reduced memory usage as the callbacks that manipulate each input value are evaluted lazily. This allow the step to process even larger 
+  data than before.
+* Potentially faster processing time since common operation can be written into the index and reuse by the main processing. 
+* Much faster read/write performance compare to SDK cache. 
+
+Disadvantages: 
+* Potential code duplication with the main processing (`forOutputNode`).
+* API flexibility vs. SDK Cache. The API to populate index is not as easy to use as SDK Cache. In addition to that, index is only **unique per
+  step** and changes to the structure of the Workflow or Step property values will trigger index rebuilding.
+
+Preprocessing can be done by registering one or more indexes through the `StepProcessorBuilder`.  
+```java
+@Override
+public StepProcessor createProcessor(StepProcessorBuilder processorBuilder) {
+    return processorBuilder
+            .registerIndex(INDEX_NAME, indexBuilder -> indexBuilder
+                    .indexTypeRows() // index type
+                    .provideIndexValues(ctx -> {
+                        final ProcessorInputContext inputContext = ctx.getInputContext(INPUT_ID).orElseThrow(IllegalArgumentException::new);
+                        final List<InputColumn> inputColumns = inputContext.getColumns();
+                        final InputColumn firstInputColumn = inputColumns.get(0);
+                        final InputColumn secondInputColumn = inputColumns.get(1);
+                        
+                        // Append first and second input columns values with -index
+                        for (long i = 0; i < inputContext.getRowCount(); i++) {
+                            final int rowIndex = (int) i;
+                            ctx.appendRow(() -> {
+                                // this callback will be executed lazily
+                                final CellValue indexColumn1 = firstInputColumn.getValueAt(rowIndex);
+                                final CellValue indexColumn2 = secondInputColumn.getValueAt(rowIndex);
+                                // write the index row
+                                return Arrays.asList(indexColumn1, indexColumn2);
+                            });
+                        }
+                    })
+                    .build())
+    // omitted for brevity...
+}
+```
+
+For full example step, please refer to the 
+[DemoAggregateStep](ExampleSteps/DemoAggregateStep/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/DemoAggregateStep.java)
+
+**NOTE**: at the current moment there's no support for SDK preprocessing in the SDKTestFramework.
+
+#### Index Type
+
+As for the current moment, there's only one type of index which is `indexTypeRows`. 
+```java
+return processorBuilder
+        .registerIndex(INDEX_NAME, indexBuilder -> indexBuilder
+                .indexTypeRows() 
+                // ...
+```
+
+`indexTypeRows` store values as a map of 32 bits `int` (as index rows) and `List` of `Object`s (as index columns). 
+* This index has a good read/write performance and minimal memory usage due to the use of `int` as a key.
+* The maximum number of row size is equivalent with `Integer.MAX_VALUE` or `2,147,483,647` rows. If you foresee that your index is going to be 
+  bigger than this, I would suggest to split into multiple smaller indexes.  
+* The maximum number of index columns depends on the kind of `List` being used. `ArrayList` would have limit of `Integer.MAX_VALUE`.
+
+To append new row into the index:
+```java 
+// ...
+.indexTypeRows() 
+.provideIndexValues(ctx -> {
+    ctx.appendRow(() -> {
+        // write the index row
+        return Arrays.asList("Value for index column1", "Value for index column2");
+    });
+})
+// ...
+```
+* this will increment the index row value internally. 
+
+To explicitly put the index row:
+```java
+// ...
+.indexTypeRows() 
+.provideIndexValues(ctx -> {
+    final int explicitRowIndex = 15;
+    ctx.putRow(explicitRowIndex, () -> {
+        return Arrays.asList("Value for index column1", "Value for index column2");
+    });
+})
+// ...
+```
+
+To fetch the written index value (inside `forOutputNode`):
+```java 
+// Details omitted for brevity...
+.forOutputNode(OUTPUT_ID, (context, columnManager) -> {
+    final int rowIndex = 10; 
+    final List<CellValue> indexRowValues = context.getIndexRowValues(INDEX_NAME, rowIndex);
+})
+```
+
+Other methods available in the `provideIndexValues` context(`RowBasedIndex.ValueContext`):
+```java 
+// Details omitted for brevity...
+.indexTypeRows() 
+.provideIndexValues(ctx -> {
+    ctx.getInputContext(INPUT_1);
+    ctx.getStepPropertyValue(MY_STEP_PROPERTY);
+    ctx.getColumnFromChooserValues(MY_INPUT_COLUMN_STEP_PROPERTY);
+    ctx.getStepSettingFieldValueAsString(STEP_SETTINGS_1);
+})
+// ...
+```
+* `getInputContext`: Use this method to gain access to input columns values and input row count. 
+* `getStepPropertyValue`: Use this method to get the configured Step property value.
+* `getColumnFromChooserValues`: Use this method to get the input column instance from column chooser value.
+* `getStepSettingFieldValueAsString`: Use this method to get the configured Step Settings value.
 
 ### Custom step exception
 You can raise custom step exception by throwing the following exception class.
@@ -1352,3 +1488,12 @@ To enable Java's standard remote debugging feature:
 
 **NOTE**: make sure `-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005` is removed in the production
 environment.
+
+## Limitation in supporting minor upgrade
+1. Data Studio SDK will pick up the latest version for any custom step which have multiple minor versions. For eg 1.1.0 and 1.2.0, hence v1.2.0 is the choosen one.
+2. Importing a dmx which using an older custom step version will be 'auto-upgraded' to the latest minor version of custom step in Data Studio.
+3. Data Studio SDK is still not able to pre-select which custom step version to use in a specified environment, space or workflow since there is no "Plugin Admin UI" to manage on this. However, Data Studio SDK will honor same custom step with different major versions as display below
+
+![Capture](https://user-images.githubusercontent.com/53897209/122909412-be332280-d387-11eb-91ed-609cadac14ef.JPG)
+
+
