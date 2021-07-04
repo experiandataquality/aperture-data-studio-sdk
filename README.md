@@ -58,6 +58,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
     - [Step setting](#step-setting)
         - [Creating step setting](#creating-step-setting)
         - [Accessing step setting](#accessing-step-setting)
+    - [Workflow parameters](#workflow-parameters)
 - [Class-isolation](#class-isolation)
 - [The Logging library](#the-logging-library)
 - [The HTTP Client library](#the-http-client-library)
@@ -1014,6 +1015,24 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
 }
 ```
 
+### Workflow parameters
+
+Workflow parameters allow you to configure the settings of your Workflow steps without specifying the value. You can create a Workflow parameter and assign it to any of the Workflow step setting that support the Workflow parameter's datatype. 
+
+Custom steps now automatically support workflow parameters for string (alphanumeric) and number (numeric) properties. 
+
+Any calls to the `context.getStepPropertyValue()` method should return the workflow parameter value if a workflow parameter is referenced. 
+
+Example: 
+``` java
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+        .asString(STRING_PROPERTY)
+        .withOnValueChanged(context -> {
+            final String value = (String) context.getStepPropertyValue(STRING_PROPERTY).orElse("");
+        })
+        .build())
+```
+
 ## Class-isolation
 
 By default each and every plugin's `JAR` files are isolated in their own class-loader. This class-loader will prioritize 
@@ -1072,6 +1091,20 @@ Some notes on jar packaging:
    ```
 
 ## The Logging library
+
+There are 3 main methods available through the SdkLogManager for configuring the Logger: 
+``` java
+    Method 1: SdkLogManager.getLogger(StepsTemplate.class, Level.INFO);
+    Method 2: SdkLogManager.getLogger(StepsTemplate.class);
+    Method 3: SdkLogManager.getLogger("CustomLoggerName");
+```
+Method 1 allows you to specify a logger for your custom step class and an explicit log level (e.g. Level.INFO).
+
+Method 2 allows you to specify a logger for your custom step class but implicitly derives the log level from the Root logger in the log4j2.xml configuration file. Effectively, the log level of the custom step logger will be the same as the log level of the Root logger. 
+
+Method 3 allows you to specify a logger name (which should correspond to a logger configured in the log4j2.xml configuration file). If the logger with the specified logger name does not exist, the Root logger will be returned instead. 
+
+Example: 
 ``` java
 public class StepsTemplate implements CustomStepDefinition {
     private static final Logger LOGGER = SdkLogManager.getLogger(StepsTemplate.class, Level.INFO);
