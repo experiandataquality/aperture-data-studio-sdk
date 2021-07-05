@@ -1017,7 +1017,7 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
 
 ### Workflow parameters
 
-Workflow parameters allow you to configure the settings of your Workflow steps without specifying the value. You can create a Workflow parameter and assign it to any of the Workflow step setting that support the Workflow parameter's datatype. 
+Workflow parameters allow you to configure the properties of your Workflow steps without specifying its value. You can create a Workflow parameter and assign it to any Workflow step property that supports the Workflow parameter's datatype. 
 
 Custom steps now automatically support workflow parameters for string (alphanumeric) and number (numeric) properties. 
 
