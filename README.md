@@ -1101,11 +1101,11 @@ There are 3 main methods available through the SdkLogManager for configuring the
 ```
 Method 1 allows you to specify a logger for your custom step class and an explicit log level (e.g. Level.INFO).
 
-Method 2 allows you to specify a logger for your custom step class but implicitly derives the log level from the Root logger in the log4j2.xml configuration file. Effectively, the log level of the custom step logger will be the same as the log level of the Root logger. 
+Method 2 allows you to specify a logger for your custom step class but implicitly derives the log level from the Root logger in the log4j2.xml configuration file if no logger with the canonical class name exists. Effectively, the log level of the custom step logger will be the same as the log level of the Root logger. 
 
 Method 3 allows you to specify a logger name (which should correspond to a logger configured in the log4j2.xml configuration file). If the logger with the specified logger name does not exist, the Root logger will be returned instead. 
 
-Example: 
+Example (Method 1): 
 ``` java
 public class StepsTemplate implements CustomStepDefinition {
     private static final Logger LOGGER = SdkLogManager.getLogger(StepsTemplate.class, Level.INFO);
@@ -1115,6 +1115,25 @@ public class StepsTemplate implements CustomStepDefinition {
         LOGGER.info("Create configuration");
         ...
 ```
+
+Example (Method 2): 
+``` java
+private static final Logger LOGGER = SdkLogManager.getLogger(StepsTemplate.class);
+```
+
+log4j2.xml
+```xml
+<Loggers>
+    <Logger name="com.experian.StepsTemplate"  level="debug">
+        <AppenderRef ref="AppenderRefExample1" />
+    </Logger>
+    <Root level="info">
+        <AppenderRef ref="AppenderRefExample2"/>
+    </Root>
+</Loggers>
+```
+
+The log level of LOGGER will be Level.DEBUG since the logger with the canonical class name exists. If the first logger *does not exist*, the log level of LOGGER will be Level.INFO as determined by the Root logger log level instead. 
 
 ## The HTTP Client library
 
