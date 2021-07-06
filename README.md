@@ -58,6 +58,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
     - [Step setting](#step-setting)
         - [Creating step setting](#creating-step-setting)
         - [Accessing step setting](#accessing-step-setting)
+    - [Workflow parameters](#workflow-parameters)
 - [Class-isolation](#class-isolation)
 - [The Logging library](#the-logging-library)
 - [The HTTP Client library](#the-http-client-library)
@@ -86,8 +87,9 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 | SDK version                                                                          | Compatible Data Studio version | New features released |
 |--------------------------------------------------------------------------------------|--------------------------------|-----------------------|
-| 2.4.0                                                                                | 2.4.0 (or newer)               | <ul><li>Data Studio SDK is able to support custom step with minor version upgrade without breaking existing workflow. Kindly take note of the [limitation in supporting minor upgrade](#limitation-in-supporting-minor-upgrade)</li><li>Capability to specify default value for column chooser and custom chooser. This would allow any existing workflow to continue to use without any breaking change while introducing new properties during a minor upgrade.</li><li>An overloaded withDefaultValue method at Configuration which provide you a reference context to other step properties, settings and column definitions (only applicable for column chooser)</li><li>Capability to write [preprocessing](#preprocessing) mechanism prior to execution. This also introduces index(es) to the processed value as well.</li></ul>|                               
-| 2.3.0                                                                                | 2.1.0 (or newer)               | <ul><li>Capability to rename input node label. You can now specify a text for the input node of your step instead of the default "Connect an input".</li><li>Data tags are now stored as part of column details.</li><li>A new getColumnsByTag method at Configuration and Processing. This will allow you to retrieve column details for a given data tag.</li><li>Custom Chooser now supports value and display name for each item defined. You can now set a friendly name to be displayed in the chooser while maintaining ids for backend processing.</li><li>Fixed SDK Test framework bug for failing to retrieve value from `getStepCell`.</li></ul>
+| 2.5.0                                                                                | 2.4.2 (or newer)               | <ul><li>Data Studio SDK now supports workflow parameters in custom steps (for string and number properties). Previously, workflow parameters can only be utilized in the step configuration and function editor for selected native steps. </li><li>Workflow parameters are backward compatible as they are supported for custom steps which have been built using previous versions of the SDK. </li><li>Data Studio SDK Logging capabilities have been enhanced to allow for specifying a logger based on the class only, without explicitly specifying the log level. </li><li>This decouples the log level from the custom step and no longer needs to be hardcoded. The log level is implicitly derived from the Root logger in the log4j2.xml configuration file. </li></ul>|                               
+| [2.4.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.4.0) | 2.4.0 (or newer)               | <ul><li>Data Studio SDK is able to support custom step with minor version upgrade without breaking existing workflow. Kindly take note of the [limitation in supporting minor upgrade](#limitation-in-supporting-minor-upgrade)</li><li>Capability to specify default value for column chooser and custom chooser. This would allow any existing workflow to continue to use without any breaking change while introducing new properties during a minor upgrade.</li><li>An overloaded withDefaultValue method at Configuration which provide you a reference context to other step properties, settings and column definitions (only applicable for column chooser)</li><li>Capability to write [preprocessing](#preprocessing) mechanism prior to execution. This also introduces index(es) to the processed value as well.</li></ul>|                               
+| [2.3.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.3.0) | 2.1.0 (or newer)               | <ul><li>Capability to rename input node label. You can now specify a text for the input node of your step instead of the default "Connect an input".</li><li>Data tags are now stored as part of column details.</li><li>A new getColumnsByTag method at Configuration and Processing. This will allow you to retrieve column details for a given data tag.</li><li>Custom Chooser now supports value and display name for each item defined. You can now set a friendly name to be displayed in the chooser while maintaining ids for backend processing.</li><li>Fixed SDK Test framework bug for failing to retrieve value from `getStepCell`.</li></ul>
 | [2.2.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.2.0) | 2.0.11 (or newer)              | <ul><li>A new On value change handler for step properties. This will provide you with more control over the step properties in your custom step (e.g. you can reset the selection of subsequent step properties once the value in the preceding step property has changed).</li><li>A new Locale parameter. This will allow the users to select the "Language and region" settings when uploading a file with the custom parser. The parser will then be able to deserialize the file based on the selected setting.</li><li>SDK custom parser test framework. The SDK test framework has now been extended to cater for custom parser testing at component level as well.</li><li>New custom icons added:<ul><li>Dynamic Feed</li><li>Experian</li></ul></li></ul> |
 | [2.1.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.1.1) | 2.0.9 (or newer)               | New custom icons added:<ul><li>Australia Post</li><li>Collibra</li><li>Dynamics365</li><li>Salesforce</li><li>Tableau</li></ul> |
 | [2.1.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.1.0) | 2.0.6 (or newer)               |<ul><li>Accessing Step Settings at the Step Configuration stage, so that API calls can be made using the credentials in the Step Settings to populate the Step Properties.</li><li>Password type field in Step Settings to ensure masking and encryption of sensitive information.</li><li>Custom Step Exception. Custom step developer can define error IDs and descriptions.</li></ul>| 
@@ -1014,6 +1016,24 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
 }
 ```
 
+### Workflow parameters
+
+Workflow parameters allow you to configure the properties of your Workflow steps without specifying its value. You can create a Workflow parameter and assign it to any Workflow step property that supports the Workflow parameter's datatype. 
+
+Custom steps now automatically support workflow parameters for string (alphanumeric) and number (numeric) properties. 
+
+Any calls to the `context.getStepPropertyValue()` method should return the workflow parameter value if a workflow parameter is referenced. 
+
+Example: 
+``` java
+.addStepProperty(stepPropertyBuilder -> stepPropertyBuilder
+        .asString(STRING_PROPERTY)
+        .withOnValueChanged(context -> {
+            final String value = (String) context.getStepPropertyValue(STRING_PROPERTY).orElse("");
+        })
+        .build())
+```
+
 ## Class-isolation
 
 By default each and every plugin's `JAR` files are isolated in their own class-loader. This class-loader will prioritize 
@@ -1072,6 +1092,20 @@ Some notes on jar packaging:
    ```
 
 ## The Logging library
+
+There are 3 main methods available through the SdkLogManager for configuring the Logger: 
+``` java
+    Method 1: SdkLogManager.getLogger(StepsTemplate.class, Level.INFO);
+    Method 2: SdkLogManager.getLogger(StepsTemplate.class);
+    Method 3: SdkLogManager.getLogger("CustomLoggerName");
+```
+Method 1 allows you to specify a logger for your custom step class and an explicit log level (e.g. Level.INFO).
+
+Method 2 allows you to specify a logger for your custom step class but implicitly derives the log level from the Root logger in the log4j2.xml configuration file if no logger with the canonical class name exists. Effectively, the log level of the custom step logger will be the same as the log level of the Root logger. 
+
+Method 3 allows you to specify a logger name (which should correspond to a logger configured in the log4j2.xml configuration file). If the logger with the specified logger name does not exist, the Root logger will be returned instead. 
+
+Example (Method 1): 
 ``` java
 public class StepsTemplate implements CustomStepDefinition {
     private static final Logger LOGGER = SdkLogManager.getLogger(StepsTemplate.class, Level.INFO);
@@ -1081,6 +1115,25 @@ public class StepsTemplate implements CustomStepDefinition {
         LOGGER.info("Create configuration");
         ...
 ```
+
+Example (Method 2): 
+``` java
+private static final Logger LOGGER = SdkLogManager.getLogger(StepsTemplate.class);
+```
+
+log4j2.xml
+```xml
+<Loggers>
+    <Logger name="com.experian.StepsTemplate"  level="debug">
+        <AppenderRef ref="AppenderRefExample1" />
+    </Logger>
+    <Root level="info">
+        <AppenderRef ref="AppenderRefExample2"/>
+    </Root>
+</Loggers>
+```
+
+The log level of LOGGER will be Level.DEBUG since the logger with the canonical class name exists. If the first logger *does not exist*, the log level of LOGGER will be Level.INFO as determined by the Root logger log level instead. 
 
 ## The HTTP Client library
 
