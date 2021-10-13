@@ -874,8 +874,6 @@ public StepProcessor createProcessor(StepProcessorBuilder processorBuilder) {
 For full example step, please refer to the 
 [DemoAggregateStep](ExampleSteps/DemoAggregateStep/src/main/java/com/experian/aperture/datastudio/sdk/step/examples/DemoAggregateStep.java)
 
-**NOTE**: at the current moment there's no support for SDK preprocessing in the SDKTestFramework.
-
 #### Index Type
 
 As for the current moment, there's only one type of index which is `indexTypeRows`. 
