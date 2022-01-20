@@ -32,6 +32,8 @@ For more details about the Gradle Shadow Plugin, refer to the [user documentatio
    
 4. Once the `jar` is moved into the Data Studio addons folder, the _example steps_ will be listed in the left-hand side pane:
 
+    **Note:** From Data Studio version 2.6.2 onwards, custom steps will need to be enabled from the Workflow steps panel under the Space menu.
+
     ![Workflow Steps](readme-images/workflow-steps-pane.png)
 
 ### Linking the Example Step to a Source
