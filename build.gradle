@@ -1,0 +1,13 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
+    }
+}
+
+dependencies {
+    compileOnly("com.experian.datastudio:sdkapi:2.6.0")
+    compileOnly("com.experian.datastudio:sdklib:2.6.0")
+}

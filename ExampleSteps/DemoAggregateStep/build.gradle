@@ -1,12 +1,7 @@
-buildscript {
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
-    }
-}
 
 plugins {
     id 'java-library'
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 repositories {
@@ -14,15 +9,11 @@ repositories {
     maven {
         url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/github-maven-repository/maven'
     }
-    maven {
-        // TODO: to be removed once SDK 2.4.0 released
-        url 'https://raw.githubusercontent.com/experiandataquality/aperture-data-studio-sdk/2.4.0-SDK/maven'
-    }
 }
 
 dependencies {
     compileOnly(
-            "com.experian.datastudio:sdkapi:2.4.0",
+            "com.experian.datastudio:sdkapi:2.6.0",
     )
 }
 
