@@ -79,6 +79,17 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
     - [Get row iterator](#get-row-iterator)
       - [TableDefinitionContext](#tabledefinitioncontext-1)
       - [ClosableIteratorBuilder](#closableiteratorbuilder)
+- [Creating a custom file generator](#creating-a-custom-file-generator)
+    - [Importing the file generator SDK](#importing-the-file-generator-sdk)
+    - [Creating your metadata](#creating-your-metadata-2)
+    - [Configuring your file generator](#configuring-your-file-generator)
+        - [Default file extension](#default-file-extension)
+        - [Adding input nodes](#adding-input-nodes)
+        - [Adding step properties](#adding-step-properties-1)
+            - [asCustomChooser](#ascustomchooser-1)
+    - [Generate custom file](#generate-custom-file)
+        - [Execute generator](#execute-generator)
+        - [GeneratorContext sample code](#generatorcontext-sample-code)
 - [Debugging](#debugging)
 - [Limitation in supporting minor upgrade](#limitation-in-supporting-minor-upgrade)
 
@@ -86,7 +97,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 ## Compatibility matrix between SDK and Data Studio version
 
 | SDK version                                                                          | Compatible Data Studio version | New features released                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ------------------------------------------------------------------------------------ | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+|--------------------------------------------------------------------------------------|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [2.8.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.8.0) | 2.12.4 (or newer)              | <ul><li>Data Studio now supports custom file generator. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | [2.7.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.7.1) | 2.9.7 (or newer)               | <ul><li>Update dependency versions. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | [2.7.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.7.0) | 2.9.7 (or newer)               | <ul><li>HTTP Web Request now supports PATCH request. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | [2.6.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.6.0) | 2.5.7 (or newer)               | <ul><li>SDK custom parser now supports dropdown parameter definition display type. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -1525,6 +1537,94 @@ Return a closable iterator over a collection of table row. Use the `ClosableIter
 | withHasNext | Returns true if iterations has more rows                                       |
 | withNext    | Returns the next row in the iteration                                          |
 | withClose   | Closes any streams and releases system resources associated with the iterator. |
+
+## Creating a custom file generator
+
+Once your project is set up, you can create a new class and implement the CustomFileGeneratorDefinition interface. The newly created class will be picked up by the Data Studio UI.
+
+Note that it is recommended that you bundle one custom file generator per JAR.
+
+### Importing the file generator SDK
+
+To use the interfaces, classes and methods, you have to import the SDK into your class. Add an import statement below the package name to import all the SDK classes and methods:
+``` java
+import com.experian.datastudio.sdk.api.*;
+import com.experian.datastudio.sdk.api.exporter.*;
+```
+
+Your new class should look something like this:
+``` java
+package com.experian.datastudio.exporter;
+
+import com.experian.datastudio.sdk.api.*;
+import com.experian.datastudio.sdk.api.exporter.*;
+
+public class DemoFileGenerator implements CustomFileGeneratorDefinition{
+}
+```
+
+All the SDK interfaces, classes and methods will now available.
+
+### Creating your metadata
+
+[Same as creating metadata for custom step](#creating-your-metadata)
+
+### Configuring your file generator
+
+Use `GeneratorConfig.Builder` in `configure` method to configure your custom file generator.
+
+#### Default file extension
+
+Define the default file extension that the custom exporter exports.
+``` java
+.withDefaultFileExtension(".json")
+```
+
+#### Adding input nodes
+
+By default, export step will always have one predefined input node. You can add additional input node:
+``` java
+.addAdditionalInputNode(INPUT_2)
+.withLabel(INPUT_2)
+.isRequired(true)
+.next()
+```
+
+#### Adding step properties
+
+Step properties for custom file generator is configurable through export dialog.
+
+##### asCustomChooser
+
+``` java
+.addStepProperty(TAX_CUSTOM_CHOOSER)
+.asCustomChooser()
+.withChooserValues(List.of("0.1", "0.2", "0.3"))
+.next()
+```
+
+### Generate custom file
+
+Use `GeneratorContext` in the `generate` method to implement the logic of the custom file generator output context.
+
+#### Execute generator
+
+You define how the file to export is generated here. The example below shows that reading value from custom chooser and write it to output context.
+
+#### GeneratorContext sample code
+
+``` java
+@Override
+public void generate(GeneratorContext context) {
+    var value = context.getChooserValue(TAX_CUSTOM_CHOOSER, String.class);
+    context.write("""
+            {
+                'taxRate': %s,
+                'data': [
+            """.formatted(value));
+    context.write("]}")
+};
+```
 
 ## Debugging
 To enable Java's standard remote debugging feature:
