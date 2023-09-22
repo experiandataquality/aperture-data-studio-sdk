@@ -5,7 +5,7 @@
 <title>UnifiedStepNodeBuilder (SDKAPI 0.1.0 API)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="description" content="declaration: package: com.experian.datastudio.sdk.api.step.configuration, interface: UnifiedStepNodeBuilder">
+<meta name="description" content="declaration: package: com.experian.datastudio.sdk.unifiedapi.step.configuration, interface: UnifiedStepNodeBuilder">
 <meta name="generator" content="javadoc/ClassWriterImpl">
 <link rel="stylesheet" type="text/css" href="../../../../../../../stylesheet.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../../../../../script-dir/jquery-ui.min.css" title="Style">
@@ -68,7 +68,7 @@ loadScripts(document, 'script');</script>
 <main role="main">
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<div class="sub-title"><span class="package-label-in-type">Package</span>&nbsp;<a href="package-summary.html">com.experian.datastudio.sdk.api.step.configuration</a></div>
+<div class="sub-title"><span class="package-label-in-type">Package</span>&nbsp;<a href="package-summary.html">com.experian.datastudio.sdk.unifiedapi.step.configuration</a></div>
 <h1 title="Interface UnifiedStepNodeBuilder" class="title">Interface UnifiedStepNodeBuilder</h1>
 </div>
 <section class="class-description" id="class-description">
@@ -89,8 +89,11 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Interface</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static interface&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder.html" class="type-name-link" title="interface in com.experian.datastudio.sdk.api.step.configuration">UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder</a></code></div>
+<div class="col-second even-row-color"><code><a href="UnifiedStepNodeBuilder.UnifiedNodeDefinitionBuilder.html" class="type-name-link" title="interface in com.experian.datastudio.sdk.unifiedapi.step.configuration">UnifiedStepNodeBuilder.UnifiedNodeDefinitionBuilder</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static interface&nbsp;</code></div>
+<div class="col-second odd-row-color"><code><a href="UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder.html" class="type-name-link" title="interface in com.experian.datastudio.sdk.unifiedapi.step.configuration">UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -105,20 +108,15 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.api.step.configuration">UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.unifiedapi.step.configuration">UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#addInputNode(java.lang.String)" class="member-name-link">addInputNode</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;inputId)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Adds an input node to the custom step.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.api.step.configuration">UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#addInputNode(java.util.function.Function)" class="member-name-link">addInputNode</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="InputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.api.step.configuration">InputNodeBuilder</a>,<wbr><a href="InputNode.html" title="interface in com.experian.datastudio.sdk.api.step.configuration">InputNode</a>&gt;&nbsp;function)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.unifiedapi.step.configuration">UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#addInputNode(java.util.function.Function)" class="member-name-link">addInputNode</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="InputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.unifiedapi.step.configuration">InputNodeBuilder</a>,<wbr><a href="../../../api/step/configuration/InputNode.html" title="interface in com.experian.datastudio.sdk.api.step.configuration">InputNode</a>&gt;&nbsp;function)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Adds an input node to the custom step.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.api.step.configuration">UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#noInputNode()" class="member-name-link">noInputNode</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">No input node defined.</div>
 </div>
 </div>
 </div>
@@ -137,7 +135,7 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="addInputNode(java.lang.String)">
 <h3>addInputNode</h3>
-<div class="member-signature"><span class="return-type"><a href="UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.api.step.configuration">UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder</a></span>&nbsp;<span class="element-name">addInputNode</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;inputId)</span></div>
+<div class="member-signature"><span class="return-type"><a href="UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.unifiedapi.step.configuration">UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder</a></span>&nbsp;<span class="element-name">addInputNode</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;inputId)</span></div>
 <div class="block">Adds an input node to the custom step.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -150,22 +148,11 @@ loadScripts(document, 'script');</script>
 <li>
 <section class="detail" id="addInputNode(java.util.function.Function)">
 <h3>addInputNode</h3>
-<div class="member-signature"><span class="return-type"><a href="UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.api.step.configuration">UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder</a></span>&nbsp;<span class="element-name">addInputNode</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="InputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.api.step.configuration">InputNodeBuilder</a>,<wbr><a href="InputNode.html" title="interface in com.experian.datastudio.sdk.api.step.configuration">InputNode</a>&gt;&nbsp;function)</span></div>
+<div class="member-signature"><span class="return-type"><a href="UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.unifiedapi.step.configuration">UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder</a></span>&nbsp;<span class="element-name">addInputNode</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/function/Function.html" title="class or interface in java.util.function" class="external-link">Function</a>&lt;<a href="InputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.unifiedapi.step.configuration">InputNodeBuilder</a>,<wbr><a href="../../../api/step/configuration/InputNode.html" title="interface in com.experian.datastudio.sdk.api.step.configuration">InputNode</a>&gt;&nbsp;function)</span></div>
 <div class="block">Adds an input node to the custom step.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>function</code> - function to build input node</dd>
-<dt>Returns:</dt>
-<dd>Step node builder</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="noInputNode()">
-<h3>noInputNode</h3>
-<div class="member-signature"><span class="return-type"><a href="UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder.html" title="interface in com.experian.datastudio.sdk.api.step.configuration">UnifiedStepNodeBuilder.UnifiedOutputNodeBuilder</a></span>&nbsp;<span class="element-name">noInputNode</span>()</div>
-<div class="block">No input node defined. Proceed to define output node(s)</div>
-<dl class="notes">
 <dt>Returns:</dt>
 <dd>Step node builder</dd>
 </dl>
