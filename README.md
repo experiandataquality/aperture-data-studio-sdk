@@ -89,8 +89,12 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
         - [Adding step properties](#adding-step-properties-1)
             - [asCustomChooser](#ascustomchooser-1)
     - [Generate custom file](#generate-custom-file)
-        - [Execute generator](#execute-generator)
+        - [GeneratorContext](#generatorcontext)
         - [GeneratorContext sample code](#generatorcontext-sample-code)
+    - [Custom File Generator Validation](#custom-file-generator-validation)
+        - [Validating step configuration](#validating-step-configuration)
+        - [ValidationContext](#validationcontext)
+        - [ValidationResult](#validationresult)
 - [Debugging](#debugging)
 - [Limitation in supporting minor upgrade](#limitation-in-supporting-minor-upgrade)
 
@@ -99,6 +103,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 | SDK version                                                                          | Compatible Data Studio version | New features released                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 |--------------------------------------------------------------------------------------|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [2.8.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.8.0) | 2.12.6 (or newer)              | <ul><li>Custom file generator now supports step configuration level validation. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | [2.8.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.8.0) | 2.12.4 (or newer)              | <ul><li>Data Studio now supports custom file generator. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | [2.7.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.7.1) | 2.9.7 (or newer)               | <ul><li>Update dependency versions. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | [2.7.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.7.0) | 2.9.7 (or newer)               | <ul><li>HTTP Web Request now supports PATCH request. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
@@ -1615,11 +1620,22 @@ Step properties for custom file generator is configurable through export dialog.
 
 Use `GeneratorContext` in the `generate` method to implement the logic of the custom file generator output context.
 
-#### Execute generator
+#### GeneratorContext
 
-You define how the file to export is generated here. The example below shows that reading value from custom chooser and write it to output context.
+| Method                    | Description                                                  |
+| ------------------------- | ------------------------------------------------------------ |
+| getFirstInputRowCount     | Returns the row count of first input node                    |
+| getInputRowCounts         | Returns the row count of a specific input node               |
+| getFirstInputValue        | Returns value from first input node                          |
+| getInputValue             | Returns value from a specific input node                     |
+| getChooserValue           | Returns the value from a specific custom chooser             |
+| getDefaultInputContext    | Returns the context of first input node                      |
+| getAdditionalInputContext | Returns the context of a specific input node |
+| write                     | Writes data to file context                                  |
 
 #### GeneratorContext sample code
+
+The example below shows that reading value from custom chooser and write it to output context.
 
 ``` java
 @Override
@@ -1633,6 +1649,27 @@ public void generate(GeneratorContext context) {
     context.write("]}")
 };
 ```
+
+### Custom File Generator Validation
+
+You can set up validation rules to provide step configuration level validation for the custom file generator.
+
+#### Validating step configuration
+
+Overrides `validateStepConfiguration` method and use the `ValidationContext` in the method to implement the logic of the validation rules. This method will return valid validation result by default if not overriden.
+
+#### ValidationContext
+| Method                     | Description                                          |
+| -------------------------- | ---------------------------------------------------- |
+| getDefaultInputContext     | Returns the context of default input node            |
+| getAdditionalInputContext  | Returns the context of specified input node using ID |
+| newValidationResult        | Creates a `ValidationResult`                         |
+| getChooserValue            | Returns the value from a specific custom chooser     |
+| newValidResult             | Creates a `ValidationResult` result                  |
+
+#### ValidationResult
+
+`ValidationResult` is a record which consists of two fields, `isValid` and `errorMessage` .It is used to represent the validation result of the step configuration.
 
 ## Debugging
 To enable Java's standard remote debugging feature:
