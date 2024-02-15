@@ -97,13 +97,28 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
         - [ValidationResult](#validationresult)
 - [Debugging](#debugging)
 - [Limitation in supporting minor upgrade](#limitation-in-supporting-minor-upgrade)
+- [Unified SDK API](#unified-sdk-api)
+  - [Types of Unified SDK API](#types-of-unified-sdk-api)
+  - [Creating a custom step with One To One Data Unified SDK API](#creating-a-custom-step-with-one-to-one-data-unified-sdk-api)
+    - [Importing the Unified SDK API](#importing-the-unified-sdk-api)
+    - [Creating your metadata](#creating-your-metadata-3)
+    - [Configuring your step](#configuring-your-step-1)
+      - [Adding nodes](#adding-nodes-1)
+      - [Adding step properties](#adding-step-properties-2)
+      - [Configure isCompleteHandler](#configure-iscompletehandler-1)
+      - [Configure column layouts](#configure-column-layouts-1)
+      - [Comparison on step configuring with Classic SDK API v2.0](#comparison-of-step-configuring-with-classic-sdk-api-v20)
+    - [Processing your step](#processing-your-step-1)
+      - [Execute step](#execute-step-1)
+      - [Unified SDK API process sample code](#unified-sdk-api-process-sample-code)
+      - [Comparison of step processing with Classic SDK API v2.0](#comparison-of-step-processing-with-classic-sdk-api-v20)
 
 
 ## Compatibility matrix between SDK and Data Studio version
 
 | SDK version                                                                          | Compatible Data Studio version | New features released                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 |--------------------------------------------------------------------------------------|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [2.8.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.8.0) | 2.12.6 (or newer)              | <ul><li>Custom file generator now supports step configuration level validation. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| [2.8.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.8.0) | 2.12.6 (or newer)              | <ul><li>Included Unified SDK API</li><li>Custom file generator now supports step configuration level validation. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | [2.8.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.8.0) | 2.12.4 (or newer)              | <ul><li>Data Studio now supports custom file generator. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | [2.7.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.7.1) | 2.9.7 (or newer)               | <ul><li>Update dependency versions. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | [2.7.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.7.0) | 2.9.7 (or newer)               | <ul><li>HTTP Web Request now supports PATCH request. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
@@ -207,20 +222,20 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 4. Create a new package and class.
 5. Configure your project to output a .jar file as an artifact. Note that this will be done differently depending on your IDE.
 
-## Comparison of SDK v1.0 and v2.0
+## Comparison of SDK v1.0, v2.0 and Unified SDK
 
 Here are the main differences between the v1.0 and v2.0 of the SDK:
 
-| Features                             |            SDK v1.0                                                       |                                       SDK v2.0                                           |
-|--------------------------------------|---------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
-| Design                               | Extending Abstract class                                                  | Implementing interface                                                                   |
-| Register step details                | Using `setStepDefinition` methods in `StepConfiguration` class            | Using  `CustomTypeMetadataBuilder`  [Sample code](#metadata-sample-code)                 |
-| Configure step property              | Using `setStepProperties()` in `StepConfiguration` class                  | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code)    |
-| Configure *isComplete* handling      | Override `isComplete()` in `StepConfiguration` class                      | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code)    |
-| Configure column step                | Override `initialise()` in `StepOutput` class                             | Using `StepConfigurationBuilder` [Sample code](#stepprocessorbuilder-sample-code)        |  
-| Execute and retrieve value from step | Override `execute()` and `getValueAt()` in `StepOutput` class             | Using `StepProcessorBuilder` [Sample code](#stepprocessorbuilder-sample-code)            |
-| Logging in step                      | Using `logError()` from base class                                        | Using `SdkLogManager` library [Sample Code](#the-logging-library)                        |
-| Global constant                      | Predefined server property                                                | Using `CustomStepSettingBuilder` [Sample Code](#creating-step-setting)                   |
+| Features                             |            SDK v1.0                                                       | SDK v2.0                                                                              | Unified SDK                                                                                                                                 |
+|--------------------------------------|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| Design                               | Extending Abstract class                                                  | Implementing interface `CustomStepDefinition`                                         | Implementing interface `OneToOneDataUnifiedCustomStepDefinition`                                                                            |
+| Register step details                | Using `setStepDefinition` methods in `StepConfiguration` class            | Using  `CustomTypeMetadataBuilder`  [Sample code](#metadata-sample-code)              | same as SDK v2.0 [Sample code](#metadata-sample-code)                                                                                       |
+| Configure step property              | Using `setStepProperties()` in `StepConfiguration` class                  | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) | Using `UnifiedStepConfigurationBuilder`, this is similar to SDK v2.0 [Comparison](#comparison-of-step-configuring-with-classic-sdk-api-v20) |
+| Configure *isComplete* handling      | Override `isComplete()` in `StepConfiguration` class                      | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) | Using `UnifiedStepConfigurationBuilder`, this is similar to SDK v2.0 [Comparison](#comparison-of-step-configuring-with-classic-sdk-api-v20) |
+| Configure column step                | Override `initialise()` in `StepOutput` class                             | Using `StepConfigurationBuilder` [Sample code](#stepprocessorbuilder-sample-code)     | Using `UnifiedStepConfigurationBuilder`, this is similar to SDK v2.0 [Comparison](#comparison-of-step-configuring-with-classic-sdk-api-v20) |
+| Execute and retrieve value from step | Override `execute()` and `getValueAt()` in `StepOutput` class             | Using `StepProcessorBuilder` [Sample code](#stepprocessorbuilder-sample-code)         | Using `ProcessingContext` and `InputRecord` in `process` method [Sample code](#unified-sdk-api-process-sample-code)                         |
+| Logging in step                      | Using `logError()` from base class                                        | Using `SdkLogManager` library [Sample Code](#the-logging-library)                     | Using `SdkLogManager` library [Sample Code](#the-logging-library),same as SDK v2.0                                                          |
+| Global constant                      | Predefined server property                                                | Using `CustomStepSettingBuilder` [Sample Code](#creating-step-setting)                | Using `CustomStepSettingBuilder` [Sample Code](#creating-step-setting),same as SDK v2.0                                                     |
  
 ## Creating a custom step
 
@@ -1709,5 +1724,157 @@ environment.
 3. Data Studio SDK is still not able to pre-select which custom step version to use in a specified environment, space or workflow since there is no "Plugin Admin UI" to manage on this. However, Data Studio SDK will honor same custom step with different major versions as display below
 
 ![Capture](https://user-images.githubusercontent.com/53897209/122909412-be332280-d387-11eb-91ed-609cadac14ef.JPG)
+
+## Unified SDK API
+Since version SDK-2.8.1, we have introduced Unified SDK API.
+
+The custom steps created using Unified SDK API can run on three different DataStudio engines: classic, graph, and realtime engine.
+
+### Types of Unified SDK API
+
+| Name                                      | Feature                       | Compatible SDK Version |
+|-------------------------------------------|-------------------------------|------------------------|
+| `OneToOneDataUnifiedCustomStepDefinition` | Process one record at a time. | 2.8.1                  |
+
+## Creating a custom step with One To One Data Unified SDK API
+
+Once your project is set up with SDK version 2.8.1 or above, you can create a new class and implement the OneToOneDataUnifiedCustomStepDefinition interface. The newly created class will be picked up by the Data Studio UI.
+
+### Importing the Unified SDK API
+To use the interfaces, classes and methods in unified sdk api, you have to import the new unified SDK into your class. Add an import statement below the package name to import all the SDK classes and methods:
+
+```java
+import com.experian.datastudio.sdk.unifiedapi.step.*;
+import com.experian.datastudio.sdk.unifiedapi.step.configuration.*;
+import com.experian.datastudio.sdk.unifiedapi.step.processor.*;
+```
+
+Your new class should look something like this:
+```java
+package com.experian.unifiedsdk.demo;
+
+import com.experian.datastudio.sdk.unifiedapi.step.*;
+import com.experian.datastudio.sdk.unifiedapi.step.configuration.*;
+import com.experian.datastudio.sdk.unifiedapi.step.processor.*;
+
+public class DemoStep implements OneToOneDataUnifiedCustomStepDefinition {
+}
+```
+
+All the Unified SDK interfaces, classes and methods will now be available.
+
+### Creating your metadata
+Unified SDK API uses the same `CustomTypeMetadataBuilder` in `createMetadata` method to create metadata as in SDK v2.0. See: [here](#creating-your-metadata).
+
+### Configuring your step
+Use `UnifiedStepConfigurationBuilder` in `createConfiguration` method to configure your custom steps (e.g. nodes, step properties, column layouts) and ensure it displays correctly in the Data Studio UI.
+
+#### Adding nodes
+Use `UnifiedStepNodeBuilder` in `withNodes` method to add input and output nodes.  
+OneToOneDataUnified SDK API only accepts one input node and one output node, both nodes should be Data nodes. Therefore, OneToOneData Unified SDK API cannot set node types or adding multiple nodes. 
+
+```java
+.withNodes(unifiedStepNodeBuilder -> unifiedStepNodeBuilder
+        .addInputNode(inputNodeBuilder -> inputNodeBuilder
+            .withId(INPUT_ID)
+            .withLabel("Input Label")
+            .build())
+        .addOutputNode(outputNodeBuilder -> outputNodeBuilder
+            .withId(OUTPUT_ID)
+            .withName("Name")
+            .build())
+        .build())
+```
+
+#### Adding step properties
+OneToOneData Unified SDK API uses the same `StepPropertiesBuilder` in `withStepProperties` method to configure the step properties as in classic SDK API. See [Adding step properties](#adding-step-properties).
+
+#### Configure isCompleteHandler
+OneToOneData Unified SDK API uses a similar way to determine the completeness of the step as in classic SDK API. See [Configure isCompleteHandler](#configure-iscompletehandler).
+
+#### Configure column layouts
+
+OneToOneData Unified SDK API uses the same `OutputLayoutBuilder` in `withOutputLayouts` method to configure the output columns layout as in classic SDK API. See [Configure column layouts](#configure-column-layouts)
+
+#### Comparison of step configuring with Classic SDK API v2.0
+
+Difference between OneToOneData Unified SDK API vs classic SDK API:
+1. OneToOneData Unified SDK `InputNodeBuilder` in `addInputNode()` doesn't support these methods:
+    - `withType(NodeType nodeType)` to set the type of input node. This can only be Data node.
+    - `withIsRequired(boolean required)` to set whether the input node is mandatory. OneToOneData unified custom step can have one and only one input node.
+    - `withLabelDisplayed(boolean labelDisplayed)` to set whether the name of the preceding step is displayed on the current step.
+2. OneToOneData Unified SDK `OutputNodeBuilder` in `addInputNode()` doesn't support these methods:
+    - `withType(NodeType nodeType)` to set the type of output node. This can only be Data node.
+3. Configuration methods like `withNodes()`, `withStepProperties()`,`withOutputLayouts()`,`withStepSetting()`,`withDefaultOptions()`,`withIsCompleteHandler()`,`withIcon()` in OneToOneData Unified SDK all return to the same `UnifiedStepConfigurationBuilder`, allowing to declare the same configuration method multiple times, but it is discouraged to do so.
+
+### Processing your step
+
+Use `ProcessingContext` and `InputRecord` in the `process` method to implement the logic of the custom step output.
+
+`InputRecord` contains the step's input of a single row.
+
+| Method           | Description                                     |
+|------------------|-------------------------------------------------|
+| getColumnCount   | Get the total number of columns                 |
+| getColumnSchemas | Get the `ColumnSchema`                          |
+| getValue         | Get value of a column                           |
+| getValues        | Get values of specified columns                 |
+| getRowNumber     | Get the current record row number starting at 1 |
+
+`ColumnSchema` is the columns schema of an input.
+
+| Method            | Description                                       |
+|-------------------|---------------------------------------------------|
+| getColumns        | Get all columns metadata (id, name, tags)         |
+| indexOfColumnName | Get column index based on the column's name       |
+| indexOfColumn     | Get a column index based on the column's metadata |
+| columnsCount      | Get the total number of columns                   |
+
+`ProcessingContext`
+
+| Method                           | Description                                                                                                                                                                                                              |
+|----------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| getStepPropertyValue             | Get the step property value                                                                                                                                                                                              |
+| getColumnFromChooserValues       | Get the columns selected by user in a column chooser                                                                                                                                                                     |
+| getStepSettingFieldValueAsString | Get the specified step setting field value as a string                                                                                                                                                                   |
+| isInteractive                    | Get the interactive flag of the execution. Interactive is a flag that set to `true` when the user views the output of a step on the Data Studio Grid (UI). It is set to `false` when running the whole workflow as a Job |
+| getColumns                       | Get all the columns from the input                                                                                                                                                                                       |
+| getColumnById                    | Get the specified column from the input using column Id                                                                                                                                                                  |
+| getColumnsByTag                  | Get list of column from the input with the specified tag                                                                                                                                                                 |
+| getOutputBuilder                 | Get the builder class for output record `OutputRecordBuilder`                                                                                                                                                            |
+
+#### Execute step
+
+You define how to generate the cell value of an output column in `process` method and use `OutputRecordBuilder` which can be acquired by calling `getOutputBuilder` method with `ProcessingContext` to set the values of a column in the output.
+
+#### Unified SDK API process sample code
+
+The example below shows that appending "-processed" text to the value from the first input column, and then displayed into MY_OUTPUT_COLUMN.  
+The example starts by getting the first column metadata using `ProcessingContext`, then append the value of the `InputRecord` of this column with "-processed" if the column exists, and set the processed value in a new column using `OutputRecordBuilder`, and lastly return an `OutputRecord` by calling `.build()` of the `OutputRecordBuilder`;
+
+```java
+@Override
+public OutputRecord process(ProcessingContext context, InputRecord input) {
+   final Optional<Column> column = context.getColumns().stream().findFirst();
+   final OutputRecordBuilder outputBuilder = context.getOutputBuilder();
+           column.ifPresent(inputColumn -> outputBuilder
+                       .setValue(MY_OUTPUT_COLUMN, ()->input.getValue(inputColumn.getName()).toString()+"-processed")
+           );
+           return outputBuilder.build();
+}
+```
+
+#### Comparison of step processing with Classic SDK API v2.0
+1. As OneToOneData Unified SDK only accepts one input node and output node, we no longer needs to worry about specifying output id in `forOutputNode()`, or getting the correct input context.
+    - `InputRecord` contains step's input of a single row and has convenience method to `getValue()` or `getValues()` in that row.
+    - `OutputRecordBuilder` can set the value supplier for a single cell using `setValue()`
+2. Getting step property value
+
+   | Actions                   | OneToOneData Unified SDK API                                                                      | Classic SDK API                                                                              |
+      |---------------------------|---------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+   | Get step property values  | uses `getStepPropertyValue` in `ProcessingContext`, allow to specify value type and default value | uses `getStepPropertyValue` in `StepProcessorContext`                                        |
+   | Get column chooser values | uses `getColumnFromChooserValues` in `ProcessingContext` to get column metadata (Id, name tags)   | uses `getColumnFromChooserValues` in `StepProcessorContext` to get column metadata and value |
+3. There is no cache or index (preprocessing) mechanism for OneToOneData Unified SDK API.
+4. Cannot update progress bar using OneToOneData Unified SDK API.
 
 
