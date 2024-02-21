@@ -3,7 +3,12 @@
 
 # Aperture Data Studio SDK
 
-The SDK provides a simple Java library to create and test your own custom Workflow steps, extending Aperture Data Studio capabilities. You can also add your own custom parsers which will enable Data Studio to load data from files. 
+The SDK further extends your Aperture Data Studio capabilities by enabling you to build custom plug-ins. 
+While Aperture Data Studio already provides a wide range of workflow steps and file parser, your needs for more specific actions (e.g. loading a specific mainframe file or integrating with a 3rd party API) can be better served by creating a custom plug-in.  
+The SDK allows you to create the following plugins:
+1.	Custom workflow steps – custom steps that can be used in the Workflow canvas
+2.	Custom file parsers – custom file parser that you can select when uploading a file.
+3.	Customer file exporter – custom file generator that can be selected in export step.
 
 This repo contains the SDK JAR and a pre-configured Java project that uses Gradle, allowing you to easily build your own custom step. Alternatively, you can add the SDK as a dependency to your own project by downloading the SDK JAR from the `sdkapi` folder.
 
@@ -1728,7 +1733,10 @@ environment.
 ## Unified SDK API
 Since version SDK-2.8.1, we have introduced Unified SDK API.
 
-The custom steps created using Unified SDK API can run on three different DataStudio engines: classic, graph, and realtime engine.
+The custom steps created using Unified SDK API can run on three different DataStudio engines: 
+1. Classic engine: engine used in classic on-premises Aperture Data Studio.
+2. Graph engine: engine used in distributed Aperture Data Studio.
+3. Realtime engine: engine used to run real-time workflow, a workflow that can process API request in real time.
 
 ### Types of Unified SDK API
 
