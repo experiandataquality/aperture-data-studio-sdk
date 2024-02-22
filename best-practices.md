@@ -2,8 +2,14 @@
 
 ## Best practices
 
+### SDK API version
+Always use the latest SDK API version as it contains the up-to-date feature and security patches. Kindly note that all the SDK version is backward compatible.
+
 ### One custom step per jar
 It is recommended that you bundle one custom step per JAR. This will simplify the process of updating or removing a single custom step. And it will also promote security by isolation. A problematic custom step can be easily detected and isolated without affecting after custom step.
+
+### Keep custom step or parser jar size minimal
+Package the custom step/parser jar as small as possible (ie 10MB).
 
 ### Fat jar
 Bundle the custom step in a fat jar where all dependencies are bundled into a single jar. This allow custom step to use specific version of libraries without affecting other custom step. For more details, [read this](README.md#class-isolation).
@@ -58,6 +64,9 @@ public StepProcessor createProcessor(final StepProcessorBuilder processorBuilder
             .build();
 }
 ```
+
+### Semantic version
+Remember to change the semantic version in `createMetadata` method provided by SDK API and jar package version after making changes to your custom step, parser, or file generator.
 
 ## Limitation
 ### Both custom chooser and column chooser cannot be reset
