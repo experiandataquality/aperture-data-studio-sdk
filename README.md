@@ -271,13 +271,13 @@ import com.experian.datastudio.sdk.api.step.processor.*;
 public class DemoStep implements CustomStepDefinition{
 }
 ```
-All the SDK interfaces, classes and methods will now available.
+All the SDK interfaces, classes and methods will now be available.
 
 ### Creating your metadata
 
 #### Adding metadata
 
-Use `CustomTypeMetadataBuilder` in `createMetadata` method to create metadata such as the custom step name, description, version and licenses. 
+Use `CustomTypeMetadataBuilder` in the `createMetadata` method to create metadata such as the custom step name, description, version and licenses. 
 
 #### Metadata sample code
 ``` java
@@ -301,7 +301,7 @@ Use `StepConfigurationBuilder` in `createConfiguration` method to configure your
 
 #### Adding nodes
 
-Nodes represent the input and output nodes in the step. You can define how many nodes the step will have. For example, to create a step with 1 input and 1 output node:
+Nodes represent the input and output nodes in the step. You can define how many nodes the step will have. For example, to create a step with one input and one output node:
 
 ``` java
 .withNodes(stepNodeBuilder -> stepNodeBuilder
@@ -312,10 +312,9 @@ Nodes represent the input and output nodes in the step. You can define how many 
 
 ##### Process node
 
-By default, the input and output nodes are DATA node, which receive data or produce data.
-You can create a custom step that doesn't change the data in the workflow.
-For example, a custom step that sends email or calls REST API when the execution reaches that step.
-Please take note that PROCESS output node cannot connect to DATA input node.
+By default, the input and output nodes are DATA nodes, which receive data or produce data.
+You can create a custom step that doesn't change the data in the workflow: For example, a custom step that sends an email or calls a REST API when the execution reaches that step.
+Please take note that PROCESS output nodes cannot connect to DATA input nodes.
 ``` java
 .withNodes(stepNodeBuilder -> stepNodeBuilder
         .addInputNode(inputNodeBuilder -> inputNodeBuilder
@@ -332,8 +331,8 @@ Please take note that PROCESS output node cannot connect to DATA input node.
 ```
 
 ###### Input node label
-Disconnected input node displays the label defined in "withLabel". When connected, the input node displays the name of the preceding step in the current step by default. 
-To hide the input node label, set “withLabelDisplayed” to false.
+A disconnected input node displays the label defined in "withLabel". When connected, the input node displays the name of the preceding step in the current step by default. 
+To hide the input node label, set "withLabelDisplayed" to false.
 
 **Disconnected input node without label**
 
@@ -1749,7 +1748,7 @@ The custom steps created using Unified SDK API can run on three different DataSt
 Once your project is set up with SDK version 2.8.1 or above, you can create a new class and implement the OneToOneDataUnifiedCustomStepDefinition interface. The newly created class will be picked up by the Data Studio UI.
 
 ### Importing the Unified SDK API
-To use the interfaces, classes and methods in unified sdk api, you have to import the new unified SDK into your class. Add an import statement below the package name to import all the SDK classes and methods:
+To use the interfaces, classes and methods in unified SDK API, you have to import the new unified SDK into your class. Add an import statement below the package name to import all the SDK classes and methods:
 
 ```java
 import com.experian.datastudio.sdk.unifiedapi.step.*;
@@ -1775,11 +1774,11 @@ All the Unified SDK interfaces, classes and methods will now be available.
 Unified SDK API uses the same `CustomTypeMetadataBuilder` in `createMetadata` method to create metadata as in SDK v2.0. See: [here](#creating-your-metadata).
 
 ### Configuring your step
-Use `UnifiedStepConfigurationBuilder` in `createConfiguration` method to configure your custom steps (e.g. nodes, step properties, column layouts) and ensure it displays correctly in the Data Studio UI.
+Use `UnifiedStepConfigurationBuilder` in the `createConfiguration` method to configure your custom steps (e.g. nodes, step properties, column layouts) and ensure it displays correctly in the Data Studio UI.
 
 #### Adding nodes
-Use `UnifiedStepNodeBuilder` in `withNodes` method to add input and output nodes.  
-OneToOneDataUnified SDK API only accepts one input node and one output node, both nodes should be Data nodes. Therefore, OneToOneData Unified SDK API cannot set node types or adding multiple nodes. 
+Use `UnifiedStepNodeBuilder` in the `withNodes` method to add input and output nodes.  
+The OneToOneDataUnified SDK API only accepts one input node and one output node, and both nodes should be DATA nodes. Therefore, OneToOneData Unified SDK API cannot set node types or adding multiple nodes. 
 
 ```java
 .withNodes(unifiedStepNodeBuilder -> unifiedStepNodeBuilder
@@ -1795,24 +1794,24 @@ OneToOneDataUnified SDK API only accepts one input node and one output node, bot
 ```
 
 #### Adding step properties
-OneToOneData Unified SDK API uses the same `StepPropertiesBuilder` in `withStepProperties` method to configure the step properties as in classic SDK API. See [Adding step properties](#adding-step-properties).
+OneToOneData Unified SDK API uses the same `StepPropertiesBuilder` in the `withStepProperties` method to configure the step properties as in classic SDK API. See [Adding step properties](#adding-step-properties).
 
 #### Configure isCompleteHandler
 OneToOneData Unified SDK API uses a similar way to determine the completeness of the step as in classic SDK API. See [Configure isCompleteHandler](#configure-iscompletehandler).
 
 #### Configure column layouts
 
-OneToOneData Unified SDK API uses the same `OutputLayoutBuilder` in `withOutputLayouts` method to configure the output columns layout as in classic SDK API. See [Configure column layouts](#configure-column-layouts)
+OneToOneData Unified SDK API uses the same `OutputLayoutBuilder` in the `withOutputLayouts` method to configure the output columns layout as in classic SDK API. See [Configure column layouts](#configure-column-layouts)
 
 #### Comparison of step configuring with Classic SDK API v2.0
 
 Difference between OneToOneData Unified SDK API vs classic SDK API:
 1. OneToOneData Unified SDK `InputNodeBuilder` in `addInputNode()` doesn't support these methods:
-    - `withType(NodeType nodeType)` to set the type of input node. This can only be Data node.
+    - `withType(NodeType nodeType)` to set the type of input node. This can only be DATA node.
     - `withIsRequired(boolean required)` to set whether the input node is mandatory. OneToOneData unified custom step can have one and only one input node.
     - `withLabelDisplayed(boolean labelDisplayed)` to set whether the name of the preceding step is displayed on the current step.
-2. OneToOneData Unified SDK `OutputNodeBuilder` in `addInputNode()` doesn't support these methods:
-    - `withType(NodeType nodeType)` to set the type of output node. This can only be Data node.
+2. OneToOneData Unified SDK `OutputNodeBuilder` in `addOutputNode()` doesn't support these methods:
+    - `withType(NodeType nodeType)` to set the type of output node. This can only be DATA node.
 3. Configuration methods like `withNodes()`, `withStepProperties()`,`withOutputLayouts()`,`withStepSetting()`,`withDefaultOptions()`,`withIsCompleteHandler()`,`withIcon()` in OneToOneData Unified SDK all return to the same `UnifiedStepConfigurationBuilder`, allowing to declare the same configuration method multiple times, but it is discouraged to do so.
 
 ### Processing your step
@@ -1853,12 +1852,13 @@ Use `ProcessingContext` and `InputRecord` in the `process` method to implement t
 
 #### Execute step
 
-You define how to generate the cell value of an output column in `process` method and use `OutputRecordBuilder` which can be acquired by calling `getOutputBuilder` method with `ProcessingContext` to set the values of a column in the output.
+You define how to generate the cell value of an output column in `process` method and use `OutputRecordBuilder`, which can be acquired by calling `getOutputBuilder` method, with `ProcessingContext` to set the values of a column in the output.
 
 #### Unified SDK API process sample code
 
-The example below shows that appending "-processed" text to the value from the first input column, and then displayed into MY_OUTPUT_COLUMN.  
-The example starts by getting the first column metadata using `ProcessingContext`, then append the value of the `InputRecord` of this column with "-processed" if the column exists, and set the processed value in a new column using `OutputRecordBuilder`, and lastly return an `OutputRecord` by calling `.build()` of the `OutputRecordBuilder`;
+The example below shows how to append "-processed" text to the value from the first input column, and then return it in MY_OUTPUT_COLUMN. 
+
+The example starts by getting the first column metadata using `ProcessingContext`, then appends the value of the `InputRecord` of this column with "-processed" (if the column exists), then sets the processed value in a new column using `OutputRecordBuilder`, and lastly returns an `OutputRecord` by calling `.build()` of the `OutputRecordBuilder`;
 
 ```java
 @Override
@@ -1874,8 +1874,8 @@ public OutputRecord process(ProcessingContext context, InputRecord input) {
 
 #### Comparison of step processing with Classic SDK API v2.0
 1. As OneToOneData Unified SDK only accepts one input node and output node, we no longer needs to worry about specifying output id in `forOutputNode()`, or getting the correct input context.
-    - `InputRecord` contains step's input of a single row and has convenience method to `getValue()` or `getValues()` in that row.
-    - `OutputRecordBuilder` can set the value supplier for a single cell using `setValue()`
+    - `InputRecord` contains the step's input of a single row and has convenience method to `getValue()` or `getValues()` in that row.
+    - `OutputRecordBuilder` can set the value supplier for a single cell using `setValue()`.
 2. Getting step property value
 
    | Actions                   | OneToOneData Unified SDK API                                                                      | Classic SDK API                                                                              |
