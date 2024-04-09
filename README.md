@@ -18,7 +18,8 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 - [Compatibility matrix between SDK and Data Studio version](#compatibility-matrix-between-sdk-and-data-studio-version)
 - [Generating a custom step from a new or existing project](#generating-a-custom-step-from-a-new-or-existing-project)
-- [Comparison of SDK v1.0 and v2.0](#comparison-of-sdk-v10-and-v20)
+- [Comparison of SDK v1.0 and v2.0 and Unified SDK](#comparison-of-sdk-v10-v20-and-unified-sdk)
+- [Which SDK version should I use?](#which-sdk-version-should-i-use)
 - [Creating a custom step](#creating-a-custom-step)
     - [Importing the step SDK](#importing-the-step-sdk)
     - [Creating your metadata](#creating-your-metadata)
@@ -231,17 +232,22 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 Here are the main differences between the v1.0 and v2.0 of the SDK:
 
-| Features                             |            SDK v1.0                                                       | SDK v2.0                                                                              | Unified SDK                                                                                                                                 |
-|--------------------------------------|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
-| Design                               | Extending Abstract class                                                  | Implementing interface `CustomStepDefinition`                                         | Implementing interface `OneToOneDataUnifiedCustomStepDefinition`                                                                            |
-| Register step details                | Using `setStepDefinition` methods in `StepConfiguration` class            | Using  `CustomTypeMetadataBuilder`  [Sample code](#metadata-sample-code)              | same as SDK v2.0 [Sample code](#metadata-sample-code)                                                                                       |
-| Configure step property              | Using `setStepProperties()` in `StepConfiguration` class                  | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) | Using `UnifiedStepConfigurationBuilder`, this is similar to SDK v2.0 [Comparison](#comparison-of-step-configuring-with-classic-sdk-api-v20) |
-| Configure *isComplete* handling      | Override `isComplete()` in `StepConfiguration` class                      | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) | Using `UnifiedStepConfigurationBuilder`, this is similar to SDK v2.0 [Comparison](#comparison-of-step-configuring-with-classic-sdk-api-v20) |
-| Configure column step                | Override `initialise()` in `StepOutput` class                             | Using `StepConfigurationBuilder` [Sample code](#stepprocessorbuilder-sample-code)     | Using `UnifiedStepConfigurationBuilder`, this is similar to SDK v2.0 [Comparison](#comparison-of-step-configuring-with-classic-sdk-api-v20) |
-| Execute and retrieve value from step | Override `execute()` and `getValueAt()` in `StepOutput` class             | Using `StepProcessorBuilder` [Sample code](#stepprocessorbuilder-sample-code)         | Using `ProcessingContext` and `InputRecord` in `process` method [Sample code](#unified-sdk-api-process-sample-code)                         |
-| Logging in step                      | Using `logError()` from base class                                        | Using `SdkLogManager` library [Sample Code](#the-logging-library)                     | Using `SdkLogManager` library [Sample Code](#the-logging-library),same as SDK v2.0                                                          |
-| Global constant                      | Predefined server property                                                | Using `CustomStepSettingBuilder` [Sample Code](#creating-step-setting)                | Using `CustomStepSettingBuilder` [Sample Code](#creating-step-setting),same as SDK v2.0                                                     |
+| Features                             | SDK v1.0                                                       | SDK v2.0                                                                              | Unified SDK                                                                                                                                 |
+|--------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| Design                               | Extending Abstract class                                       | Implementing interface `CustomStepDefinition`                                         | Implementing interface `OneToOneDataUnifiedCustomStepDefinition`                                                                            |
+| Register step details                | Using `setStepDefinition` methods in `StepConfiguration` class | Using  `CustomTypeMetadataBuilder`  [Sample code](#metadata-sample-code)              | same as SDK v2.0 [Sample code](#metadata-sample-code)                                                                                       |
+| Configure step property              | Using `setStepProperties()` in `StepConfiguration` class       | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) | Using `UnifiedStepConfigurationBuilder`, this is similar to SDK v2.0 [Comparison](#comparison-of-step-configuring-with-classic-sdk-api-v20) |
+| Configure *isComplete* handling      | Override `isComplete()` in `StepConfiguration` class           | Using `StepConfigurationBuilder` [Sample code](#stepconfigurationbuilder-sample-code) | Using `UnifiedStepConfigurationBuilder`, this is similar to SDK v2.0 [Comparison](#comparison-of-step-configuring-with-classic-sdk-api-v20) |
+| Configure column step                | Override `initialise()` in `StepOutput` class                  | Using `StepConfigurationBuilder` [Sample code](#stepprocessorbuilder-sample-code)     | Using `UnifiedStepConfigurationBuilder`, this is similar to SDK v2.0 [Comparison](#comparison-of-step-configuring-with-classic-sdk-api-v20) |
+| Execute and retrieve value from step | Override `execute()` and `getValueAt()` in `StepOutput` class  | Using `StepProcessorBuilder` [Sample code](#stepprocessorbuilder-sample-code)         | Using `ProcessingContext` and `InputRecord` in `process` method [Sample code](#unified-sdk-api-process-sample-code)                         |
+| Logging in step                      | Using `logError()` from base class                             | Using `SdkLogManager` library [Sample Code](#the-logging-library)                     | Using `SdkLogManager` library [Sample Code](#the-logging-library),same as SDK v2.0                                                          |
+| Global constant                      | Predefined server property                                     | Using `CustomStepSettingBuilder` [Sample Code](#creating-step-setting)                | Using `CustomStepSettingBuilder` [Sample Code](#creating-step-setting),same as SDK v2.0                                                     |
  
+## Which SDK version should I use?
+- Use the Unified SDK if you are developing custom steps to be used on the latest versions of Aperture Data Studio and especially if the step is used in real-time workflows.
+- Use SDK v2.0 if you need to develop custom steps with multiple input and/or output nodes and the step is not used in real-time workflows.
+- SDK v1.0 is not longer supported.
+
 ## Creating a custom step
 
 Once your project is set up, you can create a new class and implement the `CustomStepDefinition` interface. The newly created class will be picked up by the Data Studio UI.
