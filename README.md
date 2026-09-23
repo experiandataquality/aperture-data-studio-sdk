@@ -124,6 +124,7 @@ This repo contains the SDK JAR and a pre-configured Java project that uses Gradl
 
 | SDK version                                                                          | Compatible Data Studio version | New features released                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 |--------------------------------------------------------------------------------------|--------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [2.8.3](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.8.3) | 3.4.7 (or newer)               | <ul><li>Custom parsers now support seekable channel access for more efficient multi-pass processing, while retaining legacy stream-based compatibility. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | [2.8.2](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.8.2) | 2.14.7 (or newer)              | <ul><li>Custom file generator now supports checkbox (boolean) configuration. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | [2.8.1](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.8.1) | 2.12.6 (or newer)              | <ul><li>Included Unified SDK API</li><li>Custom file generator now supports step configuration level validation. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | [2.8.0](https://github.com/experiandataquality/aperture-data-studio-sdk/tree/v2.8.0) | 2.12.4 (or newer)              | <ul><li>Data Studio now supports custom file generator. </li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
@@ -1088,7 +1089,7 @@ affecting other plugin.
 Some notes on jar packaging: 
 
 1. Always bundle dependencies into a single jar together with the plugin.
-1. If you plan to use sdklib, your plugin jar must not contains these packages:
+2. If you plan to use sdklib, your plugin jar must not contains these packages:
 
     * _org.apache.logging.log4j:log4j-api:2.12.0_
     * _com.google.code.findbugs:jsr305:3.0.2_
@@ -1098,10 +1099,10 @@ Some notes on jar packaging:
     
     Please contact us if your plugin needs a newer version of any of the libraries above.  
     
-1. It's not recommended to bundle native driver that involved JNI/JNA as it's not trivial to load native libraries from 
+3. It's not recommended to bundle native driver that involved JNI/JNA as it's not trivial to load native libraries from 
    a jar in a distributed environment. Please contact us if your plugin needs a specific native drivers.
     
-1. When using [Gradle shadow plugin](https://imperceptiblethoughts.com/shadow/) or [Maven shade plugin](https://maven.apache.org/plugins/maven-shade-plugin/),
+4. When using [Gradle shadow plugin](https://imperceptiblethoughts.com/shadow/) or [Maven shade plugin](https://maven.apache.org/plugins/maven-shade-plugin/),
    **do not** `minimize` the uber jar as it may remove dependencies that are loaded through reflection and _service-provider-interface_. 
    
    Essentially, **don't do any of the following**:
@@ -1135,6 +1136,10 @@ Some notes on jar packaging:
        </executions>
     </plugin>
    ```
+   
+> [!NOTE]
+> When using gradle, if possible please apply the `relocate-reminder.gradle` to your build.gradle file.
+  This will remind you to relocate your dependencies to avoid classpath conflicts with other plugins.
 
 ## The Logging library
 
