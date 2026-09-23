@@ -1,0 +1,135 @@
+// Reusable relocation reminder for custom step modules.
+// Apply with: apply from: "${rootProject.projectDir}/relocate-reminder.gradle"
+
+
+def relocationReminderDefaults = [
+        ignoreGroups      : [
+                'com.experian.datastudio',
+                'com.experian',
+                'org.junit'
+        ]
+]
+def relocationReminderUser = (ext.has('relocationReminder') && ext.relocationReminder instanceof Map) ? ext.relocationReminder : [:]
+ext.relocationReminder = relocationReminderDefaults + relocationReminderUser
+ext.relocationReminder.ignoreGroups = ((ext.relocationReminder.ignoreGroups ?: []) as List<String>).collect { it.toString() }
+def relocationReminderConfig = [
+        ignoreGroups: ext.relocationReminder.ignoreGroups
+]
+
+def isIgnoredGroup = { String group ->
+    if (!group) return true
+    relocationReminderConfig.ignoreGroups.any { ignored -> group == ignored || group.startsWith("${ignored}.") }
+}
+
+def packageHintsFor = { dep ->
+    def hints = [] as Set<String>
+    if (dep.group) {
+        hints << dep.group
+        // Some libraries use package roots that match `group + artifact`.
+        if (dep.name && dep.group.startsWith('org.apache.commons')) {
+            hints << "${dep.group}.${dep.name.replace('-', '.')}"
+        }
+    }
+    return hints.findAll { it && it.contains('.') }
+}
+
+def collectRelocationPatterns = {
+    def shadowTask = tasks.findByName('shadowJar')
+    if (!shadowTask) return [] as Set<String>
+
+    def patterns = [] as Set<String>
+    if (shadowTask.hasProperty('relocators') && shadowTask.relocators) {
+        shadowTask.relocators.each { relocator ->
+            if (relocator?.hasProperty('pattern') && relocator.pattern) {
+                patterns << relocator.pattern.toString()
+            }
+        }
+    }
+    return patterns
+}
+
+tasks.register('validateRelocations') {
+    group = 'verification'
+    description = 'Writes warnings when external runtime dependencies are not relocated in shadowJar.'
+
+    doLast {
+        def dependencyConfigs = ['implementation', 'api', 'runtimeOnly', 'compile']
+                .collect { configurations.findByName(it) }
+                .findAll { it != null }
+
+        def externalDeps = []
+        dependencyConfigs.each { cfg ->
+            cfg.dependencies.each { dep ->
+                if (!dep.hasProperty('group') || !dep.group || isIgnoredGroup(dep.group.toString())) {
+                    return
+                }
+                externalDeps << dep
+            }
+        }
+
+        if (externalDeps.isEmpty()) {
+            logger.lifecycle('[relocation-reminder] No external runtime dependencies detected.')
+            return
+        }
+
+        def relocationPatterns = collectRelocationPatterns()
+        if (relocationPatterns.isEmpty()) {
+            def depList = externalDeps.collect { "  - ${it.group}:${it.name}:${it.version ?: '(no version)'}" }.unique().join('\n')
+            def message = """
+[relocation-reminder] External runtime dependencies were detected, but no shadow relocations were found.
+Dependencies:
+${depList}
+
+Add relocations in `shadowJar { ... }`, for example:
+    relocate 'org.example', '${project.name.toLowerCase()}.shaded.org.example'
+""".trim()
+
+            logger.warn(message)
+            return
+        }
+
+        def unrelocated = []
+        externalDeps.each { dep ->
+            def hints = packageHintsFor(dep)
+            if (hints.isEmpty()) return
+
+            def isRelocated = hints.any { hint ->
+                relocationPatterns.any { pattern ->
+                    hint == pattern || hint.startsWith("${pattern}.") || pattern.startsWith("${hint}.")
+                }
+            }
+
+            if (!isRelocated) {
+                unrelocated << [dep: dep, hint: hints.first()]
+            }
+        }
+
+        if (unrelocated.isEmpty()) {
+            logger.lifecycle("[relocation-reminder] Relocation check passed (${externalDeps.size()} external dependencies checked).")
+            return
+        }
+
+        def details = unrelocated.collect {
+            "  - ${it.dep.group}:${it.dep.name}:${it.dep.version ?: '(no version)'} -> missing relocation for '${it.hint}'"
+        }.join('\n')
+
+        def fixExamples = unrelocated.collect {
+            "    relocate '${it.hint}', '${project.name.toLowerCase()}.shaded.${it.hint}'"
+        }.unique().join('\n')
+
+        def message = """
+[relocation-reminder] Unrelocated external libraries detected.
+${details}
+
+Suggested shadowJar entries:
+${fixExamples}
+""".trim()
+
+        logger.warn(message)
+    }
+}
+
+tasks.matching { it.name == 'check' || it.name == 'build' }.configureEach {
+    dependsOn tasks.named('validateRelocations')
+}
+

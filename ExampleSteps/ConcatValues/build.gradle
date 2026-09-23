@@ -9,6 +9,8 @@ repositories {
     }
 }
 
+apply from: "${rootProject.projectDir}/relocate-reminder.gradle"
+
 dependencies {
     compileOnly(
             "com.experian.datastudio:sdkapi:2.3.0",
